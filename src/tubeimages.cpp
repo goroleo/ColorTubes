@@ -118,6 +118,7 @@ void TubeImages::renderImages()
     QPainter shinePainter(&shineImage);
     m_source->render(&shinePainter, QLatin1String("shine"), elementRect);
 
+    // transparency mask
     for (int y = 0; y < shineImage.height(); ++y) {
         qreal dy = qreal(y) / shineImage.height();
         if (dy < 0.3) {
@@ -149,6 +150,7 @@ void TubeImages::renderImages()
     QPainter sidePainter(&sideImage);
     m_source->render(&sidePainter, QLatin1String("side"), elementRect);
 
+    // transparency mask
     for (int x = 0; x < sideImage.width(); ++x) {
         qreal dx = qreal(x) / sideImage.width();
         if (dx < 0.2) {
@@ -195,7 +197,7 @@ void TubeImages::renderImages()
 //----------------- cork
     elementRect  = m_source->boundsOnElement(QLatin1String("cork"));
     elementRect = scaleRect(elementRect);
-    QImage corkImage (elementRect.right(), elementRect.bottom(), QImage::Format_ARGB32);
+    QImage corkImage(m_bottle->width(), elementRect.bottom()+1, QImage::Format_ARGB32);
     corkImage.fill(0x00ffffff);
     QPainter corkPainter(&corkImage);
     m_source->render(&corkPainter, QLatin1String("cork"), elementRect);
