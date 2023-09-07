@@ -76,5 +76,6 @@ RESOURCES += \
     ColorTubes.qrc
 
 QT += \
+    core \
     svg \
     quick

@@ -24,8 +24,6 @@ namespace CtGlobal
     QString paletteFile();
     QString settingsFile();
 
-
-
     // game modes
     void   setGameMode(int newMode);
     int    gameMode();
@@ -38,6 +36,10 @@ namespace CtGlobal
 
     // number of game colors
     static const int NUM_OF_COLORS = 12;
+
+    // properties
+    void onScaleChanged();
+
 
     // services
     quint32 colorStrToRgb(bool &ok, QString value);

@@ -1,6 +1,7 @@
 #include "ctglobal.h"
 
 #include <QString>
+#include <QObject>
 
 #include "io.h"
 #include "palette.h"
@@ -79,6 +80,14 @@ QString CtGlobal::settingsFile()
     else
         return QString("");
 }
+
+
+void CtGlobal::onScaleChanged()
+{
+
+}
+
+
 
 quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)
 {

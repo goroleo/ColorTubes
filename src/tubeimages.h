@@ -6,11 +6,13 @@
 #include <QPixmap>
 
 // Qt is not supported SVG transparency masks. So we have to render them manually.
-class TubeImages
+class TubeImages : public QObject
 {
+    Q_OBJECT
 public:
     static TubeImages& create();
     static TubeImages& instance();
+    TubeImages* object() const;
 
     ~TubeImages();
 
@@ -39,8 +41,6 @@ public:
     {
         return *m_cork;
     }
-
-    void setScale(qreal value);
 
     qreal scale()
     {
@@ -81,8 +81,15 @@ public:
         return m_colorArea;
     }
 
+public slots:
+    void setScale(qreal value);
+
+signals:
+    void scaleChanged(qreal newScale);
+
 private:
-    TubeImages();
+    explicit TubeImages(QObject *parent = nullptr);
+
     void initialize();
     static TubeImages* m_instance;
 

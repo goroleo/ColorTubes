@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <QObject>
 class UsedColors;
 class JctlFormat;
 class BoardModel;
@@ -11,8 +12,9 @@ class BoardModel;
 /*!
  * \brief The Game singleton class
  */
-class Game
+class Game : public QObject
 {
+    Q_OBJECT
 public:
     static Game& create();
     static Game& instance();

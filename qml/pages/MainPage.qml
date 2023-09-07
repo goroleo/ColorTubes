@@ -157,7 +157,6 @@ Page {
                 anchors.top: parent.top
                 anchors.topMargin: 20 * scale
                 shade: 3
-                scale: 1.134
             }
 
             CtImageLayer {
@@ -165,6 +164,7 @@ Page {
                 source: "bottle"
                 anchors.top: parent.top
                 anchors.topMargin: + 20 * shade.scale
+                scale: 1.546
             }
 
             CtImageLayer {

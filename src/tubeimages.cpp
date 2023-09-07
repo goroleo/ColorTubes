@@ -9,9 +9,16 @@
 
 TubeImages* TubeImages::m_instance = nullptr;
 
-// Qt is not supported SVG transparency masks. So we have to render them manually.
-TubeImages::TubeImages()
-{}
+/*
+
+  Qt is not supported SVG transparency masks. So we have to render them manually.
+
+ */
+
+TubeImages::TubeImages(QObject *parent) :
+    QObject(parent)
+{
+}
 
 TubeImages::~TubeImages()
 {
@@ -52,6 +59,11 @@ TubeImages& TubeImages::instance()
     return *m_instance;
 }
 
+TubeImages* TubeImages::object() const
+{
+    return m_instance;
+}
+
 QRectF TubeImages::colorRect(quint8 index)
 {
     QRectF result;
@@ -69,6 +81,7 @@ void TubeImages::setScale(qreal newScale)
         m_scale = newScale;
         renderImages();
         scalePoints();
+        emit scaleChanged(newScale);
     }
 }
 

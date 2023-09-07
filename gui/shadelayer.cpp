@@ -12,6 +12,8 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
       m_shadeNumber(1)
 {
     internalTimer = new QTimer(this);
+    QObject::connect(CtGlobal::images().object(), SIGNAL(TubeImages::scaleChanged),
+            this, SLOT(onScaleChanged()));
     connect(internalTimer, &QTimer::timeout, [=](){
         nextAlpha();
         prepareImage();
@@ -155,6 +157,10 @@ void ShadeLayer::setShade(int newShadeNumber)
 void ShadeLayer::setScale(qreal newScale)
 {
     CtGlobal::images().setScale(newScale);
+}
+
+void ShadeLayer::onScaleChanged()
+{
     setShade(m_shadeNumber);
 
     m_drawImage = QImage(CtGlobal::images().width(),
@@ -165,6 +171,7 @@ void ShadeLayer::setScale(qreal newScale)
     update();
     emit scaleChanged(CtGlobal::images().scale());
 }
+
 
 void ShadeLayer::setPulse(bool newPulse)
 {
