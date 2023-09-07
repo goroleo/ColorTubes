@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Application
+Icon=ColorTubes
+Name=ColorTubes
+Exec=/usr/bin/sailjail -p ColorTubes.desktop /usr/bin/ColorTubes
+# translation example:
+# your app name in German locale (de)
+#
+# Remember to comment out the following line, if you do not want to use
+# a different app name in German locale (de).
+Name[de]=Color Tubes
+Name[ru]=Цветные пробирки
+
+[X-Sailjail]
+# Permissions=Audio;Calendar;Documents;Email;Music;UserDirs
+Permissions=UserDirs
+OrganizationName=com.me.legoru
+ApplicationName=Color Tubes

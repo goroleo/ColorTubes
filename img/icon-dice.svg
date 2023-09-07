@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" width="48.75" height="48.75" viewBox="0 -48.75 48.75 48.75">
+ <g id="Dice" transform="scale(1 -1)">
+  <g id="Edges" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="#ffffff" stroke-opacity="0.6" fill="none">
+   <path d="M 24.374,40.434 L 9.805,33.343 L 9.805,16.667 L 24.375,8.329 L 38.944,16.668 L 38.944,33.343 L 24.374,40.434 Z"/>
+   <path d="M 9.805,33.343 L 24.374,25.554 L 38.944,33.343"/>
+   <path d="M 24.374,25.622 L 24.375,8.33"/>
+  </g>
+  <g id="Numbers" fill="#ffffff">
+   <ellipse rx="1.187" ry="1.987" transform="translate(24.374 36.306) rotate(90)"/>
+   <ellipse rx="1.187" ry="1.987" transform="translate(19.981 32.273) rotate(90)"/>
+   <ellipse rx="1.187" ry="1.988" transform="translate(28.8 32.273) rotate(90)"/>
+   <ellipse rx="2.131" ry="1.25" transform="translate(16.333 20.936) rotate(90) skewX(26.7846)"/>
+   <ellipse rx="2.131" ry="1.249" transform="translate(34.145 24.375) rotate(90) skewX(-26.7665)"/>
+   <ellipse rx="2.131" ry="1.25" transform="translate(29.078 16.899) rotate(90) skewX(-26.7846)"/>
+  </g>
+ </g>
+</svg>

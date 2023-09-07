@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/tube.svg</file>
+        <file>img/bg-pattern.png</file>
+        <file>img/icon-dice.svg</file>
+        <file>img/icon-gear.svg</file>
+        <file>img/icon-star.svg</file>
+        <file>img/icon-undo.svg</file>
+    </qresource>
+</RCC>
