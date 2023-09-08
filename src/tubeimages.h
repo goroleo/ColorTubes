@@ -12,7 +12,6 @@ class TubeImages : public QObject
 public:
     static TubeImages& create();
     static TubeImages& instance();
-    TubeImages* object() const;
 
     ~TubeImages();
 

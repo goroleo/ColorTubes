@@ -37,14 +37,17 @@ qreal TubeFlyer::scale()
 void TubeFlyer::setScale(qreal newScale)
 {
     CtGlobal::images().setScale(newScale);
+}
 
-    m_drawImage = QImage(280 * newScale,
-                         200 * newScale,
+void TubeFlyer::onScaleChanged()
+{
+    m_drawImage = QImage(280 * scale(),
+                         200 * scale(),
                          QImage::Format_ARGB32);
     m_drawImage.fill(0x00ffffff);
 
     update();
-    emit scaleChanged(CtGlobal::images().scale());
+    emit scaleChanged(scale());
 }
 
 qreal TubeFlyer::angle()

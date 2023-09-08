@@ -12,7 +12,7 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
       m_shadeNumber(1)
 {
     internalTimer = new QTimer(this);
-    QObject::connect(CtGlobal::images().object(), SIGNAL(TubeImages::scaleChanged),
+    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
     connect(internalTimer, &QTimer::timeout, [=](){
         nextAlpha();
@@ -119,6 +119,24 @@ qreal ShadeLayer::scale()
     return CtGlobal::images().scale();
 }
 
+void ShadeLayer::setScale(qreal newScale)
+{
+    CtGlobal::images().setScale(newScale);
+}
+
+void ShadeLayer::onScaleChanged()
+{
+    setShade(m_shadeNumber);
+
+    m_drawImage = QImage(CtGlobal::images().width(),
+                         CtGlobal::images().height(),
+                         QImage::Format_ARGB32);
+    m_drawImage.fill(0x00ffffff);
+    prepareImage();
+    update();
+    emit scaleChanged(scale());
+}
+
 int ShadeLayer::shade()
 {
     return m_shadeNumber;
@@ -152,24 +170,6 @@ void ShadeLayer::setShade(int newShadeNumber)
         m_shadeImage = CtGlobal::images().shadeBlue().toImage();
         break;
     }
-}
-
-void ShadeLayer::setScale(qreal newScale)
-{
-    CtGlobal::images().setScale(newScale);
-}
-
-void ShadeLayer::onScaleChanged()
-{
-    setShade(m_shadeNumber);
-
-    m_drawImage = QImage(CtGlobal::images().width(),
-                         CtGlobal::images().height(),
-                         QImage::Format_ARGB32);
-    m_drawImage.fill(0x00ffffff);
-    prepareImage();
-    update();
-    emit scaleChanged(CtGlobal::images().scale());
 }
 
 

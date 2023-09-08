@@ -31,6 +31,9 @@ signals:
     void scaleChanged(const qreal newScale);
     void sourceChanged(const int newShadeNumber);
 
+private slots:
+    void onScaleChanged();
+
 private:
     void prepareImage();
 
@@ -38,6 +41,7 @@ private:
     bool    m_visible = true;
 
     QImage  m_drawImage;
+
 };
 
 #endif // IMAGELAYER_H

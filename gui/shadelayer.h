@@ -43,6 +43,9 @@ signals:
     void shadeChanged(const int newShadeNumber);
     void pulseChanged(const bool newPulse);
 
+private slots:
+    void onScaleChanged();
+
 private:
     void nextAlpha();
     void prepareImage();
@@ -63,9 +66,6 @@ private:
     const float ALPHA_INC_DOWN = -0.06;
     const int   TIMER_TICKS = 5;
     const int   TIMER_PULSE_TICKS = 9;
-
-private slots:
-    void onScaleChanged();
 
 };
 

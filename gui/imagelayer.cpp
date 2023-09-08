@@ -9,6 +9,8 @@
 CtImageLayer::CtImageLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent)
 {
+    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
+            this, SLOT(onScaleChanged()));
 }
 
 CtImageLayer::~CtImageLayer()
@@ -59,6 +61,10 @@ void CtImageLayer::setSource(QString newSource)
 void CtImageLayer::setScale(qreal newScale)
 {
     CtGlobal::images().setScale(newScale);
+}
+
+void CtImageLayer::onScaleChanged()
+{
     setSource(m_source);
     update();
     emit scaleChanged(CtGlobal::images().scale());

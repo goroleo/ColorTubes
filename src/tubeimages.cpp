@@ -59,11 +59,6 @@ TubeImages& TubeImages::instance()
     return *m_instance;
 }
 
-TubeImages* TubeImages::object() const
-{
-    return m_instance;
-}
-
 QRectF TubeImages::colorRect(quint8 index)
 {
     QRectF result;

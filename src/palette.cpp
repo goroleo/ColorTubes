@@ -2,10 +2,9 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QDebug>
 
 #include "ctglobal.h"
-#include "io.h"
+// #include "io.h"
 
 
 Palette* Palette::m_instance = nullptr;
@@ -93,11 +92,7 @@ bool Palette::load()
 
     qDebug() << "Palette file" << CtGlobal::paletteFile();
     if (!CtGlobal::io().loadJson(CtGlobal::paletteFile(), jObj))
-    {
-        qDebug() << "Palette file load failure";
         return false;
-    }
-    qDebug() << "Palette file load success";
 
     int count = 0;
     QString key;
@@ -111,7 +106,7 @@ bool Palette::load()
         // check count
         if (jPal.contains("count") && jPal["count"].isString())
             count = jPal["count"].toString().toInt(&result, 10);
-        result = result && count != CtGlobal::NUM_OF_COLORS;
+        result = result && count == CtGlobal::NUM_OF_COLORS;
 
         // process palette's colors
         int i = 0;
@@ -156,8 +151,6 @@ bool Palette::load()
             } else result = false;
         } else result = false;
     }
-
-    qDebug() << "Palette file load result" << result;
     return result;
 }
 
@@ -185,9 +178,6 @@ bool Palette::save()
     jObj["colors"] = jItem;
 
     // save
-    bool result = CtGlobal::io().saveJson(CtGlobal::paletteFile(), jObj);
-    qDebug() << "Palette save result" << result;
-
-    return result;
+    return CtGlobal::io().saveJson(CtGlobal::paletteFile(), jObj);
 }
 

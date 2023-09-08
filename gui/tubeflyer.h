@@ -34,6 +34,9 @@ signals:
     void scaleChanged(const qreal newScale);
     void angleChanged(const qreal newAngle);
 
+private slots:
+    void onScaleChanged();
+
 private:
     void nextAngle();
     void calculatePoints();
@@ -51,7 +54,6 @@ private:
     const int   TIMER_TICKS = 5;
 
 // ~~~~~~~~~
-
 
 
 

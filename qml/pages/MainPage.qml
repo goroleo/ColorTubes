@@ -148,14 +148,13 @@ Page {
             id: tubeItem
 
             width: bottle.width
-            height: bottle.height + 20 * shade.scale
+            height: bottle.height + 20 * bottle.scale
             anchors.top: levelLabel.bottom
 
             ShadeLayer {
                 id: shade
-
                 anchors.top: parent.top
-                anchors.topMargin: 20 * scale
+                anchors.topMargin: 20 * bottle.scale
                 shade: 3
             }
 
@@ -163,8 +162,8 @@ Page {
                 id: bottle
                 source: "bottle"
                 anchors.top: parent.top
-                anchors.topMargin: + 20 * shade.scale
-                scale: 1.546
+                anchors.topMargin: + 20 * scale
+                scale: 1.0994
             }
 
             CtImageLayer {
@@ -173,16 +172,6 @@ Page {
                 anchors.top: parent.top
                 anchors.topMargin: 0
                 visible: false
-
-                PropertyAnimation {
-                    id: animateVisible;
-                    property: "opacity";
-                    from: visible ? 1 : 0
-                    to: visible ? 0 : 1
-                    duration: 1000;
-                }
-
-                onVisibleChanged: { animateVisible.start() }
             }
 
 //            TubeFlyer {
