@@ -1,8 +1,9 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import ShadeLayer 1.0
-import CtImageLayer 1.0
-import TubeFlyer 1.0
+import BottleLayer 1.0
+import ColorsLayer 1.0
+import CorkLayer 1.0
 
 Page {
     id: page
@@ -111,7 +112,9 @@ Page {
         Label {
             id: levelLabel
             anchors.top: pulldown.bottom
-            anchors.bottom: rect.top
+//            anchors.bottom: rect.top
+            anchors.topMargin: Theme.paddingLarge * 2
+            anchors.bottomMargin: Theme.paddingLarge
 
             width: parent.width
             text: "Level 145"
@@ -125,7 +128,7 @@ Page {
             }
         }
 
-
+/*
         Rectangle {
             id: rect
 
@@ -142,35 +145,57 @@ Page {
             anchors.centerIn: parent
 
         }
-
+*/
         Item {
 
             id: tubeItem
 
-            width: bottle.width
-            height: bottle.height + 20 * bottle.scale
+            width: colors.width
+            height: colors.height
             anchors.top: levelLabel.bottom
+            anchors.horizontalCenter: parent.Center
 
             ShadeLayer {
                 id: shade
                 anchors.top: parent.top
                 anchors.topMargin: 20 * bottle.scale
+                anchors.left: parent.left
+                anchors.leftMargin: 100 * bottle.scale
+
                 shade: 3
             }
 
-            CtImageLayer {
+            BottleLayer {
+                id: bottle_back
+                source: "back"
+                anchors.top: parent.top
+                anchors.topMargin: 20 * bottle.scale
+                anchors.left: parent.left
+                anchors.leftMargin: 100 * bottle.scale
+            }
+
+            ColorsLayer {
+                id: colors
+                anchors.top: parent.top
+                anchors.left: parent.left
+                angle: 30/180*3.1415926
+            }
+
+            BottleLayer {
                 id: bottle
                 source: "bottle"
                 anchors.top: parent.top
-                anchors.topMargin: + 20 * scale
-                scale: 1.0994
+                anchors.topMargin: 35.5 * scale
+                anchors.left: parent.left
+                anchors.leftMargin: 100 * scale
+                scale: 1
             }
 
-            CtImageLayer {
+            CorkLayer {
                 id: cork
-                source: "cork"
                 anchors.top: parent.top
-                anchors.topMargin: 0
+                anchors.left: parent.left
+                anchors.leftMargin: 100 * scale
                 visible: false
             }
 
@@ -179,21 +204,25 @@ Page {
 //            }
 
             MouseArea {
-                width: parent.width
-                height: parent.height
+                anchors.leftMargin: 100 * bottle.scale;
+                anchors.topMargin: 20 * bottle.scale;
+                width: bottle.width
+                height: bottle.height
                 onClicked: {
-//                    if (!shade.visible)
-//                        shade.shade = shade.shade + 1
+                    colors.fillColors(11, 1)
 
-///                    if (!shade.pulse)
-//                        shade.shade = shade.shade + 1
+                    if (!shade.visible)
+                        shade.shade = shade.shade + 1
 
-//                    if (shade.shade == 4)
-//                        shade.shade = 1
+                    // if (!shade.pulse)
+                    //   shade.shade = shade.shade + 1
+
+                    if (shade.shade == 4)
+                        shade.shade = 1
 
                     shade.visible ? shade.startHide() : shade.startShow()
-                    cork.visible = shade.visible;
-//                    shade.pulse ? shade.stopPulse() : shade.startPulse()
+                    cork.visible = ((shade.visible) && (shade.shade == 3))
+                    //                    shade.pulse ? shade.stopPulse() : shade.startPulse()
                 }
             }
 

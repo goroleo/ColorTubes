@@ -20,6 +20,16 @@ public:
         return *m_bottle;
     }
 
+    QPixmap bottleBack()
+    {
+        return *m_bottleBack;
+    }
+
+    QPixmap bottleFront()
+    {
+        return *m_bottleFront;
+    }
+
     QPixmap shadeYellow()
     {
         return *m_shadeYellow;
@@ -100,6 +110,8 @@ private:
     QSvgRenderer *m_source;
 
     QPixmap *m_bottle;
+    QPixmap *m_bottleBack;
+    QPixmap *m_bottleFront;
     QPixmap *m_shadeYellow;
     QPixmap *m_shadeGreen;
     QPixmap *m_shadeBlue;

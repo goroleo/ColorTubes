@@ -15,8 +15,6 @@ class ShadeLayer : public QQuickPaintedItem
     Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(bool visible READ visible )
     Q_PROPERTY(bool pulse READ pulse WRITE setPulse NOTIFY pulseChanged)
-//    Q_PROPERTY(int width READ width WRITE setWidth)
-//    Q_PROPERTY(int height READ height WRITE setHeight)
 
 public:
     explicit ShadeLayer(QQuickItem *parent = 0);
@@ -51,7 +49,6 @@ private:
     void prepareImage();
 
     quint8      m_shadeNumber;
-//    qreal       m_scale;
     bool        m_visible = false;
     bool        m_pulse = false;
 
@@ -64,8 +61,8 @@ private:
 
     const float ALPHA_INC_UP = 0.03;
     const float ALPHA_INC_DOWN = -0.06;
-    const int   TIMER_TICKS = 5;
-    const int   TIMER_PULSE_TICKS = 9;
+    const int   TIMER_TICKS = 20;
+    const int   TIMER_PULSE_TICKS = 20;
 
 };
 

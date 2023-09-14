@@ -21,7 +21,9 @@ SOURCES += src/ColorTubes.cpp \
     core/moveitem.cpp \
     core/tubemodel.cpp \
     core/usedcolors.cpp \
-    gui/imagelayer.cpp \
+    gui/bottlelayer.cpp \
+    gui/colorslayer.cpp \
+    gui/corklayer.cpp \
     gui/old_tubeflyer.cpp \
     gui/shadelayer.cpp \
     gui/tubeflyer.cpp \
@@ -62,7 +64,9 @@ HEADERS += \
     core/moveitem.h \
     core/tubemodel.h \
     core/usedcolors.h \
-    gui/imagelayer.h \
+    gui/bottlelayer.h \
+    gui/colorslayer.h \
+    gui/corklayer.h \
     gui/old_tubeflyer.h \
     gui/shadelayer.h \
     gui/tubeflyer.h \

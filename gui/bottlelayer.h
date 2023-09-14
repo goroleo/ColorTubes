@@ -1,12 +1,12 @@
-#ifndef IMAGELAYER_H
-#define IMAGELAYER_H
+#ifndef BOTTLELAYER_H
+#define BOTTLELAYER_H
 
 #include <QObject>
 #include <QQuickPaintedItem>
-#include <QPainter>
-#include <QImage>
+//#include <QPainter>
+#include <QPixmap>
 
-class CtImageLayer : public QQuickPaintedItem
+class BottleLayer : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
@@ -14,8 +14,8 @@ class CtImageLayer : public QQuickPaintedItem
 //    Q_PROPERTY(bool visible READ visible )
 
 public:
-    explicit CtImageLayer(QQuickItem *parent = 0);
-    ~CtImageLayer();
+    explicit BottleLayer(QQuickItem *parent = 0);
+    ~BottleLayer();
 
     void paint(QPainter *painter) override;
 
@@ -40,8 +40,8 @@ private:
     QString m_source;
     bool    m_visible = true;
 
-    QImage  m_drawImage;
+    QPixmap  m_drawImage;
 
 };
 
-#endif // IMAGELAYER_H
+#endif // BOTTLELAYER_H

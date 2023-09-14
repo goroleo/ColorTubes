@@ -4,9 +4,11 @@
 #include "core/boardmodel.h"
 #include "core/tubemodel.h"
 #include "core/usedcolors.h"
-#include "gui/tubeflyer.h"
+//#include "gui/tubeflyer.h"
 #include "gui/shadelayer.h"
-#include "gui/imagelayer.h"
+#include "gui/bottlelayer.h"
+#include "gui/colorslayer.h"
+#include "gui/corklayer.h"
 
 Game* Game::m_instance = nullptr;
 
@@ -42,7 +44,8 @@ void Game::initialize()
     board = new BoardModel();
 
     qmlRegisterType<ShadeLayer>("ShadeLayer",1,0,"ShadeLayer");
-    qmlRegisterType<TubeFlyer>("TubeFlyer",1,0,"TubeFlyer");
-    qmlRegisterType<CtImageLayer>("CtImageLayer",1,0,"CtImageLayer");
+    qmlRegisterType<BottleLayer>("BottleLayer",1,0,"BottleLayer");
+    qmlRegisterType<ColorsLayer>("ColorsLayer",1,0,"ColorsLayer");
+    qmlRegisterType<CorkLayer>("CorkLayer",1,0,"CorkLayer");
 }
 

@@ -5,9 +5,6 @@
 class UsedColors;
 class JctlFormat;
 class BoardModel;
-//class TubeFlyer;
-//class ShadeLayer;
-//class CtImageLayer;
 
 /*!
  * \brief The Game singleton class
@@ -31,10 +28,6 @@ public:
 private:
     Game() {};
     void initialize();
-
-//    TubeFlyer *flyer;
-//    ShadeLayer *shadeLayer;
-//    CtImageLayer *imageLayer;
 
     int gameMode;
     static Game* m_instance;

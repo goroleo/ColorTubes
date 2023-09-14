@@ -11,9 +11,20 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent),
       m_shadeNumber(1)
 {
-    internalTimer = new QTimer(this);
+
+    m_drawImage = QImage(80, 180, QImage::Format_ARGB32);
+
+    setWidth(80);
+    setHeight(180);
+
+    m_drawImage.fill(0x00ffffff);
+
+
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
+
+
+    internalTimer = new QTimer(this);
     connect(internalTimer, &QTimer::timeout, [=](){
         nextAlpha();
         prepareImage();
@@ -29,6 +40,7 @@ ShadeLayer::~ShadeLayer()
 void ShadeLayer::startShow()
 {
     m_visible = true;
+    m_pulse = false;
     m_alphaIncrement = ALPHA_INC_UP;
     if (!internalTimer->isActive()) {
         internalTimer->start(TIMER_TICKS);
@@ -38,6 +50,7 @@ void ShadeLayer::startShow()
 void ShadeLayer::startHide()
 {
     m_visible = false;
+    m_pulse = false;
     m_alphaIncrement = ALPHA_INC_DOWN;
     if (!internalTimer->isActive()) {
         internalTimer->start(TIMER_TICKS);
@@ -70,7 +83,7 @@ void ShadeLayer::nextAlpha()
 {
     m_alpha += m_alphaIncrement;
 
-    if (m_alphaIncrement > 0) {
+    if (m_visible) {
         if (m_alpha > 1) {
             m_alpha = 1.0;
             if (m_pulse) {
@@ -105,8 +118,6 @@ void ShadeLayer::prepareImage()
             }
         }
 
-    setWidth(CtGlobal::images().width());
-    setHeight(CtGlobal::images().height());
 }
 
 void ShadeLayer::paint(QPainter *painter)
@@ -131,6 +142,10 @@ void ShadeLayer::onScaleChanged()
     m_drawImage = QImage(CtGlobal::images().width(),
                          CtGlobal::images().height(),
                          QImage::Format_ARGB32);
+
+    setWidth(CtGlobal::images().width());
+    setHeight(CtGlobal::images().height());
+
     m_drawImage.fill(0x00ffffff);
     prepareImage();
     update();

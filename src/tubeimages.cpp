@@ -24,6 +24,8 @@ TubeImages::~TubeImages()
 {
     delete m_source;
     delete m_bottle;
+    delete m_bottleFront;
+    delete m_bottleBack;
     delete m_shadeYellow;
     delete m_shadeGreen;
     delete m_shadeBlue;
@@ -44,14 +46,16 @@ void TubeImages::initialize()
 {
     m_source = new QSvgRenderer(QLatin1String(":/img/tube.svg"));
     m_bottle = new QPixmap;
+    m_bottleFront = new QPixmap;
+    m_bottleBack = new QPixmap;
     m_shadeYellow = new QPixmap;
     m_shadeGreen = new QPixmap;
     m_shadeBlue = new QPixmap;
     m_cork = new QPixmap;
     m_points = new QPointF[6];
 
-    renderImages();
     scalePoints();
+    renderImages();
 }
 
 TubeImages& TubeImages::instance()
@@ -63,7 +67,7 @@ QRectF TubeImages::colorRect(quint8 index)
 {
     QRectF result;
     result.setX(m_points[3].x());
-    result.setY(m_points[3].y() - m_colorHeight * index);
+    result.setY(m_points[3].y() - m_colorHeight * (index+1));
     result.setHeight(m_colorHeight);
     result.setWidth(m_colorWidth);
     return result;
@@ -74,8 +78,8 @@ void TubeImages::setScale(qreal newScale)
     if (!qFuzzyCompare(m_scale, newScale))
     {
         m_scale = newScale;
-        renderImages();
         scalePoints();
+        renderImages();
         emit scaleChanged(newScale);
     }
 }
@@ -89,7 +93,7 @@ void TubeImages::scalePoints()
     m_points[4] = QPointF(14.0, 26.0) * m_scale;
     m_points[5] = QPointF(20.0, 15.5) * m_scale;
     m_colorHeight = (m_points[2].y() - m_points[1].y()) / 4;
-    m_colorWidth = m_points[2].x() - m_points[2].x();
+    m_colorWidth = m_points[2].x() - m_points[3].x();
     m_colorArea = m_colorWidth * m_colorHeight;
 }
 
@@ -182,6 +186,16 @@ void TubeImages::renderImages()
     elementRect = scaleRect(elementRect);
     m_source->render(&painter, QLatin1String("bottle"), elementRect);
     m_bottle->convertFromImage(image);
+
+    // back side
+    elementRect = image.rect();
+    elementRect.setHeight(m_points[0].y());
+    *m_bottleBack = m_bottle->copy(elementRect.toRect());
+
+    // front side
+    elementRect = image.rect();
+    elementRect.adjust(0, m_points[0].y(), 0, 0);
+    *m_bottleFront = m_bottle->copy(elementRect.toRect());
 
 //----------------- shades
     image.fill(0x00ffffff);

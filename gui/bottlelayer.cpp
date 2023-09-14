@@ -1,69 +1,76 @@
-#include "imagelayer.h"
+#include "bottlelayer.h"
 
 #include <QPixmap>
+#include <QPainter>
 #include <QtDebug>
 
 #include "src/ctglobal.h"
 #include "src/tubeimages.h"
 
-CtImageLayer::CtImageLayer(QQuickItem *parent) :
+BottleLayer::BottleLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent)
 {
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 }
 
-CtImageLayer::~CtImageLayer()
+BottleLayer::~BottleLayer()
 {
 }
 
-void CtImageLayer::prepareImage()
+void BottleLayer::prepareImage()
 {
 }
 
-void CtImageLayer::paint(QPainter *painter)
+void BottleLayer::paint(QPainter *painter)
 {
-    painter->drawImage(0, 0, m_drawImage);
+    painter->drawPixmap(0, 0, m_drawImage);
 }
 
-QString CtImageLayer::source()
+QString BottleLayer::source()
 {
     return m_source;
 }
 
-qreal CtImageLayer::scale()
+qreal BottleLayer::scale()
 {
     return CtGlobal::images().scale();
 }
 
-bool CtImageLayer::visible()
+bool BottleLayer::visible()
 {
     return m_visible;
 }
 
-void CtImageLayer::setSource(QString newSource)
+void BottleLayer::setSource(QString newSource)
 {
     if (newSource.compare("bottle", Qt::CaseInsensitive) == 0)
     {
         m_source = newSource;
-        m_drawImage = CtGlobal::images().bottle().toImage();
+        m_drawImage = CtGlobal::images().bottleFront();
     }
+    else if (newSource.compare("back", Qt::CaseInsensitive) == 0)
+    {
+        m_source = newSource;
+        m_drawImage = CtGlobal::images().bottleBack();
+    }
+
     else if (newSource.compare("cork", Qt::CaseInsensitive) == 0)
     {
         m_source = newSource;
-        m_drawImage = CtGlobal::images().cork().toImage();
+        m_drawImage = CtGlobal::images().cork();
     }
 
     setWidth(m_drawImage.width());
     setHeight(m_drawImage.height());
 }
 
-void CtImageLayer::setScale(qreal newScale)
+void BottleLayer::setScale(qreal newScale)
 {
     CtGlobal::images().setScale(newScale);
 }
 
-void CtImageLayer::onScaleChanged()
+void BottleLayer::onScaleChanged()
 {
     setSource(m_source);
     update();

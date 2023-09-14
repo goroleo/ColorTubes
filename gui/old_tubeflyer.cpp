@@ -31,10 +31,9 @@ old_TubeFlyer::old_TubeFlyer(QQuickItem *parent) :
     internalTimer = new QTimer(this);
     connect(internalTimer, &QTimer::timeout, [=](){
         rotateBottlePoints();
-        fillColors();
+        drawColors();
         update();
     });
-
 }
 
 old_TubeFlyer::~old_TubeFlyer()
@@ -213,7 +212,7 @@ void old_TubeFlyer::clearColorsPoints()
 }
 
 
-void old_TubeFlyer::fillColors()
+void old_TubeFlyer::drawColors()
 {
     bottleDrawn = false;
     m_drawImage.fill(0x00ffffff);

@@ -49,7 +49,7 @@ private:
 
     qreal getIntersection(quint8 point);    // the intersection of the horizontal line from bottle vertices
 
-    void fillColors();
+    void drawColors();
     void nextSegment();
 
     void drawColorCell();
@@ -60,8 +60,6 @@ private:
         qint8 pointNumber;
         qreal x;
         qreal y;
-        qreal r; // polar radius from the rotation point
-        qreal a; // polar angle from the rotation point
     };
 
     struct PointP {

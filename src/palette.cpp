@@ -4,7 +4,7 @@
 #include <QJsonObject>
 
 #include "ctglobal.h"
-// #include "io.h"
+#include "io.h"
 
 
 Palette* Palette::m_instance = nullptr;
@@ -90,7 +90,6 @@ bool Palette::load()
 {
     QJsonObject jObj;
 
-    qDebug() << "Palette file" << CtGlobal::paletteFile();
     if (!CtGlobal::io().loadJson(CtGlobal::paletteFile(), jObj))
         return false;
 
