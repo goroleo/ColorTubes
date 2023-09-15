@@ -178,7 +178,7 @@ Page {
                 id: colors
                 anchors.top: parent.top
                 anchors.left: parent.left
-                angle: -95/180*3.1415926
+                angle: 0
             }
 
             BottleLayer {
@@ -211,19 +211,19 @@ Page {
                 onClicked: {
                     colors.fillColors(11, 1)
 
-                    if (!shade.visible)
-                        shade.shade = shade.shade + 1
+//                    if (!shade.visible)
+//                        shade.shade = shade.shade + 1
 
-                    // if (!shade.pulse)
-                    //   shade.shade = shade.shade + 1
+                    if (!shade.pulse)
+                       shade.shade = shade.shade + 1
 
                     if (shade.shade == 4)
                         shade.shade = 1
 
-                    colors.setAngle(colors.angle + 5/180*3.1415926)
-                    shade.visible ? shade.startHide() : shade.startShow()
+//                    colors.setAngle(colors.angle + 5/180*3.1415926)
+//                    shade.visible ? shade.startHide() : shade.startShow()
                     cork.visible = ((shade.visible) && (shade.shade == 3))
-                    //                    shade.pulse ? shade.stopPulse() : shade.startPulse()
+                    shade.pulse ? shade.stopPulse() : shade.startPulse()
                 }
             }
 

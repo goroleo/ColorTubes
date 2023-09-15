@@ -291,7 +291,7 @@ void ColorsLayer::nextSegment()
         m_sliceArea = 0;
         m_sliceCurrent++;
 
-        if (m_topLine.v == 0) // and is this the last segment?
+        if (m_topLine.v == 0) // is this the last segment?
         {
             drawColorCell();
             clearColorSegments();
@@ -316,8 +316,8 @@ void ColorsLayer::nextSegment()
             newHeight = 2 * m_fillArea / dx1;
 
         } else if (qFuzzyIsNull(dx1))  {
-            // This is alomst impossible, but let it be.
-            // The current segment is a triangle.
+            // This is almost impossible, but let it be.
+            // The current segment is a triangle too.
             newHeight = 2 * m_fillArea / dx0;
 
         }  else if (qFuzzyCompare(dx0, dx1)) {
@@ -416,7 +416,6 @@ void ColorsLayer::setAngle(qreal newAngle)
     }
 
 // --- calculate edges before sorting points
-    qDebug() << "edges:";
     for (qint8 i = 0; i < 5; i++)
     {
         edgeLines[i] = QLineF(tubeVertices[i].x, tubeVertices[i].y,
@@ -429,7 +428,6 @@ void ColorsLayer::setAngle(qreal newAngle)
     for (qint8 i = 1; i < 6; ++i) {
         temp = tubeVertices[i];
         j = i;
-
         while ( (j > 0) && (tubeVertices[j-1].y < temp.y) ) {
             tubeVertices[j] = tubeVertices[j-1];
             j--;
@@ -437,53 +435,34 @@ void ColorsLayer::setAngle(qreal newAngle)
         tubeVertices[j] = temp;
     }
 
-    qDebug() << "after points sort:";
-    for (int i = 0; i < 6; ++i) {
-        qDebug() << "point:" << i
-                 << "p_num:" << tubeVertices[i].v
-                 << "x:"     << tubeVertices[i].x
-                 << "y:"     << tubeVertices[i].y;
-    }
-
 // --- calculate slices
     clearSlices();
     if (tubeVertices[0].v != 0)             // rotation point must be not a lowest point
     {
-        quint8 currentPoint;
+        quint8 currentVertex;
 
         // lowest point(s)
         if (qFuzzyCompare(qAbs(m_angle), (qreal)M_PI_2))
         {   // if angle = +-90 deg, we have two lowest points
             addSlice(tubeVertices[1].v, tubeVertices[0].x,
                     tubeVertices[1].x, tubeVertices[1].y);
-            currentPoint = 1;
-            qDebug() << "lowest:" << tubeVertices[0].v << "-" << tubeVertices[1].v;
+            currentVertex = 1;
         }
         else
         {
             addSlice(tubeVertices[0].v, tubeVertices[0].x,
                     tubeVertices[0].x, tubeVertices[0].y);
-            currentPoint = 0;
-            qDebug() << "lowest:" << tubeVertices[0].v;
+            currentVertex = 0;
         }
 
         // other points
         do {
-            currentPoint++;
-            addSlice(tubeVertices[currentPoint].v,
-                    getIntersection(currentPoint),
-                    tubeVertices[currentPoint].x,
-                    tubeVertices[currentPoint].y);
-        } while (tubeVertices[currentPoint].v != 0);
-    }
-
-    qDebug() << "slices:" << m_slicesCount;
-    for (int i = 0; i < m_slicesCount; ++i) {
-        qDebug() << "slice:" << i
-                 << "p_num:" << tubeSlices[i].v
-                 << "x1:"    << tubeSlices[i].x1
-                 << "x2:"    << tubeSlices[i].x2
-                 << "y:"     << tubeSlices[i].y;
+            currentVertex++;
+            addSlice(tubeVertices[currentVertex].v,
+                    getIntersection(currentVertex),
+                    tubeVertices[currentVertex].x,
+                    tubeVertices[currentVertex].y);
+        } while (tubeVertices[currentVertex].v != 0);
     }
 
     emit angleChanged(m_angle);
@@ -514,8 +493,8 @@ qreal ColorsLayer::getIntersection(quint8 vertex)
     qint8 line = 0;
     while (line < 5)
     {
-        if ((line != tubeVertices[vertex].v)
-            && (line + 1 != tubeVertices[vertex].v))
+        if ((tubeVertices[vertex].v != line)
+            && (tubeVertices[vertex].v) != line + 1)
         {
             qreal minY = qMin(edgeLines[line].p1().y(), edgeLines[line].p2().y());
             qreal maxY = qMax(edgeLines[line].p1().y(), edgeLines[line].p2().y());
@@ -532,22 +511,13 @@ qreal ColorsLayer::getIntersection(quint8 vertex)
     return -1000;
 }
 
-
 void ColorsLayer::addColorSegment(SliceF line)
 {
     addColorSegment(line.x1, line.x2, line.y);
 }
 
-
 void ColorsLayer::addColorSegment(qreal x1, qreal x2, qreal y)
 {
-    qDebug() << "color No" << m_colorCurrent
-             << "segment No" << m_segmentsCount
-             << "x1:"    << qMin(x1, x2)
-             << "x2:"    << qMax(x1, x2)
-             << "y:"     << y;
-
-
     colorSegments[m_segmentsCount].x1 = qMin(x1, x2);
     colorSegments[m_segmentsCount].x2 = qMax(x1, x2);
     colorSegments[m_segmentsCount].y = y;

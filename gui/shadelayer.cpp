@@ -87,6 +87,7 @@ void ShadeLayer::nextAlpha()
         if (m_alpha > 1) {
             m_alpha = 1.0;
             if (m_pulse) {
+                m_visible = false;
                 m_alphaIncrement = ALPHA_INC_DOWN;
             } else {
                 internalTimer->stop();
@@ -96,6 +97,7 @@ void ShadeLayer::nextAlpha()
         if (m_alpha < 0) {
             m_alpha = 0.0;
             if (m_pulse) {
+                m_visible = true;
                 m_alphaIncrement = ALPHA_INC_UP;
             } else {
                 internalTimer->stop();
