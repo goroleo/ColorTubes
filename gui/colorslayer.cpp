@@ -17,7 +17,7 @@ ColorsLayer::ColorsLayer(QQuickItem *parent) :
     m_colors[1] = 8;
     m_colors[2] = 1;
     m_colors[3] = 10;
-    m_count = 1;
+    m_count = 4;
 
 // tilt angles
     m_tiltAngles = new qreal[5];
@@ -28,15 +28,15 @@ ColorsLayer::ColorsLayer(QQuickItem *parent) :
     m_tiltAngles[4] = 26.9970  / 180 * M_PI;
 
 // coordinates
-    bottleCoordinates = new PointF[6];
-    bottlePolarCoordinates = new PointP[6];
-    edgeLines = new QLineF[4];
-    slicesCoordinates = new SegmentCoo[6];
-    segmentsCoordinates = new SegmentCoo[6];
+    tubeVertices = new PointF[6];
+    edgeLines = new QLineF[5];
+    tubeSlices = new SliceF[6];
+    colorSegments = new SliceF[6];
 
 
     m_drawImage = new QImage(280, 200, QImage::Format_ARGB32);
     m_painter = new QPainter(m_drawImage);
+    m_painter->setPen(Qt::NoPen);
     setWidth(280);
     setHeight(200);
 
@@ -68,11 +68,10 @@ ColorsLayer::~ColorsLayer()
     delete m_rotateTimer;
 
 
-    delete [] bottlePolarCoordinates;
-    delete [] bottleCoordinates;
+    delete [] tubeVertices;
     delete [] edgeLines;
-    delete [] slicesCoordinates;
-    delete [] segmentsCoordinates;
+    delete [] tubeSlices;
+    delete [] colorSegments;
 
 }
 
@@ -124,23 +123,63 @@ void ColorsLayer::drawColors()
             m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(m_colors[i]));
         }
     }
+    else
+    {
+        m_colorCurrent = 0;
+        m_sliceCurrent = 0;
+        clearColorSegments();
+        m_fillArea = CtGlobal::images().colorArea();
+
+        while (m_sliceCurrent < m_slicesCount-1
+               && m_colorCurrent < m_count)
+        {
+            nextSegment();
+            if (qFuzzyIsNull(m_fillArea))
+                m_fillArea = CtGlobal::images().colorArea();
+        }
+    }
+
+}
+
+void ColorsLayer::drawColorCell()
+{
+    QPainterPath path;
+    path.moveTo(colorSegments[0].x1, colorSegments[0].y);
+    int i = 1;
+    do {
+        path.lineTo(colorSegments[i].x1, colorSegments[i].y);
+        i++;
+    } while (i != m_segmentsCount);
+    do {
+        i--;
+        path.lineTo(colorSegments[i].x2, colorSegments[i].y);
+    } while (i != 0);
+    path.lineTo(colorSegments[0].x1, colorSegments[0].y);
+
+    path.translate(100 * scale(), 20 * scale());
+    m_painter->setBrush(QBrush(CtGlobal::palette().getColor(m_colors[m_colorCurrent])));
+    m_painter->setPen(Qt::NoPen);
+
+    m_painter->drawPath(path);
+
 }
 
 void ColorsLayer::fillColors(quint8 colorNum, quint8 count)
 {
-    if (m_rotateTimer->isActive())
+    if (!qFuzzyIsNull(m_angle) || m_rotateTimer->isActive())
         return;
+
+/*    if (m_count == 4)
+    {
+        m_count = 0;
+        drawColors();
+        update();
+        return;
+    }
+*/
 
     if (m_fillTimer->isActive())
     {
-        if (m_count == 4)
-        {
-            m_count = 0;
-            drawColors();
-            update();
-            return;
-        }
-
         if (m_colors[m_count - 1] == colorNum)
             m_fillCount += count;
     }
@@ -222,6 +261,117 @@ void ColorsLayer::dropColors(quint8 count)
 {
 }
 
+void ColorsLayer::nextSegment()
+{
+
+    if (m_sliceCurrent == 0 && m_colorCurrent == 0)
+        m_bottomLine = tubeSlices[0];
+    else
+        m_bottomLine = m_topLine;
+
+    if (m_segmentsCount == 0)
+        addColorSegment(m_bottomLine);
+
+    m_topLine = tubeSlices[m_sliceCurrent+1];
+
+    // size (area) of the segment
+    qreal dx0 = m_bottomLine.x2 - m_bottomLine.x1; // bottom section length
+    qreal dx1 = m_topLine.x2 - m_topLine.x1;       // top section length
+    qreal dy = m_bottomLine.y - m_topLine.y;       // height
+    m_sliceArea = dy * (dx0 + dx1) / 2;
+
+    // checks the area
+    if (m_fillArea > m_sliceArea)
+    {
+
+        // Whole the segment is filled by the current color
+
+        addColorSegment(m_topLine);
+        m_fillArea -= m_sliceArea;
+        m_sliceArea = 0;
+        m_sliceCurrent++;
+
+        if (m_topLine.v == 0) // and is this the last segment?
+        {
+            drawColorCell();
+            clearColorSegments();
+
+//          drawBottle();
+//          if (!qFuzzyIsNull(endAngle))
+//                drawFlow(colorArea - sliceArea);
+
+            m_sliceArea -= m_fillArea;
+            m_fillArea = 0;
+            m_colorCurrent ++;
+        }
+
+    } else {
+
+        // The current segment is not filled by one color,
+        // so we need to calculate size of the current color.
+
+        qreal newHeight = dy;
+        if (qFuzzyIsNull(dx0)) {
+            // The current segment is a triangle.
+            newHeight = 2 * m_fillArea / dx1;
+
+        } else if (qFuzzyIsNull(dx1))  {
+            // This is alomst impossible, but let it be.
+            // The current segment is a triangle.
+            newHeight = 2 * m_fillArea / dx0;
+
+        }  else if (qFuzzyCompare(dx0, dx1)) {
+            // The current segment is a parallelogram.
+            newHeight = m_fillArea / dx1;
+
+        } else {
+
+            /*
+             * The current segment is a trapeze.
+             * We have to solve a sqare equation:
+             *   ( k/2 ) * x^2 + dx0 * x - S = 0,
+             * where k   - a trapeze's coefficient
+             *       dx0 - bottom section length
+             *       S   - color's area
+            */
+            qreal k = (dx1 - dx0) / dy;
+            qreal D = dx0 * dx0 + 2 * k * m_fillArea;
+
+            if (D < 0) {
+                qDebug() << "ERROR! check nextSegment() D value";
+                return;
+            }
+
+            qreal newH = ( -dx0 + sqrt(D) ) / k;
+            if (newH > 0 && newH < dy) {
+                newHeight = newH;
+            } else {
+                newH = ( -dx0 - sqrt(D) ) / k;
+                if (newH > 0 && newH < dy) {
+                    newHeight = newH;
+                } else {
+                    qDebug() << "ERROR! check nextSegment() X value";
+                    return;
+                }
+            }
+        }
+
+        // Now recalculates top line of the color's segment...
+        m_topLine.y = m_bottomLine.y - newHeight;
+        m_topLine.x1 = (m_topLine.x1 - m_bottomLine.x1) * newHeight / dy + m_bottomLine.x1;
+        m_topLine.x2 = (m_topLine.x2 - m_bottomLine.x2) * newHeight / dy + m_bottomLine.x2;
+
+        // and draws the color
+        addColorSegment(m_topLine);
+        drawColorCell();
+        clearColorSegments();
+        m_sliceArea -= m_fillArea;
+        m_fillArea = 0;
+        m_colorCurrent ++;
+    }
+
+}
+
 void ColorsLayer::setAngle(qreal newAngle)
 {
 
@@ -237,151 +387,178 @@ void ColorsLayer::setAngle(qreal newAngle)
         return;
     }
 
-// set rotation point
-    quint8 rPointNumber;
+// ---- set rotation point
+    quint8 rVertexNumber; // rotation vertex number
     if (m_angle > 0)
-        rPointNumber = 0;
+        rVertexNumber = 0;
     else
-        rPointNumber = 5;
+        rVertexNumber = 5;
 
-    rotationPoint.pointNumber = rPointNumber;
-    rotationPoint.x = CtGlobal::images().point(rPointNumber).x();
-    rotationPoint.y = CtGlobal::images().point(rPointNumber).y();
+    tubeVertices[0].v = 0;
+    tubeVertices[0].x = CtGlobal::images().vertex(rVertexNumber).x();
+    tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
 
-    bottleCoordinates[0].pointNumber = 0;
-    bottleCoordinates[0].x = rotationPoint.x;
-    bottleCoordinates[0].y = rotationPoint.y;
-
-// calculates vertices polar coordinates
-    for (int i = 0; i < 6; i++)
+// --- calculate polar coordinates of other vertices & rotate them
+    for (quint8 i = 0; i < 6; i++)
     {
-        qreal dx = CtGlobal::images().point(i).x() - rotationPoint.x;
-        qreal dy = CtGlobal::images().point(i).y() - rotationPoint.y;
-        bottlePolarCoordinates[abs(rPointNumber - i)].r = sqrt(dx*dx + dy*dy);
-        bottlePolarCoordinates[abs(rPointNumber - i)].a = atan2(dy, dx);
+        if (i != rVertexNumber) {
+            quint8 number = abs(rVertexNumber - i);
+
+            qreal dx = CtGlobal::images().vertex(i).x() - tubeVertices[0].x;
+            qreal dy = CtGlobal::images().vertex(i).y() - tubeVertices[0].y;
+            qreal radius = sqrt(dx*dx + dy*dy);
+            qreal angle = atan2(dy, dx) + m_angle;
+
+            tubeVertices[number].v = number;
+            tubeVertices[number].x = tubeVertices[0].x + radius * qCos(angle);
+            tubeVertices[number].y = tubeVertices[0].y + radius * qSin(angle);
+        }
     }
 
-// rotate vertices
-    for (qint8 i = 1; i < 6; i++)
-    {
-        bottleCoordinates[i].x = rotationPoint.x + bottlePolarCoordinates[i].r
-                * qCos(bottlePolarCoordinates[i].a + m_angle);
-        bottleCoordinates[i].y = rotationPoint.y + bottlePolarCoordinates[i].r
-                * qSin(bottlePolarCoordinates[i].a + m_angle);
-        bottleCoordinates[i].pointNumber = i;
-    }
-
-// calculate edges before sort points
+// --- calculate edges before sorting points
     qDebug() << "edges:";
-    for (qint8 i = 0; i < 4; i++)
+    for (qint8 i = 0; i < 5; i++)
     {
-        edgeLines[i] = QLineF(bottleCoordinates[i].x, bottleCoordinates[i].y,
-                              bottleCoordinates[i+1].x, bottleCoordinates[i+1].y);
-
-        qDebug() << "edge:" << i
-                 << "p1_num:" << bottleCoordinates[i].pointNumber
-                 << "p2_num:" << bottleCoordinates[i+1].pointNumber
-                 << "p1:"     << edgeLines[i].p1()
-                 << "p2:"     << edgeLines[i].p2();
+        edgeLines[i] = QLineF(tubeVertices[i].x, tubeVertices[i].y,
+                              tubeVertices[i+1].x, tubeVertices[i+1].y);
     }
 
-// sort points by vertical
-    int j;
+// --- sort points by vertical
+    qint8 j;
     PointF temp;
-    for (int i = 1; i < 6; ++i) {
-        temp.x = bottleCoordinates[i].x;
-        temp.y = bottleCoordinates[i].y;
-        temp.pointNumber = bottleCoordinates[i].pointNumber;
+    for (qint8 i = 1; i < 6; ++i) {
+        temp = tubeVertices[i];
         j = i;
 
-        while ( (j > 0) && (bottleCoordinates[j-1].y < temp.y) ) {
-            bottleCoordinates[j].x = bottleCoordinates[j-1].x;
-            bottleCoordinates[j].y = bottleCoordinates[j-1].y;
-            bottleCoordinates[j].pointNumber = bottleCoordinates[j-1].pointNumber;
+        while ( (j > 0) && (tubeVertices[j-1].y < temp.y) ) {
+            tubeVertices[j] = tubeVertices[j-1];
             j--;
         }
-        bottleCoordinates[j].x = temp.x;
-        bottleCoordinates[j].y = temp.y;
-        bottleCoordinates[j].pointNumber = temp.pointNumber;
+        tubeVertices[j] = temp;
     }
 
     qDebug() << "after points sort:";
     for (int i = 0; i < 6; ++i) {
         qDebug() << "point:" << i
-                 << "p_num:" << bottleCoordinates[i].pointNumber
-                 << "x:"     << bottleCoordinates[i].x
-                 << "y:"     << bottleCoordinates[i].y;
+                 << "p_num:" << tubeVertices[i].v
+                 << "x:"     << tubeVertices[i].x
+                 << "y:"     << tubeVertices[i].y;
     }
 
-// calculate slices
-    clearSlicesPoints();
-    if (bottleCoordinates[0].pointNumber != 0             // rotation point is not a lowest point
-            && !qFuzzyIsNull(qAbs(m_angle) - M_PI/2))     // angle != +-90 deg
+// --- calculate slices
+    clearSlices();
+    if (tubeVertices[0].v != 0)             // rotation point must be not a lowest point
     {
+        quint8 currentPoint;
 
-        // add lowest point
-        addSlicePoints(bottleCoordinates[0].pointNumber, bottleCoordinates[0].x, bottleCoordinates[0].x, bottleCoordinates[0].y);
+        // lowest point(s)
+        if (qFuzzyCompare(qAbs(m_angle), (qreal)M_PI_2))
+        {   // if angle = +-90 deg, we have two lowest points
+            addSlice(tubeVertices[1].v, tubeVertices[0].x,
+                    tubeVertices[1].x, tubeVertices[1].y);
+            currentPoint = 1;
+            qDebug() << "lowest:" << tubeVertices[0].v << "-" << tubeVertices[1].v;
+        }
+        else
+        {
+            addSlice(tubeVertices[0].v, tubeVertices[0].x,
+                    tubeVertices[0].x, tubeVertices[0].y);
+            currentPoint = 0;
+            qDebug() << "lowest:" << tubeVertices[0].v;
+        }
 
-        quint8 currentPoint = 0;
+        // other points
         do {
             currentPoint++;
-            qreal x = getIntersection(currentPoint);
-            addSlicePoints(bottleCoordinates[currentPoint].pointNumber,
-                           x, bottleCoordinates[currentPoint].x,
-                           bottleCoordinates[currentPoint].y);
-        } while (bottleCoordinates[currentPoint].pointNumber != rotationPoint.pointNumber);
+            addSlice(tubeVertices[currentPoint].v,
+                    getIntersection(currentPoint),
+                    tubeVertices[currentPoint].x,
+                    tubeVertices[currentPoint].y);
+        } while (tubeVertices[currentPoint].v != 0);
     }
 
-    qDebug() << "slicing:" << m_slicesCount;
+    qDebug() << "slices:" << m_slicesCount;
     for (int i = 0; i < m_slicesCount; ++i) {
         qDebug() << "slice:" << i
-                 << "p_num:" << slicesCoordinates[i].pointNumber
-                 << "x1:"    << slicesCoordinates[i].x1
-                 << "x2:"    << slicesCoordinates[i].x2
-                 << "y:"     << bottleCoordinates[i].y;
+                 << "p_num:" << tubeSlices[i].v
+                 << "x1:"    << tubeSlices[i].x1
+                 << "x2:"    << tubeSlices[i].x2
+                 << "y:"     << tubeSlices[i].y;
     }
+
     emit angleChanged(m_angle);
+
+    drawColors();
+    update();
 }
 
 
-void ColorsLayer::addSlicePoints(qint8 pNumber, qreal x1, qreal x2, qreal y)
+void ColorsLayer::addSlice(qint8 vertex, qreal x1, qreal x2, qreal y)
 {
-    slicesCoordinates[m_slicesCount].pointNumber = pNumber;
-    slicesCoordinates[m_slicesCount].x1 = qMin(x1, x2);
-    slicesCoordinates[m_slicesCount].x2 = qMax(x1, x2);
-    slicesCoordinates[m_slicesCount].y = y;
+    tubeSlices[m_slicesCount].v = vertex;
+    tubeSlices[m_slicesCount].x1 = qMin(x1, x2);
+    tubeSlices[m_slicesCount].x2 = qMax(x1, x2);
+    tubeSlices[m_slicesCount].y = y;
     m_slicesCount++;
 }
 
-void ColorsLayer::clearSlicesPoints()
+void ColorsLayer::clearSlices()
 {
     for (int i = 0; i < 6; i++)
-    {
-        slicesCoordinates[segmentsCount].pointNumber = 0;
-        slicesCoordinates[segmentsCount].x1 = 0;
-        slicesCoordinates[segmentsCount].x2 = 0;
-        slicesCoordinates[segmentsCount].y = 0;
-    }
+        tubeSlices[i] = {};
     m_slicesCount = 0;
 }
 
-qreal ColorsLayer::getIntersection(quint8 point)
+qreal ColorsLayer::getIntersection(quint8 vertex)
 {
-
-    QLineF horizLine = QLineF(0,           bottleCoordinates[point].y,
-                              280*scale(), bottleCoordinates[point].y);
-    QPointF i_point;
-
     qint8 line = 0;
-    while (line < 4)
+    while (line < 5)
     {
-        if ((line != bottleCoordinates[point].pointNumber)
-            && (line + 1 != bottleCoordinates[point].pointNumber))
+        if ((line != tubeVertices[vertex].v)
+            && (line + 1 != tubeVertices[vertex].v))
         {
-            if (horizLine.intersect(edgeLines[line], &i_point) == QLineF::BoundedIntersection)
-                return i_point.x();
+            qreal minY = qMin(edgeLines[line].p1().y(), edgeLines[line].p2().y());
+            qreal maxY = qMax(edgeLines[line].p1().y(), edgeLines[line].p2().y());
+
+            if (tubeVertices[vertex].y >= minY && tubeVertices[vertex].y <= maxY)
+            {
+                return (tubeVertices[vertex].y - edgeLines[line].p1().y())
+                        * edgeLines[line].dx() / edgeLines[line].dy()
+                        + edgeLines[line].p1().x();
+            }
         }
         line++;
     }
     return -1000;
 }
+
+
+void ColorsLayer::addColorSegment(SliceF line)
+{
+    addColorSegment(line.x1, line.x2, line.y);
+}
+
+
+void ColorsLayer::addColorSegment(qreal x1, qreal x2, qreal y)
+{
+    qDebug() << "color No" << m_colorCurrent
+             << "segment No" << m_segmentsCount
+             << "x1:"    << qMin(x1, x2)
+             << "x2:"    << qMax(x1, x2)
+             << "y:"     << y;
+
+
+    colorSegments[m_segmentsCount].x1 = qMin(x1, x2);
+    colorSegments[m_segmentsCount].x2 = qMax(x1, x2);
+    colorSegments[m_segmentsCount].y = y;
+    m_segmentsCount++;
+}
+
+void ColorsLayer::clearColorSegments()
+{
+    for (int i = 0; i < 6; i++)
+        colorSegments[i] = {};
+    m_segmentsCount = 0;
+}
+
+

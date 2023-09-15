@@ -36,13 +36,13 @@ private slots:
     void onScaleChanged();
 
 private:
-    quint8* m_colors;
-    quint8  m_count;
+    quint8 *m_colors; // will be replaced by TubeModel
+    quint8  m_count;  // will be replaced by TubeModel
 
-//  draw static colors
+//  draw colors
     void drawColors();
-    QImage*    m_drawImage;
-    QPainter*  m_painter;
+    QImage   *m_drawImage;
+    QPainter *m_painter;
 
 //  fill colors from another tube
     void addFillArea(qreal fillAreaInc);
@@ -55,56 +55,52 @@ private:
     QRectF  m_colorRect;                 // rect of the color
     qreal   m_colorBottom;               // bottom vertical coordinate
 
-//  flow colors to another tube
+//  drop colors to another tube
+    void nextSegment();
+    void drawColorCell();
     QTimer *m_rotateTimer;
     qreal  *m_tiltAngles;                 //
     qreal   m_angle;                      // current angle
     qreal   m_angleInc;                   // angle increment
     qreal   m_startAngle;
     qreal   m_endAngle;
-    bool rotateLeft;
 
-//  rotation coordinates
-
+//  rotation coordinates & routines
     struct PointF {
-        qint8 pointNumber;
-        qreal x;
-        qreal y;
+        qint8 v;    // vertex/point number
+        qreal x;    // X coorinate
+        qreal y;    // Y coorinate
     };
 
-    struct PointP {
-        qint8 pointNumber;
-        qreal r;    // polar radius from the rotation point
-        qreal a;    // polar angle from the rotation point
-    };
-
-    struct SegmentCoo {
-        qint8 pointNumber;
-        qreal x1;   // right X
-        qreal x2;   // left X
+    struct SliceF {
+        qint8 v;    // vertex number
+        qreal x1;   // left X
+        qreal x2;   // right X
         qreal y;    // Y coordinate
     };
 
+    PointF *tubeVertices;                  // coordinates after rotation
+    QLineF *edgeLines;                     // tube edges to calculate intersections
+    qreal getIntersection(quint8 vertex);  // the intersection of the horizontal line from bottle vertices
 
-    PointF rotationPoint;                  // rotation point coordinate
+    void addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
+    void clearSlices();
+    SliceF *tubeSlices;                    // tube is sliced by horizontal lines passing through its vertices
+    qint8   m_slicesCount;
+    qint8   m_sliceCurrent;
+    qreal   m_sliceArea;
 
-    PointP* bottlePolarCoordinates;        // polar coordinates of the bottle vertices relative to the rotation point
-    PointF* bottleCoordinates;             // coordinates after rotation
-    QLineF* edgeLines;                     // bottle edges
+    void addColorSegment(qreal x1, qreal x2, qreal y);
+    void addColorSegment(SliceF line);
+    void clearColorSegments();
+    SliceF *colorSegments;                 // color segments coordinates
+    qint8   m_segmentsCount;
+    qint8   m_colorCurrent;
+    qreal   m_segmentArea;
 
-    SegmentCoo* slicesCoordinates;         // tube is sliced by horizontal lines passing through its vertices
-    qint8 m_slicesCount;
-    qint8 sliceCurrent;
-    qreal sliceArea;
+    SliceF  m_bottomLine;
+    SliceF  m_topLine;
 
-    SegmentCoo* segmentsCoordinates;       // color segments coordinates
-    qint8 segmentsCount;
-
-
-
-    void addSlicePoints(qint8 pNumber, qreal x1, qreal x2, qreal y);
-    void clearSlicesPoints();
-    qreal getIntersection(quint8 point);    // the intersection of the horizontal line from bottle vertices
 
 
 

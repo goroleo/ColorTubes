@@ -72,8 +72,8 @@ void old_TubeFlyer::setScale(qreal newScale)
 void old_TubeFlyer::setRotationPoint(int number)
 {
     // number can be 0 or 5
-    rotationPoint.x = CtGlobal::images().point(number).x();
-    rotationPoint.y = CtGlobal::images().point(number).y();
+    rotationPoint.x = CtGlobal::images().vertex(number).x();
+    rotationPoint.y = CtGlobal::images().vertex(number).y();
     rotationPoint.pointNumber = number;
     bottleCoordinates[0].pointNumber = 0;
     bottleCoordinates[0].x = rotationPoint.x;
@@ -81,8 +81,8 @@ void old_TubeFlyer::setRotationPoint(int number)
 
     for (int i = 0; i < 6; i++)
     {
-        double dx = CtGlobal::images().point(i).x() - rotationPoint.x;
-        double dy = CtGlobal::images().point(i).y() - rotationPoint.y;
+        double dx = CtGlobal::images().vertex(i).x() - rotationPoint.x;
+        double dy = CtGlobal::images().vertex(i).y() - rotationPoint.y;
         bottlePolarCoordinates[abs(number-i)].r = sqrt(dx*dx + dy*dy);
         bottlePolarCoordinates[abs(number-i)].a = atan2(dy, dx);
     }

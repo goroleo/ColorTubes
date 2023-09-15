@@ -30,7 +30,7 @@ TubeImages::~TubeImages()
     delete m_shadeGreen;
     delete m_shadeBlue;
     delete m_cork;
-    delete m_points;
+    delete m_vertices;
 }
 
 TubeImages& TubeImages::create()
@@ -52,7 +52,7 @@ void TubeImages::initialize()
     m_shadeGreen = new QPixmap;
     m_shadeBlue = new QPixmap;
     m_cork = new QPixmap;
-    m_points = new QPointF[6];
+    m_vertices = new QPointF[6];
 
     scalePoints();
     renderImages();
@@ -66,8 +66,8 @@ TubeImages& TubeImages::instance()
 QRectF TubeImages::colorRect(quint8 index)
 {
     QRectF result;
-    result.setX(m_points[3].x());
-    result.setY(m_points[3].y() - m_colorHeight * (index+1));
+    result.setX(m_vertices[3].x());
+    result.setY(m_vertices[3].y() - m_colorHeight * (index+1));
     result.setHeight(m_colorHeight);
     result.setWidth(m_colorWidth);
     return result;
@@ -86,14 +86,14 @@ void TubeImages::setScale(qreal newScale)
 
 void TubeImages::scalePoints()
 {
-    m_points[0] = QPointF(60.0, 15.5) * m_scale;
-    m_points[1] = QPointF(66.0, 26.0) * m_scale;
-    m_points[2] = QPointF(66.0, 166.0) * m_scale;
-    m_points[3] = QPointF(14.0, 166.0) * m_scale;
-    m_points[4] = QPointF(14.0, 26.0) * m_scale;
-    m_points[5] = QPointF(20.0, 15.5) * m_scale;
-    m_colorHeight = (m_points[2].y() - m_points[1].y()) / 4;
-    m_colorWidth = m_points[2].x() - m_points[3].x();
+    m_vertices[0] = QPointF(60.0, 15.5) * m_scale;
+    m_vertices[1] = QPointF(66.0, 26.0) * m_scale;
+    m_vertices[2] = QPointF(66.0, 166.0) * m_scale;
+    m_vertices[3] = QPointF(14.0, 166.0) * m_scale;
+    m_vertices[4] = QPointF(14.0, 26.0) * m_scale;
+    m_vertices[5] = QPointF(20.0, 15.5) * m_scale;
+    m_colorHeight = (m_vertices[2].y() - m_vertices[1].y()) / 4;
+    m_colorWidth = m_vertices[2].x() - m_vertices[3].x();
     m_colorArea = m_colorWidth * m_colorHeight;
 }
 
@@ -189,12 +189,12 @@ void TubeImages::renderImages()
 
     // back side
     elementRect = image.rect();
-    elementRect.setHeight(m_points[0].y());
+    elementRect.setHeight(m_vertices[0].y());
     *m_bottleBack = m_bottle->copy(elementRect.toRect());
 
     // front side
     elementRect = image.rect();
-    elementRect.adjust(0, m_points[0].y(), 0, 0);
+    elementRect.adjust(0, m_vertices[0].y(), 0, 0);
     *m_bottleFront = m_bottle->copy(elementRect.toRect());
 
 //----------------- shades

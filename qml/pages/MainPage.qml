@@ -178,7 +178,7 @@ Page {
                 id: colors
                 anchors.top: parent.top
                 anchors.left: parent.left
-                angle: 30/180*3.1415926
+                angle: -95/180*3.1415926
             }
 
             BottleLayer {
@@ -188,7 +188,7 @@ Page {
                 anchors.topMargin: 35.5 * scale
                 anchors.left: parent.left
                 anchors.leftMargin: 100 * scale
-                scale: 1
+                scale: 1.894
             }
 
             CorkLayer {
@@ -220,6 +220,7 @@ Page {
                     if (shade.shade == 4)
                         shade.shade = 1
 
+                    colors.setAngle(colors.angle + 5/180*3.1415926)
                     shade.visible ? shade.startHide() : shade.startShow()
                     cork.visible = ((shade.visible) && (shade.shade == 3))
                     //                    shade.pulse ? shade.stopPulse() : shade.startPulse()

@@ -66,14 +66,14 @@ public:
         return m_bottle->height();
     };
 
-    QPointF* points()
+    QPointF* vertices()
     {
-        return m_points;
+        return m_vertices;
     };
 
-    QPointF point(quint8 index)
+    QPointF vertex(quint8 index)
     {
-        return m_points[index];
+        return m_vertices[index];
     };
 
     QRectF colorRect(quint8 index);
@@ -117,7 +117,7 @@ private:
     QPixmap *m_shadeBlue;
     QPixmap *m_cork;
 
-    QPointF *m_points;   // vertexes of the bottle
+    QPointF *m_vertices;   // vertices of the егиу
 
     qreal m_colorHeight; // width of the one color cell after scaling
     qreal m_colorWidth;
