@@ -24,6 +24,7 @@ void BottleLayer::prepareImage()
 
 void BottleLayer::paint(QPainter *painter)
 {
+    painter->rotate(m_angle);
     painter->drawPixmap(0, 0, m_drawImage);
 }
 
@@ -37,14 +38,14 @@ qreal BottleLayer::scale()
     return CtGlobal::images().scale();
 }
 
-bool BottleLayer::visible()
-{
-    return m_visible;
-}
-
 void BottleLayer::setSource(QString newSource)
 {
     if (newSource.compare("bottle", Qt::CaseInsensitive) == 0)
+    {
+        m_source = newSource;
+        m_drawImage = CtGlobal::images().bottle();
+    }
+    else if (newSource.compare("front", Qt::CaseInsensitive) == 0)
     {
         m_source = newSource;
         m_drawImage = CtGlobal::images().bottleFront();
@@ -55,19 +56,19 @@ void BottleLayer::setSource(QString newSource)
         m_drawImage = CtGlobal::images().bottleBack();
     }
 
-    else if (newSource.compare("cork", Qt::CaseInsensitive) == 0)
-    {
-        m_source = newSource;
-        m_drawImage = CtGlobal::images().cork();
-    }
-
-    setWidth(m_drawImage.width());
-    setHeight(m_drawImage.height());
 }
 
 void BottleLayer::setScale(qreal newScale)
 {
     CtGlobal::images().setScale(newScale);
+    update();
+}
+
+void BottleLayer::setAngle(qreal newAngle)
+{
+    m_angle = newAngle;
+    setWidth(qMax(m_drawImage.width(), m_drawImage.height()));
+    setHeight(width());
 }
 
 void BottleLayer::onScaleChanged()

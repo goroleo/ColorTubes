@@ -1,9 +1,10 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import ShadeLayer 1.0
-import BottleLayer 1.0
-import ColorsLayer 1.0
-import CorkLayer 1.0
+//import ShadeLayer 1.0
+//import BottleLayer 1.0
+//import ColorsLayer 1.0
+//import CorkLayer 1.0
+import TubeItem 1.0
 
 Page {
     id: page
@@ -146,7 +147,7 @@ Page {
 
         }
 */
-        Item {
+/*        Item {
 
             id: tubeItem
 
@@ -209,7 +210,15 @@ Page {
                 width: bottle.width
                 height: bottle.height
                 onClicked: {
-                    colors.fillColors(11, 1)
+//                    if (colors.count < 4)
+//                       colors.fillColors(11, 1)
+//                    else
+//                        colors.count = 0
+                    if (colors.count == 0)
+                        colors.count = 4
+                    else
+                        colors.dropColors(1);
+
 
 //                    if (!shade.visible)
 //                        shade.shade = shade.shade + 1
@@ -222,11 +231,18 @@ Page {
 
 //                    colors.setAngle(colors.angle + 5/180*3.1415926)
 //                    shade.visible ? shade.startHide() : shade.startShow()
-                    cork.visible = ((shade.visible) && (shade.shade == 3))
                     shade.pulse ? shade.stopPulse() : shade.startPulse()
+                    cork.visible = ((shade.visible || shade.pulse) && (shade.shade == 3))
                 }
             }
 
+        }
+    }
+
+    */
+
+        TubeItem {
+            id: tube1
         }
     }
 }

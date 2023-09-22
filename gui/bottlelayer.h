@@ -11,7 +11,6 @@ class BottleLayer : public QQuickPaintedItem
     Q_OBJECT
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
-//    Q_PROPERTY(bool visible READ visible )
 
 public:
     explicit BottleLayer(QQuickItem *parent = 0);
@@ -20,8 +19,9 @@ public:
     void paint(QPainter *painter) override;
 
     qreal scale();
-    bool visible();
     QString source();
+
+    void setAngle(qreal newAngle);
 
 public slots:
     void setSource(QString newSource);
@@ -37,9 +37,8 @@ private slots:
 private:
     void prepareImage();
 
-    QString m_source;
-    bool    m_visible = true;
-
+    QString  m_source;
+    qreal    m_angle;
     QPixmap  m_drawImage;
 
 };

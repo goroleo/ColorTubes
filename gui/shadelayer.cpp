@@ -12,10 +12,12 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
       m_shadeNumber(1)
 {
 
-    m_drawImage = QImage(80, 180, QImage::Format_ARGB32);
+    m_drawImage = QImage(80 * CtGlobal::images().scale(),
+                         180* CtGlobal::images().scale(),
+                         QImage::Format_ARGB32);
 
-    setWidth(80);
-    setHeight(180);
+    setWidth(CtGlobal::images().width());
+    setHeight(CtGlobal::images().height());
 
     m_drawImage.fill(0x00ffffff);
 

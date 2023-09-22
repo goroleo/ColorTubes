@@ -24,8 +24,8 @@ SOURCES += src/ColorTubes.cpp \
     gui/bottlelayer.cpp \
     gui/colorslayer.cpp \
     gui/corklayer.cpp \
-    gui/old_tubeflyer.cpp \
     gui/shadelayer.cpp \
+    gui/tubeitem.cpp \
     src/ctglobal.cpp \
     src/io.cpp \
     src/game.cpp \
@@ -66,8 +66,8 @@ HEADERS += \
     gui/bottlelayer.h \
     gui/colorslayer.h \
     gui/corklayer.h \
-    gui/old_tubeflyer.h \
     gui/shadelayer.h \
+    gui/tubeitem.h \
     src/ctglobal.h \
     src/io.h \
     src/game.h \
