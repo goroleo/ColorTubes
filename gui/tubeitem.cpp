@@ -24,7 +24,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
     shade = new ShadeLayer(this);
     shade->setX(100*scale());
     shade->setY(20*scale());
-    shade->setShade(3);
+    shade->setShade(0);
     shade->startShow();
 
     back = new BottleLayer(this);
@@ -77,6 +77,17 @@ void TubeItem::setScale(qreal newScale)
 {
     CtGlobal::images().setScale(newScale);
 }
+
+qreal TubeItem::angle() const
+{
+    return m_angle;
+}
+
+void TubeItem::setAngle(qreal newAngle)
+{
+    m_angle = newAngle;
+}
+
 
 QRectF TubeItem::clipRect() const
 {

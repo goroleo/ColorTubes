@@ -23,11 +23,16 @@ public:
 
     void paint(QPainter *painter) override;
 
-
     qreal scale() const;
-    void setScale(qreal newScale);
     qreal angle() const;
+
+public slots:
+    void setScale(qreal newScale);
     void setAngle(qreal newAngle);
+
+signals:
+    void scaleChanged(const qreal newScale);
+    bool angleChanged(const qreal newAngle);
 
 
 private:
@@ -38,6 +43,8 @@ private:
     ShadeLayer  *shade;
 
     TubeModel *model;
+
+    qreal        m_angle;
 
     QRectF clipRect() const override;
 
