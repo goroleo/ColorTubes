@@ -6,6 +6,8 @@
 //#include <QPainter>
 #include <QPixmap>
 
+class TubeItem;
+
 class BottleLayer : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -13,7 +15,7 @@ class BottleLayer : public QQuickPaintedItem
     Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
 
 public:
-    explicit BottleLayer(QQuickItem *parent = 0);
+    explicit BottleLayer(TubeItem *parent = 0);
     ~BottleLayer();
 
     void paint(QPainter *painter) override;
@@ -36,6 +38,7 @@ private slots:
 
 private:
     void prepareImage();
+    bool findImage(QString aSource);
 
     QString  m_source;
     qreal    m_angle;
