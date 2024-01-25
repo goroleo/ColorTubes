@@ -11,9 +11,8 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent),
       m_shadeNumber(1)
 {
-
-    m_drawImage = QImage(80 * CtGlobal::images().scale(),
-                         180* CtGlobal::images().scale(),
+    m_drawImage = QImage(280 * CtGlobal::images().scale(),
+                         180 * CtGlobal::images().scale(),
                          QImage::Format_ARGB32);
 
     setWidth(CtGlobal::images().width());
@@ -21,10 +20,8 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
 
     m_drawImage.fill(0x00ffffff);
 
-
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
-
 
     internalTimer = new QTimer(this);
     connect(internalTimer, &QTimer::timeout, [=](){
@@ -121,7 +118,6 @@ void ShadeLayer::prepareImage()
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
-
 }
 
 void ShadeLayer::paint(QPainter *painter)
@@ -153,7 +149,9 @@ void ShadeLayer::onScaleChanged()
     m_drawImage.fill(0x00ffffff);
     prepareImage();
     update();
-    emit scaleChanged(scale());
+
+    qDebug() << "Shade::onScaleChanged" << scale();
+//    emit scaleChanged(scale());
 }
 
 int ShadeLayer::shade()
@@ -190,7 +188,6 @@ void ShadeLayer::setShade(int newShadeNumber)
         break;
     }
 }
-
 
 void ShadeLayer::setPulse(bool newPulse)
 {

@@ -10,8 +10,8 @@ class TubeImages : public QObject
 {
     Q_OBJECT
 public:
-    static TubeImages& create();
-    static TubeImages& instance();
+    static TubeImages & create();
+    static TubeImages & instance();
 
     ~TubeImages();
 
@@ -66,10 +66,15 @@ public:
         return m_bottle->height();
     };
 
-    QPointF* vertices()
+    QPointF * vertices()
     {
         return m_vertices;
     };
+
+    QPointF center()
+    {
+        return centerPoint;
+    }
 
     QPointF vertex(quint8 index)
     {
@@ -118,6 +123,7 @@ private:
     QPixmap *m_cork;
 
     QPointF *m_vertices;   // vertices of the егиу
+    QPointF centerPoint;   // central point to draw tube from it
 
     qreal m_colorHeight; // width of the one color cell after scaling
     qreal m_colorWidth;

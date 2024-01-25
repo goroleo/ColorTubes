@@ -26,6 +26,7 @@ CorkLayer::CorkLayer(QQuickItem *parent) :
     });
 
     onScaleChanged();
+    m_visible = false;
 
 }
 
@@ -91,7 +92,10 @@ void CorkLayer::onScaleChanged()
     m_drawImage.fill(0x00ffffff);
     prepareImage();
     update();
-    emit scaleChanged(scale());
+
+    qDebug() << "Cork::onScaleChanged" << scale();
+
+//    emit scaleChanged(scale());
 }
 
 void CorkLayer::paint(QPainter *painter)

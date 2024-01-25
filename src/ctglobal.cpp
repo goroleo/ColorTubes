@@ -87,8 +87,6 @@ void CtGlobal::onScaleChanged()
 
 }
 
-
-
 quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)
 {
     quint32 result = 0;

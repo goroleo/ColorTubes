@@ -48,7 +48,6 @@ bool Io::loadJson(QString fName, QJsonObject &jsonObj)
     QFile loadFile(fName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
         qDebug() << "LoadJson" << "Couldn't open save file." << fName;
-//        qWarning("Couldn't open file.");
         return false;
     }
 
@@ -64,7 +63,6 @@ bool Io::saveJson(QString fName, QJsonObject &jsonObj)
     QFile saveFile(fName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
         qDebug() << "saveJson" << "Couldn't open save file." << fName;
-//        qWarning("Couldn't open save file.");
         return false;
     }
 
@@ -77,7 +75,6 @@ bool Io::loadGame(QString fName, QByteArray &buffer)
     QFile loadFile(fName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
         qDebug() << "loadGame" << "Couldn't open save file." << fName;
-//        qWarning("Couldn't open file.");
         return false;
     }
 
@@ -90,7 +87,6 @@ bool Io::saveGame(QString fName, QByteArray &buffer)
     QFile saveFile(fName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
         qDebug() << "saveGame"<< "Couldn't open save file." << fName;
-//        qWarning("Couldn't open save file.");
         return false;
     }
 

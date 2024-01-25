@@ -11,7 +11,7 @@
 #include "shadelayer.h"
 
 TubeItem::TubeItem(QQuickItem *parent) :
-    QQuickPaintedItem(parent)
+    QQuickItem(parent)
 {
     model = new TubeModel();
     model->putColor(12);
@@ -19,36 +19,31 @@ TubeItem::TubeItem(QQuickItem *parent) :
     model->putColor(1);
     model->putColor(10);
 
-
-    setScale(2);
+    setScale(2.12);
     shade = new ShadeLayer(this);
-    shade->setX(100*scale());
-    shade->setY(20*scale());
+    shade->setVisible(true);
     shade->setShade(0);
     shade->startShow();
 
     back = new BottleLayer(this);
     back->setSource("back");
-    back->setX(100*scale());
-    back->setY(20*scale());
+    back->setVisible(true);
 
     colors = new ColorsLayer(this);
     colors->setModel(model);
-    colors->setAngle(-30.0/180.0*M_PI);
-//    colors->setY(20*scale());
 
     front = new BottleLayer(this);
     front->setSource("front");
-    front->setX(100*scale());
-    front->setY(35.5*scale());
 
     cork = new CorkLayer(this);
-    cork->setVisible(true);
-    cork->setX(100*scale());
-    cork->setY(0);
+    cork->setVisible(false);
 
+    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
+            this, SLOT(onScaleChanged()));
 
-    setClip(true);
+    onScaleChanged();
+    setAngle(-28.11 / 180.0 * M_PI);
+
 }
 
 TubeItem::~TubeItem()
@@ -58,14 +53,6 @@ TubeItem::~TubeItem()
     delete colors;
     delete back;
     delete shade;
-}
-
-void TubeItem::paint(QPainter *painter)
-{
-//    setWidth(clipRect().width());
-//    setHeight(clipRect().height());
-    setX(-clipRect().x());
-    qDebug() << "x" << x();
 }
 
 qreal TubeItem::scale() const
@@ -78,6 +65,29 @@ void TubeItem::setScale(qreal newScale)
     CtGlobal::images().setScale(newScale);
 }
 
+void TubeItem::onScaleChanged()
+{
+    if (qFuzzyIsNull(m_angle)) {
+        shade->setX(100 * scale());
+        shade->setY(20 * scale());
+
+        back->setX(shade->x());
+        back->setY(shade->y());
+
+        colors->setX(0);
+        colors->setY(0);
+
+        front->setX(shade->x());
+        front->setY(35.5 * scale());
+
+        cork->setX(shade->x());
+        cork->setY(0);
+    }
+
+
+}
+
+
 qreal TubeItem::angle() const
 {
     return m_angle;
@@ -86,13 +96,6 @@ qreal TubeItem::angle() const
 void TubeItem::setAngle(qreal newAngle)
 {
     m_angle = newAngle;
+    emit angleChanged(newAngle);
 }
-
-
-QRectF TubeItem::clipRect() const
-{
-    qDebug() << "clipRect";
-    return QRectF(100.0 * scale(), 0, 80.0 * scale(), 200.0 * scale());
-}
-
 

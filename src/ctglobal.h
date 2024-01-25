@@ -14,10 +14,10 @@ namespace CtGlobal
     void destroy();
 
     // set of global singletons
-    Game& game();
-    Io& io();
-    TubeImages& images();
-    Palette& palette();
+    Game & game();
+    Io & io();
+    TubeImages & images();
+    Palette & palette();
 
     // files
     QString localFile(QString fName);

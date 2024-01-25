@@ -9,10 +9,8 @@ class ColorsLayer;
 class ShadeLayer;
 class TubeModel;
 
-
-class TubeItem : public QQuickPaintedItem
+class TubeItem : public QQuickItem
 {
-
     Q_OBJECT
     Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(qreal angle READ angle WRITE setAngle NOTIFY angleChanged)
@@ -20,8 +18,6 @@ class TubeItem : public QQuickPaintedItem
 public:
     explicit TubeItem(QQuickItem *parent = 0);
     ~TubeItem();
-
-    void paint(QPainter *painter) override;
 
     qreal scale() const;
     qreal angle() const;
@@ -32,8 +28,10 @@ public slots:
 
 signals:
     void scaleChanged(const qreal newScale);
-    bool angleChanged(const qreal newAngle);
+    void angleChanged(const qreal newAngle);
 
+private slots:
+    void onScaleChanged();
 
 private:
     CorkLayer   *cork;
@@ -45,8 +43,6 @@ private:
     TubeModel *model;
 
     qreal        m_angle;
-
-    QRectF clipRect() const override;
 
 };
 

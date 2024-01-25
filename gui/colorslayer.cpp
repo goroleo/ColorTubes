@@ -9,19 +9,14 @@
 #include "src/tubeimages.h"
 #include "src/palette.h"
 #include "core/tubemodel.h"
+#include "tubeitem.h"
 
-ColorsLayer::ColorsLayer(QQuickItem *parent, TubeModel *tm) :
-    QQuickPaintedItem(parent),
+ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
+    QQuickPaintedItem((QQuickItem *) parent),
     m_model(tm)
 {
 
-/*    m_colors = new quint8[4];
-    m_colors[0] = 12;
-    m_colors[1] = 8;
-    m_colors[2] = 1;
-    m_colors[3] = 10;
-    m_count = 4;
-*/
+    parentTube = parent;
 
 // tilt angles
     m_tiltAngles = new qreal[5];
@@ -33,7 +28,7 @@ ColorsLayer::ColorsLayer(QQuickItem *parent, TubeModel *tm) :
 
 // coordinates
     tubeVertices = new PointF[6];
-    edgeLines = new QLineF[5];
+    bottleLines = new LineF[5];
     tubeSlices = new SliceF[6];
     colorSegments = new SliceF[6];
 
@@ -49,14 +44,17 @@ ColorsLayer::ColorsLayer(QQuickItem *parent, TubeModel *tm) :
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
+    QObject::connect(parent, &TubeItem::angleChanged,
+            this, &ColorsLayer::onAngleChanged);
+
     m_fillTimer = new QTimer(this);
-    connect(m_fillTimer, &QTimer::timeout, [=](){
+    connect(m_fillTimer, &QTimer::timeout, [=]() {
         addFillArea(m_fillAreaInc);
         update();
     });
 
     m_rotateTimer = new QTimer(this);
-    connect(m_rotateTimer, &QTimer::timeout, [=](){
+    connect(m_rotateTimer, &QTimer::timeout, [=]() {
         addAngle(m_angleInc);
         update();
     });
@@ -75,9 +73,8 @@ ColorsLayer::~ColorsLayer()
     delete m_fillTimer;
     delete m_rotateTimer;
 
-
     delete [] tubeVertices;
-    delete [] edgeLines;
+    delete [] bottleLines;
     delete [] tubeSlices;
     delete [] colorSegments;
 
@@ -105,11 +102,6 @@ int ColorsLayer::count()
     return m_model->count();
 }
 
-void ColorsLayer::setScale(qreal newScale)
-{
-    CtGlobal::images().setScale(newScale);
-}
-
 void ColorsLayer::onScaleChanged()
 {
 
@@ -127,7 +119,19 @@ void ColorsLayer::onScaleChanged()
 
     drawColors();
     update();
-    emit scaleChanged(scale());
+
+    qDebug() << "Colors::onscaleChanged" << scale();
+
+//     emit scaleChanged(scale());
+}
+
+void ColorsLayer::onAngleChanged()
+{
+    qreal newAngle = parentTube->angle();
+
+    qDebug() << newAngle / M_PI * 180 << newAngle;
+
+    setAngle( newAngle);
 }
 
 void ColorsLayer::paint(QPainter *painter)
@@ -156,6 +160,7 @@ void ColorsLayer::drawColors()
         m_colorCurrent = 0;
         m_sliceCurrent = 0;
         clearColorSegments();
+
         m_fillArea = CtGlobal::images().colorArea();
 
         while (m_sliceCurrent < m_slicesCount-1
@@ -204,12 +209,6 @@ void ColorsLayer::fillColors(quint8 colorNum, quint8 count)
         m_fillTimer->start(20);
     }
 
-/*    for (int i = 0; i < count; i++)
-    {
-        m_colors[i + m_count] = colorNum;
-    }
-    m_count += count;
-    */
 }
 
 void ColorsLayer::dropColors(quint8 count)
@@ -336,11 +335,17 @@ void ColorsLayer::setAngle(qreal newAngle)
         }
     }
 
-// --- calculate edges before sorting points
+// --- calculate edge lines before sorting points
     for (qint8 i = 0; i < 5; i++)
     {
-        edgeLines[i] = QLineF(tubeVertices[i].x, tubeVertices[i].y,
-                              tubeVertices[i+1].x, tubeVertices[i+1].y);
+        bottleLines[i].x1 = tubeVertices[i].x;
+        bottleLines[i].y1 = tubeVertices[i].y;
+        bottleLines[i].x2 = tubeVertices[i+1].x;
+        bottleLines[i].y2 = tubeVertices[i+1].y;
+
+        bottleLines[i].k = (bottleLines[i].y2 - bottleLines[i].y1)
+                / (bottleLines[i].x2 - bottleLines[i].x1);
+        bottleLines[i].b = bottleLines[i].y1 - (bottleLines[i].k * bottleLines[i].x1);
     }
 
 // --- sort points by vertical. The lowest point will be tubeVertices[0]
@@ -389,7 +394,7 @@ void ColorsLayer::setAngle(qreal newAngle)
     drawColors();
     update();
 
-    emit angleChanged(m_angle);
+//    emit angleChanged(m_angle);
 
 }
 
@@ -404,7 +409,7 @@ void ColorsLayer::nextSegment()
     if (m_segmentsCount == 0)
         addColorSegment(m_bottomLine);
 
-    m_topLine = tubeSlices[m_sliceCurrent+1];
+    m_topLine = tubeSlices[m_sliceCurrent + 1];
 
     // size (area) of the segment
     qreal dx0 = m_bottomLine.x2 - m_bottomLine.x1; // bottom section length
@@ -441,13 +446,9 @@ void ColorsLayer::nextSegment()
         // so we need to calculate size of the current color.
 
         qreal newHeight;
-        if (qFuzzyIsNull(dx0)) {
-            // The current segment is a triangle.
-            newHeight = 2 * m_fillArea / dx1;
-
-        } else if (qFuzzyIsNull(dx1))  {
+        if (qFuzzyIsNull(dx1))  {
             // This is almost impossible, but let it be.
-            // The current segment is a triangle too.
+            // The current segment is a triangle.
             newHeight = 2 * m_fillArea / dx0;
 
         }  else if (qFuzzyCompare(dx0, dx1)) {
@@ -499,7 +500,6 @@ void ColorsLayer::nextSegment()
         m_fillArea = 0;
         m_colorCurrent ++;
     }
-
 }
 
 void ColorsLayer::drawColorCell()
@@ -564,14 +564,13 @@ qreal ColorsLayer::getIntersectionX(quint8 vertex)
         if ((tubeVertices[vertex].v != line)
             && (tubeVertices[vertex].v) != line + 1)
         {
-            qreal minY = qMin(edgeLines[line].p1().y(), edgeLines[line].p2().y());
-            qreal maxY = qMax(edgeLines[line].p1().y(), edgeLines[line].p2().y());
 
-            if (tubeVertices[vertex].y >= minY && tubeVertices[vertex].y <= maxY)
+            qreal x = (tubeVertices[vertex].y - bottleLines[line].b) / bottleLines[line].k;
+
+            if (x >= qMin(bottleLines[line].x1, bottleLines[line].x2)
+                    && x <= qMax(bottleLines[line].x1, bottleLines[line].x2))
             {
-                return (tubeVertices[vertex].y - edgeLines[line].p1().y())
-                        * edgeLines[line].dx() / edgeLines[line].dy()
-                        + edgeLines[line].p1().x();
+                return x;
             }
         }
         line++;

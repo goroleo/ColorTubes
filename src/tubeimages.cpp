@@ -73,14 +73,19 @@ QRectF TubeImages::colorRect(quint8 index)
     return result;
 }
 
-void TubeImages::setScale(qreal newScale)
+void TubeImages::setScale(qreal value)
 {
-    if (!qFuzzyCompare(m_scale, newScale))
+    if (!qFuzzyCompare(m_scale, value))
     {
-        m_scale = newScale;
+        m_scale = value;
         scalePoints();
         renderImages();
-        emit scaleChanged(newScale);
+        centerPoint = QPointF(
+                (m_vertices[0].x() + m_vertices[5].x()) / 2,
+                (m_vertices[0].y() + m_vertices[5].y()) / 2);
+
+        qDebug() << "Images::setScale" << m_scale;
+        emit scaleChanged(m_scale);
     }
 }
 
