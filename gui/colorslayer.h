@@ -50,13 +50,13 @@ private:
 //  fill colors from another tube
     void addFillArea(qreal fillAreaInc);
     QTimer * m_fillTimer;
-    qreal   m_fillArea;                  // currently filled area
-    qreal   m_fillAreaInc;               // area increment
-    QColor  m_fillColor;                 // color to fill color cells
-    quint8  m_fillCount;                 // number of filled color cells
-    qreal   m_fillJetWidth;              // width of the jet
-    QRectF  m_colorRect;                 // rect of the color
-    qreal   m_colorBottom;               // bottom vertical coordinate
+    qreal    m_fillArea;                  // currently filled area
+    qreal    m_fillAreaInc;               // area increment
+    QColor   m_fillColor;                 // color to fill color cells
+    quint8   m_fillCount;                 // number of filled color cells
+    qreal    m_fillJetWidth;              // width of the jet
+    QRectF   m_colorRect;                 // rect of the color
+    qreal    m_colorBottom;               // bottom vertical coordinate
 
 //  drop colors to another tube
     void addAngle(qreal angleInc);
