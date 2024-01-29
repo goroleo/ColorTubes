@@ -42,7 +42,7 @@ private:
 
     TubeModel *model;
 
-    qreal        m_angle;
+    qreal        m_angle = 0.0;
 
 };
 

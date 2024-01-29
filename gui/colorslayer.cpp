@@ -131,7 +131,7 @@ void ColorsLayer::onAngleChanged()
 
     qDebug() << newAngle / M_PI * 180 << newAngle;
 
-    setAngle( newAngle);
+    setAngle(newAngle);
 }
 
 void ColorsLayer::paint(QPainter *painter)

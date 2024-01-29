@@ -42,7 +42,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
             this, SLOT(onScaleChanged()));
 
     onScaleChanged();
-    setAngle(-28.11 / 180.0 * M_PI);
+//    setAngle(-28.11 / 180.0 * M_PI);
 
 }
 
@@ -68,6 +68,7 @@ void TubeItem::setScale(qreal newScale)
 void TubeItem::onScaleChanged()
 {
     if (qFuzzyIsNull(m_angle)) {
+
         shade->setX(100 * scale());
         shade->setY(20 * scale());
 

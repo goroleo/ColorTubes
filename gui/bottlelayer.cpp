@@ -3,18 +3,25 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QtDebug>
+#include <QtMath>
 
 #include "src/ctglobal.h"
 #include "src/tubeimages.h"
+#include "tubeitem.h"
 
 BottleLayer::BottleLayer(TubeItem *parent) :
-      QQuickPaintedItem((QQuickItem*) parent)
+      QQuickPaintedItem((QQuickItem *) parent)
 {
+
+    parentTube = parent;
+
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
-//    m_drawImage = nullptr;
-//    onScaleChanged();
+    QObject::connect(parent, &TubeItem::angleChanged,
+            this, &BottleLayer::onAngleChanged);
+
+    setAntialiasing(true);
 }
 
 BottleLayer::~BottleLayer()
@@ -27,8 +34,50 @@ void BottleLayer::prepareImage()
 
 void BottleLayer::paint(QPainter *painter)
 {
-//    painter->rotate(m_angle);
-    painter->drawPixmap(0, 0, m_drawImage);
+    if (qFuzzyIsNull(m_angle)) {
+
+        setWidth(m_drawImage.width());
+        setHeight(m_drawImage.height());
+        painter->drawPixmap(0, 0, m_drawImage);
+
+    } else {
+
+        qreal cos = qCos(m_angle);
+        qreal sin = qSin(m_angle);
+        setWidth(280 * scale());
+        setHeight(200 * scale());
+
+        qreal x = (m_angle > 0)
+                  ? CtGlobal::images().vertex(0).x()
+                  : CtGlobal::images().vertex(5).x();
+
+        qreal y = CtGlobal::images().vertex(0).y();
+
+//        painter->translate(-x, -y);
+        painter->rotate(m_angle / M_PI * 180);
+//        painter->translate(x, y);
+        painter->drawPixmap(x, y, m_drawImage);
+
+        qDebug() << x << y << width() << height();
+
+/*
+
+        qreal cos = qCos(m_angle);
+        qreal sin = qSin(m_angle);
+        setWidth(m_drawImage.width() * cos);
+        setHeight(m_drawImage.height() * sin);
+
+        QTransform trans = QTransform::setMatrix(
+                    cos, -sin, (x * cos - y * sin - x),
+                    sin, cos, (x * sin + y * cos - y),
+                    0, 0, 1);
+
+        painter->setTransform();
+*/
+
+
+    }
+
 }
 
 QString BottleLayer::source()
@@ -64,39 +113,29 @@ void BottleLayer::setSource(QString newSource)
 {
     if (findImage(newSource)) {
         m_source = newSource;
-        setWidth(m_drawImage.width());
-        setHeight(m_drawImage.height());
         update();
-
         qDebug() << "bottleLayer::setSource" << m_source << m_drawImage.width() << m_drawImage.height();
     }
-
-}
-
-void BottleLayer::setScale(qreal newScale)
-{
-    CtGlobal::images().setScale(newScale);
-}
-
-void BottleLayer::setAngle(qreal newAngle)
-{
-    m_angle = newAngle;
-//    setWidth(qMax(m_drawImage.width(), m_drawImage.height()));
-//    setHeight(width());
 }
 
 void BottleLayer::onScaleChanged()
 {
-
     if (findImage(m_source)) {
-        setWidth(m_drawImage.width());
-        setHeight(m_drawImage.height());
         update();
-
         qDebug() << "bottleLayer::onScaleChanged" << m_source << m_drawImage.width() << m_drawImage.height();
     }
-    //    emit scaleChanged(CtGlobal::images().scale());
 }
 
+void BottleLayer::onAngleChanged()
+{
+    if (qFuzzyCompare(m_angle, parentTube->angle()))
+            return;
+
+    if (findImage(m_source)) {
+        m_angle = parentTube->angle();
+        update();
+        qDebug() << "bottleLayer::onAngleChanged" << m_source << m_angle << m_angle / M_PI * 180;
+    }
+}
 
 
