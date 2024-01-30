@@ -19,7 +19,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
     model->putColor(1);
     model->putColor(10);
 
-    setScale(2.12);
+    setScale(2.0);
     shade = new ShadeLayer(this);
     shade->setVisible(true);
     shade->setShade(0);
@@ -42,7 +42,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
             this, SLOT(onScaleChanged()));
 
     onScaleChanged();
-//    setAngle(-28.11 / 180.0 * M_PI);
+    setAngle(28.11 / 180.0 * M_PI);
 
 }
 
@@ -67,23 +67,23 @@ void TubeItem::setScale(qreal newScale)
 
 void TubeItem::onScaleChanged()
 {
-    if (qFuzzyIsNull(m_angle)) {
+    shade->setX(100 * scale());
+    shade->setY(20 * scale());
+    cork->setX(shade->x());
 
-        shade->setX(100 * scale());
-        shade->setY(20 * scale());
 
-        back->setX(shade->x());
-        back->setY(shade->y());
+/*    colors->setX(0);
+    colors->setY(0);
 
-        colors->setX(0);
-        colors->setY(0);
 
-        front->setX(shade->x());
-        front->setY(35.5 * scale());
+    cork->setY(0);
 
-        cork->setX(shade->x());
-        cork->setY(0);
-    }
+    back->setX(0);
+    back->setY(0);
+    front->setX(0);
+    front->setY(0);
+
+*/
 
 
 }

@@ -38,7 +38,7 @@ private:
     void prepareImage();
     bool findImage(QString aSource);
     qreal scale();
-
+    qreal dy = 0;
     QString  m_source;
     qreal    m_angle = 0.0;
     QPixmap  m_drawImage;
