@@ -7,16 +7,12 @@
 #include <QImage>
 #include <QPainter>
 
-
 class TubeModel;
 class TubeItem;
 
 class ColorsLayer : public QQuickPaintedItem
 {
     Q_OBJECT
-//    Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
-//    Q_PROPERTY(qreal angle READ angle WRITE setAngle NOTIFY angleChanged)
-//    Q_PROPERTY(int count READ count NOTIFY countChanged)
 
 public:
     explicit ColorsLayer(TubeItem *parent = 0, TubeModel *tm = 0);
@@ -26,7 +22,7 @@ public:
     void setModel(TubeModel *tm);
 
 public slots:
-    void fillColors(quint8 colorNum, quint8 count);
+//    void fillColors(quint8 colorNum, quint8 count);
     void dropColors(quint8 count);
 
 private slots:
@@ -59,13 +55,12 @@ private:
     qreal    m_colorBottom;               // bottom vertical coordinate
 
 //  drop colors to another tube
-    void addAngle(qreal angleInc);
+//    void addAngle(qreal angleInc);
     void nextSegment();
     void drawColorCell();
-    QTimer * m_rotateTimer;
+//    QTimer * m_rotateTimer;
     qreal  * m_tiltAngles;                 //
-    qreal    m_angle = 0.0;                // current angle
-    qreal    m_angleInc;                   // angle increment
+//    qreal    m_angleInc = 0.00001;                   // angle increment
     qreal    m_startAngle;
     qreal    m_endAngle;
     quint8   m_dropCount;                  // number of dropped color cells

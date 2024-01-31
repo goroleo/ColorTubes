@@ -53,11 +53,13 @@ ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
         update();
     });
 
+/*
     m_rotateTimer = new QTimer(this);
     connect(m_rotateTimer, &QTimer::timeout, [=]() {
         addAngle(m_angleInc);
         update();
     });
+*/
 
     if (m_model) {
         drawColors();
@@ -71,7 +73,7 @@ ColorsLayer::~ColorsLayer()
     delete m_painter;
     delete m_drawImage;
     delete m_fillTimer;
-    delete m_rotateTimer;
+//  delete m_rotateTimer;
 
     delete [] tubeVertices;
     delete [] bottleLines;
@@ -94,7 +96,7 @@ qreal ColorsLayer::scale()
 
 qreal ColorsLayer::angle()
 {
-    return m_angle;
+    return parentTube->angle();
 }
 
 int ColorsLayer::count()
@@ -127,13 +129,12 @@ void ColorsLayer::onScaleChanged()
 
 void ColorsLayer::onAngleChanged()
 {
-    qreal newAngle = parentTube->angle();
-    setAngle(newAngle);
+    setAngle(parentTube->angle());
 }
 
 void ColorsLayer::paint(QPainter *painter)
 {
-    painter->drawImage(0, 0, *m_drawImage);
+    painter->drawImage(0, 0, * m_drawImage);
 }
 
 void ColorsLayer::drawColors()
@@ -143,7 +144,7 @@ void ColorsLayer::drawColors()
     if (!m_model)
         return;
 
-    if (qFuzzyIsNull(m_angle))
+    if (qFuzzyIsNull(angle()))
     {
         for (quint8 i = 0; i < m_model->count(); ++i)
         {
@@ -171,12 +172,13 @@ void ColorsLayer::drawColors()
 
 }
 
+/*
 void ColorsLayer::fillColors(quint8 colorNum, quint8 count)
 {
     if (!m_model)
         return;
 
-    if (!qFuzzyIsNull(m_angle) || m_rotateTimer->isActive())
+    if (!qFuzzyIsNull(angle()) || m_rotateTimer->isActive())
         return;
 
     count = qMin(count, quint8 (4 - m_model->count()));
@@ -207,14 +209,15 @@ void ColorsLayer::fillColors(quint8 colorNum, quint8 count)
     }
 
 }
+*/
 
 void ColorsLayer::dropColors(quint8 count)
 {
     if (!m_model)
         return;
 
-    if (m_fillTimer->isActive() || m_rotateTimer->isActive())
-        return;
+//    if (m_fillTimer->isActive() || m_rotateTimer->isActive())
+//        return;
 
     m_dropCount = qMin(count, m_model->count());
     if (m_dropCount == 0)
@@ -223,8 +226,9 @@ void ColorsLayer::dropColors(quint8 count)
     m_startAngle = m_tiltAngles[m_model->count()];
     setAngle(m_tiltAngles[m_model->count()]);
     m_endAngle = m_tiltAngles[m_model->count() - m_dropCount];
-    m_angleInc = (m_endAngle - m_startAngle) / 60 / count;
-    m_rotateTimer->start(20);
+
+//    m_angleInc = (m_endAngle - m_startAngle) / 60 / count;
+//    m_rotateTimer->start(20);
 }
 
 void ColorsLayer::addFillArea(qreal fillAreaInc)
@@ -275,27 +279,22 @@ void ColorsLayer::addFillArea(qreal fillAreaInc)
     }
 }
 
+
+/*
 void ColorsLayer::addAngle(qreal angleInc)
 {
     setAngle(m_angle + angleInc);
-    if (qFuzzyCompare(m_angle, m_endAngle))
-    {
-//        m_count -= m_dropCount;
+    if (qFuzzyCompare(m_angle, m_endAngle)) {
         m_angleInc = - m_angle / 10;
-    }
-     else if (qFuzzyIsNull(m_angle))
+    } else if (qFuzzyIsNull(m_angle))
         m_rotateTimer->stop();
 }
 
-
+*/
 void ColorsLayer::setAngle(qreal newAngle)
 {
-    if (qFuzzyCompare(m_angle, newAngle))
-        return;
 
-    m_angle = newAngle;
-
-    if (qFuzzyIsNull(m_angle))
+    if (qFuzzyIsNull(newAngle))
     {
         drawColors();
         update();
@@ -304,7 +303,7 @@ void ColorsLayer::setAngle(qreal newAngle)
 
 // ---- set rotation point
     quint8 rVertexNumber; // rotation vertex number
-    if (m_angle > 0)
+    if (newAngle > 0)
         rVertexNumber = 0;
     else
         rVertexNumber = 5;
@@ -314,8 +313,8 @@ void ColorsLayer::setAngle(qreal newAngle)
     tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
 
 // --- calculate new coordinates of other vertices after rotation
-    qreal cos = qCos(m_angle);
-    qreal sin = qSin(m_angle);
+    qreal cos = qCos(newAngle);
+    qreal sin = qSin(newAngle);
 
     for (quint8 i = 0; i < 6; i++)
     {
@@ -364,7 +363,7 @@ void ColorsLayer::setAngle(qreal newAngle)
         quint8 currentVertex;
 
         // lowest point(s)
-        if ( qFuzzyCompare(qAbs(m_angle), (qreal) M_PI_2) )
+        if ( qFuzzyCompare(qAbs(newAngle), (qreal) M_PI_2) )
         {
             // when angle = +-90 degrees, we have two lowest points
             addSlice(tubeVertices[1].v, tubeVertices[0].x,
@@ -388,13 +387,8 @@ void ColorsLayer::setAngle(qreal newAngle)
         } while (tubeVertices[currentVertex].v != 0);
     }
 
-
-
     drawColors();
     update();
-
-//    emit angleChanged(m_angle);
-
 }
 
 void ColorsLayer::nextSegment()
@@ -431,7 +425,6 @@ void ColorsLayer::nextSegment()
             drawColorCell();
             clearColorSegments();
 
-//          drawBottle();
 //          if (!qFuzzyIsNull(endAngle))
 //                drawFlow(colorArea - sliceArea);
 
@@ -457,7 +450,7 @@ void ColorsLayer::nextSegment()
         } else {
 
             /*
-             * The current segment is a trapeze.
+             * The current segment is a trapeze or triangle.
              * We have to solve a sqare equation:
              *   ( k/2 ) * x^2 + dx0 * x - S = 0,
              * where k   - a trapeze's coefficient
@@ -547,7 +540,6 @@ qreal ColorsLayer::getIntersectionX(quint8 vertex)
         if ((tubeVertices[vertex].v != line)
             && (tubeVertices[vertex].v) != line + 1)
         {
-
             qreal x = (tubeVertices[vertex].y - bottleLines[line].b) / bottleLines[line].k;
 
             if (x >= qMin(bottleLines[line].x1, bottleLines[line].x2)

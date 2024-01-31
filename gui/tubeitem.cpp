@@ -19,7 +19,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
     model->putColor(1);
     model->putColor(10);
 
-    setScale(2.12);
+    setScale(1.85);
     shade = new ShadeLayer(this);
     shade->setVisible(true);
     shade->setShade(0);
@@ -80,6 +80,9 @@ qreal TubeItem::angle() const
 
 void TubeItem::setAngle(qreal newAngle)
 {
+    if (qFuzzyCompare(m_angle, newAngle))
+        return;
+
     m_angle = newAngle;
     emit angleChanged(newAngle);
 }
