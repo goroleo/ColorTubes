@@ -28,15 +28,8 @@ BottleLayer::~BottleLayer()
 {
 }
 
-void BottleLayer::prepareImage()
-{
-}
-
 void BottleLayer::paint(QPainter *painter)
 {
-//    painter->setBrush(QColor(0,127,0,80));
-//    painter->drawRect(0,0,width(), height());
-
 
     if (qFuzzyIsNull(m_angle)) {
 
@@ -47,37 +40,18 @@ void BottleLayer::paint(QPainter *painter)
         qreal x = (m_angle > 0)
                   ? CtGlobal::images().vertex(0).x()
                   : CtGlobal::images().vertex(5).x();
-        x = x + 100 * scale();
+        x += 100 * scale();
 
-        qreal y = (m_source.compare("back", Qt::CaseInsensitive) == 0)
-                ? m_drawImage.height() + dy * scale()
-                : dy * scale();
+        qreal y = CtGlobal::images().vertex(0).y() + 20 * scale();
 
-        painter->translate(-x, -y);
-        painter->rotate(m_angle / M_PI * 180);
         painter->translate(x, y);
-        painter->drawPixmap(0, 0, m_drawImage);
+        painter->rotate(m_angle / M_PI * 180);
+        painter->translate(-x, -y);
 
-        qDebug() << "Vertex:" << x << y;
-        qDebug() << x << y << dy * scale();
-
-/*
-        qreal cos = qCos(m_angle);
-        qreal sin = qSin(m_angle);
-        setWidth(m_drawImage.width() * cos);
-        setHeight(m_drawImage.height() * sin);
-
-        QTransform trans = QTransform::setMatrix(
-                    cos, -sin, (x * cos - y * sin - x),
-                    sin, cos, (x * sin + y * cos - y),
-                    0, 0, 1);
-
-        painter->setTransform();
-*/
-
-
+        painter->drawPixmap(100 * scale(),
+                            dy * scale(),
+                            m_drawImage);
     }
-
 }
 
 QString BottleLayer::source()
@@ -119,7 +93,6 @@ void BottleLayer::setSource(QString newSource)
         setWidth(280 * scale());
         setHeight(200 * scale());
         update();
-        qDebug() << "bottleLayer::setSource" << m_source << m_drawImage.width() << m_drawImage.height();
     }
 }
 
@@ -129,7 +102,6 @@ void BottleLayer::onScaleChanged()
         setWidth(280 * scale());
         setHeight(200 * scale());
         update();
-        qDebug() << "bottleLayer::onScaleChanged" << m_source << m_drawImage.width() << m_drawImage.height();
     }
 }
 
@@ -141,7 +113,6 @@ void BottleLayer::onAngleChanged()
     if (findImage(m_source)) {
         m_angle = parentTube->angle();
         update();
-        qDebug() << "bottleLayer::onAngleChanged" << m_source << m_angle << m_angle / M_PI * 180;
     }
 }
 

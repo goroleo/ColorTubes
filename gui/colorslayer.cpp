@@ -128,9 +128,6 @@ void ColorsLayer::onScaleChanged()
 void ColorsLayer::onAngleChanged()
 {
     qreal newAngle = parentTube->angle();
-
-    qDebug() << newAngle / M_PI * 180 << newAngle;
-
     setAngle(newAngle);
 }
 
@@ -293,8 +290,6 @@ void ColorsLayer::addAngle(qreal angleInc)
 
 void ColorsLayer::setAngle(qreal newAngle)
 {
-    qDebug() << newAngle;
-
     if (qFuzzyCompare(m_angle, newAngle))
         return;
 
@@ -318,7 +313,10 @@ void ColorsLayer::setAngle(qreal newAngle)
     tubeVertices[0].x = CtGlobal::images().vertex(rVertexNumber).x();
     tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
 
-// --- calculate polar coordinates of other vertices & rotate them
+// --- calculate new coordinates of other vertices after rotation
+    qreal cos = qCos(m_angle);
+    qreal sin = qSin(m_angle);
+
     for (quint8 i = 0; i < 6; i++)
     {
         if (i != rVertexNumber) {
@@ -326,12 +324,10 @@ void ColorsLayer::setAngle(qreal newAngle)
 
             qreal dx = CtGlobal::images().vertex(i).x() - tubeVertices[0].x;
             qreal dy = CtGlobal::images().vertex(i).y() - tubeVertices[0].y;
-            qreal radius = sqrt(dx*dx + dy*dy);
-            qreal angle = atan2(dy, dx) + m_angle;
 
             tubeVertices[number].v = number;
-            tubeVertices[number].x = tubeVertices[0].x + radius * qCos(angle);
-            tubeVertices[number].y = tubeVertices[0].y + radius * qSin(angle);
+            tubeVertices[number].x = tubeVertices[0].x + dx * cos - dy * sin;
+            tubeVertices[number].y = tubeVertices[0].y + dx * sin + dy * cos;
         }
     }
 
@@ -391,6 +387,9 @@ void ColorsLayer::setAngle(qreal newAngle)
                      tubeVertices[currentVertex].y);
         } while (tubeVertices[currentVertex].v != 0);
     }
+
+
+
     drawColors();
     update();
 
@@ -468,23 +467,9 @@ void ColorsLayer::nextSegment()
             qreal k = (dx1 - dx0) / dy;
             qreal D = dx0 * dx0 + 2 * k * m_fillArea;
 
-//          disabled to improve the speed
-//          if (D < 0) {
-//              qDebug() << "ERROR! check nextSegment() D value";
-//              return;
-//          }
-
             newHeight = ( -dx0 + sqrt(D) ) / k;
-            if (!(newHeight > 0 && newHeight < dy))
-            {
+            if (!(newHeight > 0 && newHeight < dy)) {
                 newHeight = ( -dx0 - sqrt(D) ) / k;
-
-//              disabled to improve the speed
-//              if (!(newHeight > 0 && newHeight < dy)) {
-//                  qDebug() << "ERROR! check nextSegment() newHeight value";
-//                  return;
-//              }
-
             }
         }
 
@@ -541,8 +526,6 @@ void ColorsLayer::clearSlices()
 
 void ColorsLayer::addColorSegment(SliceF line)
 {
-//    colorSegments[m_segmentsCount].x1 = qMin(line.x1, line.x2);
-//    colorSegments[m_segmentsCount].x2 = qMax(line.x1, line.x2);
     colorSegments[m_segmentsCount].x1 = line.x1;
     colorSegments[m_segmentsCount].x2 = line.x2;
     colorSegments[m_segmentsCount].y = line.y;

@@ -58,7 +58,7 @@ void CorkLayer::setVisible(bool newVisible)
         startShow();
     else
         startHide();
-    visibleChanged(m_visible);
+    emit visibleChanged(m_visible);
 }
 
 void CorkLayer::startShow()
@@ -92,10 +92,6 @@ void CorkLayer::onScaleChanged()
     m_drawImage.fill(0x00ffffff);
     prepareImage();
     update();
-
-    qDebug() << "Cork::onScaleChanged" << scale();
-
-//    emit scaleChanged(scale());
 }
 
 void CorkLayer::paint(QPainter *painter)
@@ -118,11 +114,8 @@ void CorkLayer::nextStep()
             internalTimer->stop();
         }
     }
-//    m_currY = (20 * scale()) * m_alpha;
 
-
-   m_currY = (20 * scale()) * exp(-0.5 * (1 - m_alpha));
-
+    m_currY = (20 * scale()) * exp(-0.5 * (1 - m_alpha));
 }
 
 void CorkLayer::prepareImage()
@@ -131,8 +124,7 @@ void CorkLayer::prepareImage()
     int newAlpha;
     QImage corkImage = CtGlobal::images().cork().toImage();
 
-
-    for (int x = 0; x < corkImage.width(); ++x)
+    for (int x = 0; x < corkImage.width(); ++x) {
         for (int y = 0; y < corkImage.height(); ++y) {
             pix = corkImage.pixel(x, y);
             if ((pix >> 24) > 0) {
@@ -140,5 +132,5 @@ void CorkLayer::prepareImage()
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
-
+    }
 }

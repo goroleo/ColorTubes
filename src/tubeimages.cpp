@@ -84,7 +84,6 @@ void TubeImages::setScale(qreal value)
                 (m_vertices[0].x() + m_vertices[5].x()) / 2,
                 (m_vertices[0].y() + m_vertices[5].y()) / 2);
 
-        qDebug() << "Images::setScale" << m_scale;
         emit scaleChanged(m_scale);
     }
 }

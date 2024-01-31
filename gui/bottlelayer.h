@@ -11,7 +11,6 @@ class BottleLayer : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
-//    Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
 
 public:
     explicit BottleLayer(TubeItem *parent = 0);
@@ -25,7 +24,6 @@ public slots:
     void setSource(QString newSource);
 
 signals:
-//    void scaleChanged(const qreal newScale);
     void sourceChanged(const int newShadeNumber);
 
 private slots:
@@ -35,7 +33,6 @@ private slots:
 private:
     TubeItem * parentTube;
 
-    void prepareImage();
     bool findImage(QString aSource);
     qreal scale();
     qreal dy = 0;

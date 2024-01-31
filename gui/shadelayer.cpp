@@ -149,9 +149,6 @@ void ShadeLayer::onScaleChanged()
     m_drawImage.fill(0x00ffffff);
     prepareImage();
     update();
-
-    qDebug() << "Shade::onScaleChanged" << scale();
-//    emit scaleChanged(scale());
 }
 
 int ShadeLayer::shade()
