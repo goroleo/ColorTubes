@@ -33,18 +33,18 @@ private:
     TubeModel * m_model;
     TubeItem * parentTube;
 
-    int count();
-    qreal scale();
-    qreal angle();
-    void setAngle(qreal newAngle);
+    int      count();
+    qreal    scale();
+    qreal    angle();
+    void     setAngle(qreal newAngle);
 
 //  draw colors
-    void drawColors();
+    void     drawColors();
     QImage   * m_drawImage;
     QPainter * m_painter;
 
 //  fill colors from another tube
-    void addFillArea(qreal fillAreaInc);
+    void     addFillArea(qreal fillAreaInc);
     QTimer * m_fillTimer;
     qreal    m_fillArea;                  // currently filled area
     qreal    m_fillAreaInc;               // area increment
@@ -55,12 +55,14 @@ private:
     qreal    m_colorBottom;               // bottom vertical coordinate
 
 //  drop colors to another tube
+    void     nextSegment();
+    void     drawColorCell();
+
 //    void addAngle(qreal angleInc);
-    void nextSegment();
-    void drawColorCell();
 //    QTimer * m_rotateTimer;
-    qreal  * m_tiltAngles;                 //
 //    qreal    m_angleInc = 0.00001;                   // angle increment
+
+    qreal  * m_tiltAngles;                 //
     qreal    m_startAngle;
     qreal    m_endAngle;
     quint8   m_dropCount;                  // number of dropped color cells
@@ -88,25 +90,28 @@ private:
         qreal b;    // koeff b
     };
 
-    PointF * tubeVertices;                   // coordinates after rotation
-    LineF  * bottleLines;                    // bottle edge lines
-    qreal getIntersectionX(quint8 vertex);   // the intersection of the horizontal line from bottle vertices
+    PointF * tubeVertices;                      // coordinates after rotation
+    LineF  * bottleLines;                       // bottle edge lines
+    qreal    getIntersectionX(quint8 vertex);   // the intersection of the horizontal line from bottle vertices
 
-    void addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
-    void clearSlices();
-    SliceF * tubeSlices;                     // tube is sliced by horizontal lines passing through its vertices
+    void     addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
+    void     clearSlices();
+    SliceF * tubeSlices;                         // tube is sliced by horizontal lines passing through its vertices
     qint8    m_slicesCount;
     qint8    m_sliceCurrent;
 
-    void addColorSegment(SliceF line);
-    void clearColorSegments();
-    SliceF * colorSegments;                  // color segments coordinates
+    void     addColorSegment(SliceF line);
+    void     clearColorSegments();
+    SliceF * colorSegments;                       // color segments coordinates
     qint8    m_segmentsCount;
     qint8    m_colorCurrent;
     qreal    m_segmentArea;
 
     SliceF   m_bottomLine;
     SliceF   m_topLine;
+
+    // temporary
+    qreal  * m_Areas;
 
 };
 

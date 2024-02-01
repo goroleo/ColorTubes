@@ -65,6 +65,8 @@ ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
         drawColors();
         update();
     }
+
+    m_Areas = new qreal[4];
 }
 
 ColorsLayer::~ColorsLayer()
@@ -80,6 +82,7 @@ ColorsLayer::~ColorsLayer()
     delete [] tubeSlices;
     delete [] colorSegments;
 
+    delete [] m_Areas;
 }
 
 void ColorsLayer::setModel(TubeModel *tm)
@@ -157,6 +160,12 @@ void ColorsLayer::drawColors()
     {
         m_colorCurrent = 0;
         m_sliceCurrent = 0;
+
+        m_Areas[0] = 0.0;
+        m_Areas[1] = 0.0;
+        m_Areas[2] = 0.0;
+        m_Areas[3] = 0.0;
+
         clearColorSegments();
 
         m_fillArea = CtGlobal::images().colorArea();
@@ -168,6 +177,13 @@ void ColorsLayer::drawColors()
             if (qFuzzyIsNull(m_fillArea))
                 m_fillArea = CtGlobal::images().colorArea();
         }
+
+        qDebug() << angle() * 180 / M_PI << ";"
+                 << m_Areas[0] << ";" << CtGlobal::images().colorArea() - m_Areas[0] << ";"
+                 << m_Areas[1] << ";" << CtGlobal::images().colorArea() - m_Areas[1] << ";"
+                 << m_Areas[2] << ";" << CtGlobal::images().colorArea() - m_Areas[2] << ";"
+                 << m_Areas[3] << ";" << CtGlobal::images().colorArea() - m_Areas[3] ;
+
     }
 
 }
@@ -417,6 +433,7 @@ void ColorsLayer::nextSegment()
         // Whole the segment is filled by the current color
 
         addColorSegment(m_topLine);
+        m_Areas[m_colorCurrent] += sliceArea;
         m_fillArea -= sliceArea;
         m_sliceCurrent++;
 
@@ -475,6 +492,7 @@ void ColorsLayer::nextSegment()
         addColorSegment(m_topLine);
         drawColorCell();
         clearColorSegments();
+        m_Areas[m_colorCurrent] += m_fillArea;
         m_fillArea = 0;
         m_colorCurrent ++;
     }

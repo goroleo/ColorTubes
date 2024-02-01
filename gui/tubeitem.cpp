@@ -19,7 +19,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
     model->putColor(1);
     model->putColor(10);
 
-    setScale(1.85);
+//    setScale(1.145);
     shade = new ShadeLayer(this);
     shade->setVisible(true);
     shade->setShade(0);
@@ -42,7 +42,7 @@ TubeItem::TubeItem(QQuickItem *parent) :
             this, SLOT(onScaleChanged()));
 
     onScaleChanged();
-    setAngle(45.11 / 180.0 * M_PI);
+    setAngle(115.11 / 180.0 * M_PI);
 
 }
 
