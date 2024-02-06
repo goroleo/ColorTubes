@@ -109,7 +109,7 @@ Page {
                 }
             }
         }
-
+/*
         Label {
             id: levelLabel
             anchors.top: pulldown.bottom
@@ -243,6 +243,18 @@ Page {
 
         TubeItem {
             id: tube1
+
+//            angle: 27.45 * 3.14159265358979 / 180
+            scale: 1.5
+/*
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+
+
+                    console.log ("width: ", width, ", height:", height) }
+            }
+ */
         }
     }
 }

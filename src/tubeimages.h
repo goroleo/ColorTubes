@@ -95,6 +95,8 @@ public:
         return m_colorArea;
     }
 
+    QRectF scaleRect (QRectF rect);
+
 public slots:
     void setScale(qreal value);
 
@@ -107,7 +109,6 @@ private:
     void initialize();
     static TubeImages* m_instance;
 
-    QRectF scaleRect (QRectF rect);
     void scalePoints();
     void renderImages();
 

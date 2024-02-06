@@ -44,6 +44,9 @@ private:
 
     qreal        m_angle = 0.0;
 
+    void mousePressEvent(QMouseEvent* event);
+    void resize();
+
 };
 
 #endif // TUBEITEM_H

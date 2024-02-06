@@ -33,7 +33,7 @@ void BottleLayer::paint(QPainter *painter)
 
     if (qFuzzyIsNull(m_angle)) {
 
-        painter->drawPixmap(100 * scale(), dy * scale(), m_drawImage);
+        painter->drawPixmap(0, dy * scale(), m_drawImage);
 
     } else {
 

@@ -152,7 +152,7 @@ void ColorsLayer::drawColors()
         for (quint8 i = 0; i < m_model->count(); ++i)
         {
             m_colorRect = CtGlobal::images().colorRect(i);
-            m_colorRect.translate(100 * scale(), 20 * scale());
+//            m_colorRect.translate(100 * scale(), 20 * scale());
             m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(m_model->getColor(i)));
         }
     }

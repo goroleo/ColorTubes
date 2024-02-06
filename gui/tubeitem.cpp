@@ -1,5 +1,7 @@
 #include "tubeitem.h"
 
+#include <QSGClipNode>
+
 #include "src/ctglobal.h"
 #include "src/tubeimages.h"
 
@@ -19,7 +21,6 @@ TubeItem::TubeItem(QQuickItem *parent) :
     model->putColor(1);
     model->putColor(10);
 
-//    setScale(1.145);
     shade = new ShadeLayer(this);
     shade->setVisible(true);
     shade->setShade(0);
@@ -41,8 +42,11 @@ TubeItem::TubeItem(QQuickItem *parent) :
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
-    onScaleChanged();
-    setAngle(115.11 / 180.0 * M_PI);
+//    onScaleChanged();
+//    setAngle(15.11 / 180.0 * M_PI);
+
+    setAcceptedMouseButtons(Qt::AllButtons);
+    setFlag(ItemAcceptsInputMethod, true);
 
 }
 
@@ -53,6 +57,13 @@ TubeItem::~TubeItem()
     delete colors;
     delete back;
     delete shade;
+}
+
+void TubeItem::mousePressEvent(QMouseEvent* event)
+{
+    QQuickItem::mousePressEvent(event);
+    setAngle(m_angle - CT_2PI * 4 + (180.0 + 90.0)/180.0 * CT_PI);
+    qDebug() << event->pos();
 }
 
 qreal TubeItem::scale() const
@@ -67,11 +78,8 @@ void TubeItem::setScale(qreal newScale)
 
 void TubeItem::onScaleChanged()
 {
-    shade->setX(100 * scale());
-    shade->setY(20 * scale());
-    cork->setX(shade->x());
+    resize();
 }
-
 
 qreal TubeItem::angle() const
 {
@@ -80,10 +88,50 @@ qreal TubeItem::angle() const
 
 void TubeItem::setAngle(qreal newAngle)
 {
+
+    newAngle = fmod(newAngle, CT_2PI);
+    if (qAbs(newAngle) > CT_PI) {
+        newAngle = std::signbit(newAngle)
+                ? CT_2PI + newAngle
+                : newAngle - CT_2PI;
+    }
+
     if (qFuzzyCompare(m_angle, newAngle))
         return;
 
     m_angle = newAngle;
+    resize();
+
     emit angleChanged(newAngle);
+}
+
+
+void TubeItem::resize()
+{
+    shade->setY(20 * scale());
+    back->setX(0);
+    colors->setX(0);
+    front->setX(0);
+
+    if (qFuzzyIsNull(m_angle)) {
+
+        shade->setX(0);
+        colors->setY(shade->y());
+        cork->setX(0);
+
+        setWidth(80 * scale());
+        setHeight(200 * scale());
+        setClip(true);
+
+    } else {
+
+        shade->setX(100 * scale());
+        colors->setY(0);
+        cork->setX(shade->x());
+
+        setWidth(0);
+        setHeight(0);
+        setClip(false);
+    }
 }
 
