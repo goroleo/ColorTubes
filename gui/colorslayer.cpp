@@ -20,11 +20,11 @@ ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
 
 // tilt angles
     m_tiltAngles = new qreal[5];
-    m_tiltAngles[0] = 118.6105 / 180 * M_PI;
-    m_tiltAngles[1] = 85.252   / 180 * M_PI;
-    m_tiltAngles[2] = 77.666   / 180 * M_PI;
-    m_tiltAngles[3] = 71.5285  / 180 * M_PI;
-    m_tiltAngles[4] = 26.9970  / 180 * M_PI;
+    m_tiltAngles[0] = 118.6105 * CT_DEG2RAD;
+    m_tiltAngles[1] = 85.252   * CT_DEG2RAD;
+    m_tiltAngles[2] = 77.666   * CT_DEG2RAD;
+    m_tiltAngles[3] = 71.5285  * CT_DEG2RAD;
+    m_tiltAngles[4] = 26.9970  * CT_DEG2RAD;
 
 // coordinates
     tubeVertices = new PointF[6];
@@ -178,7 +178,7 @@ void ColorsLayer::drawColors()
                 m_fillArea = CtGlobal::images().colorArea();
         }
 
-        qDebug() << angle() * 180 / M_PI << ";"
+        qDebug() << angle() * CT_RAD2DEG << ";"
                  << m_Areas[0] << ";" << CtGlobal::images().colorArea() - m_Areas[0] << ";"
                  << m_Areas[1] << ";" << CtGlobal::images().colorArea() - m_Areas[1] << ";"
                  << m_Areas[2] << ";" << CtGlobal::images().colorArea() - m_Areas[2] << ";"
@@ -379,7 +379,7 @@ void ColorsLayer::setAngle(qreal newAngle)
         quint8 currentVertex;
 
         // lowest point(s)
-        if ( qFuzzyCompare(qAbs(newAngle), (qreal) M_PI_2) )
+        if ( qFuzzyCompare(qAbs(newAngle), (qreal) CT_PI2) )
         {
             // when angle = +-90 degrees, we have two lowest points
             addSlice(tubeVertices[1].v, tubeVertices[0].x,

@@ -10,6 +10,7 @@ class Palette;
 
 #define CT_PI          3.14159265358979323846              // PI
 #define CT_2PI         6.28318530717958647692              // 2*PI
+#define CT_PI2         1.57079632679489661923              // PI/2
 #define CT_DEG2RAD     0.01745329251994329576922222222222  // PI/180
 #define CT_RAD2DEG     57.295779513082320876846364344191   // 180/PI
 

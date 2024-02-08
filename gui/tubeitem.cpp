@@ -21,20 +21,20 @@ TubeItem::TubeItem(QQuickItem *parent) :
     model->putColor(1);
     model->putColor(10);
 
-    shade = new ShadeLayer(this);
-    shade->setVisible(true);
-    shade->setShade(0);
-    shade->startShow();
+    m_shade = new ShadeLayer(this);
+    m_shade->setVisible(true);
+    m_shade->setShade(0);
+    m_shade->startShow();
 
     back = new BottleLayer(this);
-    back->setSource("back");
+    back->setSource(CT_BOTTLE_BACK);
     back->setVisible(true);
 
     colors = new ColorsLayer(this);
     colors->setModel(model);
 
     front = new BottleLayer(this);
-    front->setSource("front");
+    front->setSource(CT_BOTTLE_FRONT);
 
     cork = new CorkLayer(this);
     cork->setVisible(false);
@@ -42,12 +42,8 @@ TubeItem::TubeItem(QQuickItem *parent) :
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
-//    onScaleChanged();
-//    setAngle(15.11 / 180.0 * M_PI);
-
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
-
 }
 
 TubeItem::~TubeItem()
@@ -56,7 +52,7 @@ TubeItem::~TubeItem()
     delete front;
     delete colors;
     delete back;
-    delete shade;
+    delete m_shade;
 }
 
 void TubeItem::mousePressEvent(QMouseEvent* event)
@@ -64,6 +60,17 @@ void TubeItem::mousePressEvent(QMouseEvent* event)
     QQuickItem::mousePressEvent(event);
     setAngle(m_angle - CT_2PI * 4 + (180.0 + 90.0)/180.0 * CT_PI);
     qDebug() << event->pos();
+}
+
+int TubeItem::shade()
+{
+    return m_shade->shade();
+}
+
+void TubeItem::setShade(int newShade)
+{
+    m_shade->setShade(newShade);
+    m_shade->startShow();
 }
 
 qreal TubeItem::scale() const
@@ -108,15 +115,15 @@ void TubeItem::setAngle(qreal newAngle)
 
 void TubeItem::resize()
 {
-    shade->setY(20 * scale());
+    m_shade->setY(20 * scale());
     back->setX(0);
     colors->setX(0);
     front->setX(0);
 
     if (qFuzzyIsNull(m_angle)) {
 
-        shade->setX(0);
-        colors->setY(shade->y());
+        m_shade->setX(0);
+        colors->setY(m_shade->y());
         cork->setX(0);
 
         setWidth(80 * scale());
@@ -125,9 +132,9 @@ void TubeItem::resize()
 
     } else {
 
-        shade->setX(100 * scale());
+        m_shade->setX(100 * scale());
         colors->setY(0);
-        cork->setX(shade->x());
+        cork->setX(m_shade->x());
 
         setWidth(0);
         setHeight(0);

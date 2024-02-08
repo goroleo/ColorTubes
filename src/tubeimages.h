@@ -73,7 +73,7 @@ public:
 
     QPointF center()
     {
-        return centerPoint;
+        return m_centerPoint;
     }
 
     QPointF vertex(quint8 index)
@@ -124,7 +124,7 @@ private:
     QPixmap *m_cork;
 
     QPointF *m_vertices;   // vertices of the егиу
-    QPointF centerPoint;   // central point to draw tube from it
+    QPointF m_centerPoint;   // central point to draw tube from it
 
     qreal m_colorHeight; // width of the one color cell after scaling
     qreal m_colorWidth;

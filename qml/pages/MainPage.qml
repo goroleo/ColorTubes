@@ -1,9 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-//import ShadeLayer 1.0
-//import BottleLayer 1.0
-//import ColorsLayer 1.0
-//import CorkLayer 1.0
 import TubeItem 1.0
 
 Page {
@@ -109,44 +105,7 @@ Page {
                 }
             }
         }
-/*
-        Label {
-            id: levelLabel
-            anchors.top: pulldown.bottom
-//            anchors.bottom: rect.top
-            anchors.topMargin: Theme.paddingLarge * 2
-            anchors.bottomMargin: Theme.paddingLarge
 
-            width: parent.width
-            text: "Level 145"
-            color: Theme.lightPrimaryColor
-            horizontalAlignment: Label.AlignHCenter
-            verticalAlignment: Label.AlignVCenter
-
-            font {
-                bold: true
-                pixelSize: Theme.fontSizeLarge
-            }
-        }
-
-/*
-        Rectangle {
-            id: rect
-
-            width: 190
-            height: 180+180+200
-
-            scale: Math.min((parent.width) / width,
-                            (parent.height - levelLabel.height) / height * (0.8) )
-
-            border.width: 1
-            border.color: "yellow"
-
-            color: "steelblue"
-            anchors.centerIn: parent
-
-        }
-*/
 /*        Item {
 
             id: tubeItem
@@ -244,17 +203,8 @@ Page {
         TubeItem {
             id: tube1
 
-//            angle: 27.45 * 3.14159265358979 / 180
             scale: 1.5
-/*
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-
-
-                    console.log ("width: ", width, ", height:", height) }
-            }
- */
+            shade: 2
         }
     }
 }

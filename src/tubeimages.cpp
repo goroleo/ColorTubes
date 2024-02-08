@@ -11,7 +11,7 @@ TubeImages* TubeImages::m_instance = nullptr;
 
 /*
 
-  Qt is not supported SVG transparency masks. So we have to render them manually.
+  Qt 5.6 is not supported SVG transparency masks. So we have to render them manually.
 
  */
 
@@ -80,7 +80,7 @@ void TubeImages::setScale(qreal value)
         m_scale = value;
         scalePoints();
         renderImages();
-        centerPoint = QPointF(
+        m_centerPoint = QPointF(
                 (m_vertices[0].x() + m_vertices[5].x()) / 2,
                 (m_vertices[0].y() + m_vertices[5].y()) / 2);
 
@@ -148,7 +148,7 @@ void TubeImages::renderImages()
         for (int x = 0; x < shineImage.width(); ++x) {
             pix = shineImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = round (qreal(pix >> 24) * alpha / 255);
+                newAlpha = round (qreal(pix >> 24) * alpha / 255.0);
                 shineImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
@@ -178,7 +178,7 @@ void TubeImages::renderImages()
         for (int y = 0; y < sideImage.height(); ++y) {
             pix = sideImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = round ( qreal(pix >> 24) * alpha / 255);
+                newAlpha = round ( qreal(pix >> 24) * alpha / 255.0);
                 sideImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
