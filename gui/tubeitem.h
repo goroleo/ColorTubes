@@ -23,6 +23,7 @@ public:
     qreal scale() const;
     qreal angle() const;
     int shade();
+    void rotate();
 
 public slots:
     void setScale(qreal newScale);
@@ -38,18 +39,23 @@ private slots:
     void onScaleChanged();
 
 private:
-    CorkLayer   *cork;
-    BottleLayer *front;
-    ColorsLayer *colors;
-    BottleLayer *back;
-    ShadeLayer  *m_shade;
+    CorkLayer   * cork;
+    BottleLayer * front;
+    ColorsLayer * colors;
+    BottleLayer * back;
+    ShadeLayer  * m_shade;
 
-    TubeModel *model;
+    TubeModel   * model;
 
-    qreal        m_angle = 0.0;
+    qreal         m_angle = 0.0;
+    qreal         m_angleIncrement;
 
     void mousePressEvent(QMouseEvent* event);
     void resize();
+
+    void addAngle(qreal value);
+    QTimer      * m_rotateTimer;
+
 
 };
 

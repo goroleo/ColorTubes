@@ -9,11 +9,11 @@ public:
     JctlFormat();
     ~JctlFormat();
 
-    quint32 fileVer;
+    quint32 fileVersion;
     quint32 fileSize;
 
     quint32 level = 508;
-    quint32 gMode = 0;
+    quint32 gameMode = 0;
     quint16 tubesCount = 0;
     quint16 emptyCount = 0;
     quint16 movesCount = 0;
@@ -23,14 +23,14 @@ public:
     quint32 fileCRC;
 
     quint32 size();
-    quint32 size(quint32 fileVer);
-    quint32 crcVer1();
-    quint16 crcVer2(QByteArray &buffer);
-    quint16 crcVer2(QByteArray &buffer, quint32 length);
+    quint32 size(quint32 formatVersion);
+    quint32 crcVersion1();
+    quint16 crcVersion2(QByteArray &buffer);
+    quint16 crcVersion2(QByteArray &buffer, quint32 length);
 
     bool read(QByteArray &buffer);
     bool write(QByteArray &buffer);
-    bool write(QByteArray &buffer, quint32 ver);
+    bool write(QByteArray &buffer, quint32 formatVersion);
 
     bool checkTubes();
 

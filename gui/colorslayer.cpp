@@ -53,14 +53,6 @@ ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
         update();
     });
 
-/*
-    m_rotateTimer = new QTimer(this);
-    connect(m_rotateTimer, &QTimer::timeout, [=]() {
-        addAngle(m_angleInc);
-        update();
-    });
-*/
-
     if (m_model) {
         drawColors();
         update();
@@ -177,13 +169,13 @@ void ColorsLayer::drawColors()
             if (qFuzzyIsNull(m_fillArea))
                 m_fillArea = CtGlobal::images().colorArea();
         }
-
+/*
         qDebug() << angle() * CT_RAD2DEG << ";"
                  << m_Areas[0] << ";" << CtGlobal::images().colorArea() - m_Areas[0] << ";"
                  << m_Areas[1] << ";" << CtGlobal::images().colorArea() - m_Areas[1] << ";"
                  << m_Areas[2] << ";" << CtGlobal::images().colorArea() - m_Areas[2] << ";"
                  << m_Areas[3] << ";" << CtGlobal::images().colorArea() - m_Areas[3] ;
-
+*/
     }
 
 }

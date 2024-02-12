@@ -15,22 +15,23 @@ public:
 
     QVector<TubeModel> * tubes;
 
-    QVector<MoveItem> * moves;
-    MoveItem* currentMove;
-    MoveItem* parentMove;
+    QVector<MoveItem>  * moves;
+    MoveItem           * currentMove;
+    MoveItem           * parentMove;
 
-    void setAsRoot();
-    BoardModel root() const {return *m_root;}
-    BoardModel parent() const {return *m_parent;}
-    bool hasChildren();
+    void                 setAsRoot();
+    BoardModel           root() const {return * m_root;}
+    BoardModel           parent() const {return * m_parent;}
+    bool hasMoves();
 
+    int tubesCount() const {return m_tubesCount; }
     void addNewTube();
     void addNewTube(TubeModel tube);
 
     void clear();
     bool solved();
 
-//    bool operator == (const BoardModel &other) const;
+    bool operator == (const BoardModel &other) const;
 
 //    QString toString();
 
@@ -39,8 +40,11 @@ public:
 //    }
 
 private:
-    BoardModel* m_parent = nullptr;
-    BoardModel* m_root = nullptr;
+    BoardModel * m_parent = nullptr;
+    BoardModel * m_root = nullptr;
+    int m_tubesCount;
+
+
 };
 
 #endif // BOARDMODEL_H

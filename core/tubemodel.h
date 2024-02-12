@@ -27,23 +27,23 @@ public:
     //  get color(s)
     quint8 currentColor() const;
     quint8 getColor(quint8 index);
-    bool hasColor(quint8 colorNum);
+    bool hasColor(quint8 colorNumber);
 
     //  put color
-    bool canPutColor(quint8 colorNum);
-    bool putColor(quint8 colorNum);
+    bool canPutColor(quint8 colorNumber);
+    bool putColor(quint8 colorNumber);
 
     //  extract color
     quint8 extractColor();
     quint8 sameColorsCount() const;
 
     //  compare to another tube
-    bool operator == (const TubeModel &other) const;
+    bool operator == (const TubeModel & other) const;
 
     // store & restore
     void assignColors(quint32 stored);
-    void assignColors(TubeModel *tmFrom);
-    quint32 storeColors();
+    void assignColors(TubeModel * tmFrom);
+    quint32 storeColors() const;
 
 private:
     bool checkClosed();

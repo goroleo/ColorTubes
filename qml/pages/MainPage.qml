@@ -106,105 +106,11 @@ Page {
             }
         }
 
-/*        Item {
-
-            id: tubeItem
-
-            width: colors.width
-            height: colors.height
-            anchors.top: levelLabel.bottom
-            anchors.horizontalCenter: parent.Center
-
-            ShadeLayer {
-                id: shade
-                anchors.top: parent.top
-                anchors.topMargin: 20 * bottle.scale
-                anchors.left: parent.left
-                anchors.leftMargin: 100 * bottle.scale
-
-                shade: 3
-            }
-
-            BottleLayer {
-                id: bottle_back
-                source: "back"
-                anchors.top: parent.top
-                anchors.topMargin: 20 * bottle.scale
-                anchors.left: parent.left
-                anchors.leftMargin: 100 * bottle.scale
-            }
-
-            ColorsLayer {
-                id: colors
-                anchors.top: parent.top
-                anchors.left: parent.left
-                angle: 0
-            }
-
-            BottleLayer {
-                id: bottle
-                source: "bottle"
-                anchors.top: parent.top
-                anchors.topMargin: 35.5 * scale
-                anchors.left: parent.left
-                anchors.leftMargin: 100 * scale
-                scale: 1.894
-            }
-
-            CorkLayer {
-                id: cork
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.leftMargin: 100 * scale
-                visible: false
-            }
-
-//            TubeFlyer {
-//                id: flyer
-//            }
-
-            MouseArea {
-                anchors.leftMargin: 100 * bottle.scale;
-                anchors.topMargin: 20 * bottle.scale;
-                width: bottle.width
-                height: bottle.height
-                onClicked: {
-//                    if (colors.count < 4)
-//                       colors.fillColors(11, 1)
-//                    else
-//                        colors.count = 0
-                    if (colors.count == 0)
-                        colors.count = 4
-                    else
-                        colors.dropColors(1);
-
-
-//                    if (!shade.visible)
-//                        shade.shade = shade.shade + 1
-
-                    if (!shade.pulse)
-                       shade.shade = shade.shade + 1
-
-                    if (shade.shade == 4)
-                        shade.shade = 1
-
-//                    colors.setAngle(colors.angle + 5/180*3.1415926)
-//                    shade.visible ? shade.startHide() : shade.startShow()
-                    shade.pulse ? shade.stopPulse() : shade.startPulse()
-                    cork.visible = ((shade.visible || shade.pulse) && (shade.shade == 3))
-                }
-            }
-
-        }
-    }
-
-    */
-
-        TubeItem {
+       TubeItem {
             id: tube1
 
-            scale: 1.5
-            shade: 2
+            scale: 1.678
+            shade: 0
         }
     }
 }

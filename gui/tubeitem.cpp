@@ -38,16 +38,24 @@ TubeItem::TubeItem(QQuickItem *parent) :
 
     cork = new CorkLayer(this);
     cork->setVisible(false);
+    resize();
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
+
+    m_rotateTimer = new QTimer(this);
+    connect(m_rotateTimer, &QTimer::timeout, [=]() {
+        addAngle(m_angleIncrement);
+        update();
+    });
 }
 
 TubeItem::~TubeItem()
 {
+    delete m_rotateTimer;
     delete cork;
     delete front;
     delete colors;
@@ -58,8 +66,8 @@ TubeItem::~TubeItem()
 void TubeItem::mousePressEvent(QMouseEvent* event)
 {
     QQuickItem::mousePressEvent(event);
-    setAngle(m_angle - CT_2PI * 4 + (180.0 + 90.0)/180.0 * CT_PI);
     qDebug() << event->pos();
+    rotate();
 }
 
 int TubeItem::shade()
@@ -125,6 +133,7 @@ void TubeItem::resize()
         m_shade->setX(0);
         colors->setY(m_shade->y());
         cork->setX(0);
+        this->setX(0);
 
         setWidth(80 * scale());
         setHeight(200 * scale());
@@ -135,10 +144,29 @@ void TubeItem::resize()
         m_shade->setX(100 * scale());
         colors->setY(0);
         cork->setX(m_shade->x());
+        this->setX(-100 * scale());
 
         setWidth(0);
         setHeight(0);
         setClip(false);
     }
 }
+
+void TubeItem::rotate()
+{
+    m_angleIncrement = std::copysign(0.5 * CT_DEG2RAD, m_angleIncrement);
+    m_rotateTimer->start(1);
+}
+
+void TubeItem::addAngle(qreal value)
+{
+    setAngle(m_angle + m_angleIncrement);
+    if (abs(m_angle) >= 125 * CT_DEG2RAD)
+        m_angleIncrement = - m_angle / 30.0;
+    if (qFuzzyIsNull(m_angle)) {
+        setAngle(0);
+        m_rotateTimer->stop();
+    }
+}
+
 
