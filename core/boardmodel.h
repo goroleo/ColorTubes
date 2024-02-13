@@ -11,38 +11,46 @@ class BoardModel
 {
 public:
     BoardModel();
+    BoardModel(BoardModel * parentBoard);
+    BoardModel(MoveItem * parentMove);
     ~BoardModel();
 
-    QVector<TubeModel> * tubes;
+    const BoardModel * rootBoard()   const {return m_rootBoard;}
+    const BoardModel * parentBoard() const {return m_parentBoard;}
+    const MoveItem   * parentMove()  const {return m_parentMove;}
+    MoveItem         * currentMove() const;
 
-    QVector<MoveItem>  * moves;
-    MoveItem           * currentMove;
-    MoveItem           * parentMove;
+    int            tubesCount() const { return m_tubes->size(); }
+    TubeModel    * getTube(int index) const;
 
-    void                 setAsRoot();
-    BoardModel           root() const {return * m_root;}
-    BoardModel           parent() const {return * m_parent;}
-    bool hasMoves();
+    int           movesCount() const { return m_moves->size(); }
+    bool          hasMoves() const;
+    void          deleteCurrentMove();
 
-    int tubesCount() const {return m_tubesCount; }
-    void addNewTube();
-    void addNewTube(TubeModel tube);
+    int           calculateMoves();
 
-    void clear();
-    bool solved();
+    TubeModel *   addNewTube();
+    TubeModel *   addNewTube(TubeModel * tube);
+
+    void          clear();
+    void          clearMoves();
+    bool          isSolved();
 
     bool operator == (const BoardModel &other) const;
 
-//    QString toString();
+    QString toString();
 
 //    void sortMoves() {
 //        std::sort(moves->begin(), moves->end(), MoveItem);
 //    }
 
 private:
-    BoardModel * m_parent = nullptr;
-    BoardModel * m_root = nullptr;
-    int m_tubesCount;
+    const BoardModel  * m_parentBoard = nullptr;
+    const BoardModel  * m_rootBoard = nullptr;
+    const MoveItem    * m_parentMove = nullptr;
+
+    QVector<TubeModel> * m_tubes;
+    QVector<MoveItem>  * m_moves;
 
 
 };

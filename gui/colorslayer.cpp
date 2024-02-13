@@ -302,12 +302,15 @@ void ColorsLayer::addAngle(qreal angleInc)
 void ColorsLayer::setAngle(qreal newAngle)
 {
 
+
     if (qFuzzyIsNull(newAngle))
     {
         drawColors();
         update();
         return;
     }
+
+    qDebug() << "colors";
 
 // ---- set rotation point
     quint8 rVertexNumber; // rotation vertex number
@@ -320,6 +323,7 @@ void ColorsLayer::setAngle(qreal newAngle)
     tubeVertices[0].x = CtGlobal::images().vertex(rVertexNumber).x();
     tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
 
+    qreal minY = tubeVertices[0].y;
 // --- calculate new coordinates of other vertices after rotation
     qreal cos = qCos(newAngle);
     qreal sin = qSin(newAngle);

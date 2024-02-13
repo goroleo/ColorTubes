@@ -15,10 +15,10 @@ MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
     m_boardBefore = board;
     m_tubeFrom = idxTubeFrom;
     m_tubeTo = idxTubeTo;
-    m_parentMove = board->parentMove;
-    m_color = m_boardBefore->tubes->at(idxTubeFrom).currentColor();
-    m_count = qMin( board->tubes->at(idxTubeFrom).sameColorsCount(),
-                   quint8(4 - board->tubes->at(idxTubeTo).count()) );
+    m_parentMove = board->parentMove();
+    m_color = m_boardBefore->getTube(idxTubeFrom)->currentColor();
+    m_count = qMin( board->getTube(idxTubeFrom)->sameColorsCount(),
+                   quint8(4 - board->getTube(idxTubeTo)->count()) );
 }
 
 MoveItem::~MoveItem()

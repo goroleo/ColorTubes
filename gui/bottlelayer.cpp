@@ -51,6 +51,8 @@ void BottleLayer::paint(QPainter *painter)
         painter->drawPixmap(100 * scale(),
                             dy * scale(),
                             m_drawImage);
+
+        qDebug() << "bottle" << source();
     }
 }
 

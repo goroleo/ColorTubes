@@ -82,8 +82,7 @@ bool TubeModel::hasColor(quint8 colorNumber)
 
 bool TubeModel::canPutColor(quint8 colorNumber)
 {
-    switch(m_count)
-    {
+    switch(m_count) {
     case 0:
         return true;
     case 4:
@@ -143,7 +142,7 @@ quint8 TubeModel::sameColorsCount() const
         return 0;
     }
 
-    quint8 current = currentColor();
+    quint8 current = m_items.colors[m_count - 1];
     quint8 result = 0;
     quint8 i = m_count;
     do {
@@ -180,7 +179,7 @@ void TubeModel::assignColors(TubeModel * tm)
     }
 }
 
-quint32 TubeModel::storeColors()
+quint32 TubeModel::storeColors() const
 {
     return m_items.stored;
 }

@@ -55,6 +55,8 @@ TubeItem::TubeItem(QQuickItem *parent) :
 
 TubeItem::~TubeItem()
 {
+    qDebug() << "TubeItem deleeted";
+
     delete m_rotateTimer;
     delete cork;
     delete front;

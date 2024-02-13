@@ -28,8 +28,8 @@ public:
     void         setTubeTo(quint8 idxTubeTo);
     void         setRank(qint8 newRank);
 
-    MoveItem   * parentMove()  { return m_parentMove; }
-    BoardModel * boardBefore() { return m_boardBefore; }
+    const MoveItem   * parentMove()  { return m_parentMove; }
+    const BoardModel * boardBefore() { return m_boardBefore; }
     BoardModel * boardAfter()  { return m_boardAfter; }
     quint8       tubeFrom()    { return m_tubeFrom; }
     quint8       tubeTo()      { return m_tubeTo; }
@@ -43,8 +43,8 @@ private:
     quint8       m_count;
     qint8        m_rank;
 
-    MoveItem   * m_parentMove = nullptr;
-    BoardModel * m_boardBefore = nullptr;
+    const MoveItem   * m_parentMove = nullptr;
+    const BoardModel * m_boardBefore = nullptr;
     BoardModel * m_boardAfter = nullptr;
 };
 
