@@ -118,18 +118,18 @@ void ColorsLayer::onScaleChanged()
     update();
 
     qDebug() << "Colors::onscaleChanged" << scale();
-
-//     emit scaleChanged(scale());
 }
 
 void ColorsLayer::onAngleChanged()
 {
     setAngle(parentTube->angle());
+    qDebug() << "colors";
 }
 
 void ColorsLayer::paint(QPainter *painter)
 {
     painter->drawImage(0, 0, * m_drawImage);
+    qDebug() << "colors";
 }
 
 void ColorsLayer::drawColors()
@@ -144,7 +144,6 @@ void ColorsLayer::drawColors()
         for (quint8 i = 0; i < m_model->count(); ++i)
         {
             m_colorRect = CtGlobal::images().colorRect(i);
-//            m_colorRect.translate(100 * scale(), 20 * scale());
             m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(m_model->getColor(i)));
         }
     }
@@ -287,18 +286,6 @@ void ColorsLayer::addFillArea(qreal fillAreaInc)
     }
 }
 
-
-/*
-void ColorsLayer::addAngle(qreal angleInc)
-{
-    setAngle(m_angle + angleInc);
-    if (qFuzzyCompare(m_angle, m_endAngle)) {
-        m_angleInc = - m_angle / 10;
-    } else if (qFuzzyIsNull(m_angle))
-        m_rotateTimer->stop();
-}
-
-*/
 void ColorsLayer::setAngle(qreal newAngle)
 {
 
@@ -309,8 +296,6 @@ void ColorsLayer::setAngle(qreal newAngle)
         update();
         return;
     }
-
-    qDebug() << "colors";
 
 // ---- set rotation point
     quint8 rVertexNumber; // rotation vertex number

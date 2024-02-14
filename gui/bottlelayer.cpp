@@ -138,12 +138,13 @@ void BottleLayer::onScaleChanged()
 void BottleLayer::onAngleChanged()
 {
     if (qFuzzyCompare(m_angle, parentTube->angle()))
-            return;
+        return;
 
     if (m_source_id != CT_BOTTLE_NONE) {
         m_angle = parentTube->angle();
         update();
     }
+    qDebug() << "bottle" << source();
 }
 
 
