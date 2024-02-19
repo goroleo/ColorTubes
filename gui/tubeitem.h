@@ -1,7 +1,7 @@
 #ifndef TUBEITEM_H
 #define TUBEITEM_H
 
-#include <QQuickPaintedItem>
+#include <QQuickItem>
 
 class CorkLayer;
 class BottleLayer;

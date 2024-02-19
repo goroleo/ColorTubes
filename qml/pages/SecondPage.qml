@@ -7,8 +7,6 @@ Page {
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
-
-
     SilicaListView {
         id: listView
         model: 20

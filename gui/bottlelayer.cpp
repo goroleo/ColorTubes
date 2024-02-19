@@ -144,7 +144,6 @@ void BottleLayer::onAngleChanged()
         m_angle = parentTube->angle();
         update();
     }
-    qDebug() << "bottle" << source();
 }
 
 

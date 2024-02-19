@@ -6,6 +6,7 @@
 #include "core/usedcolors.h"
 
 #include "gui/tubeitem.h"
+#include "gui/gameboard.h"
 
 Game* Game::m_instance = nullptr;
 
@@ -13,7 +14,7 @@ Game::~Game()
 {
     delete usedColors;
     delete jctl;
-    delete board;
+//    delete board;
 
     delete m_instance;
     m_instance = nullptr;
@@ -38,8 +39,9 @@ void Game::initialize()
     usedColors = new UsedColors; // UsedColors must be before JctlFormat
 
     jctl = new JctlFormat();
-    board = new BoardModel();
+//    board = new GameBoard();
 
     qmlRegisterType <TubeItem> ("TubeItem", 1, 0, "TubeItem");
+    qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
 }
 

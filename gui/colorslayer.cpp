@@ -123,7 +123,6 @@ void ColorsLayer::onScaleChanged()
 void ColorsLayer::onAngleChanged()
 {
     setAngle(parentTube->angle());
-    qDebug() << "colors";
 }
 
 void ColorsLayer::paint(QPainter *painter)
@@ -308,7 +307,6 @@ void ColorsLayer::setAngle(qreal newAngle)
     tubeVertices[0].x = CtGlobal::images().vertex(rVertexNumber).x();
     tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
 
-    qreal minY = tubeVertices[0].y;
 // --- calculate new coordinates of other vertices after rotation
     qreal cos = qCos(newAngle);
     qreal sin = qSin(newAngle);

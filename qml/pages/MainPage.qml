@@ -1,10 +1,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import TubeItem 1.0
+import GameBoard 1.0
 
 Page {
     id: page
     allowedOrientations: Orientation.Portrait
+
 
     Image {
         id: backgroundImage
@@ -18,11 +20,11 @@ Page {
     SilicaFlickable {
         id: mySilica
 
-        contentWidth: page.width - Theme.horizontalPageMargin*2;
+        contentWidth:  page.width - Theme.horizontalPageMargin*2;
         contentHeight: page.height
-        anchors.fill: parent
-        topMargin: Theme.paddingLarge
-        leftMargin: Theme.horizontalPageMargin
+        anchors.fill:  parent
+//        topMargin:   Theme.paddingLarge
+        leftMargin:  Theme.horizontalPageMargin
         rightMargin: Theme.horizontalPageMargin
 
         PullDownMenu {
@@ -105,12 +107,35 @@ Page {
                 }
             }
         }
-
-       TubeItem {
-            id: tube1
-
-            scale: 1.678
-            shade: 0
-        }
     }
+
+        TubeItem {
+            id: tube1
+            anchors.left: r1.right
+
+            scale: 1.2
+
+            shade: 0
+
+        }
+
+        GameBoard {
+            id: board
+            anchors.top: tube1.bottom
+            width: parent.width
+            height: parent.height - tube1.height;
+
+            Rectangle {
+
+                width:  board.width
+                height: board.height
+                color: "#22ff22FF"
+
+                Text {
+                    id: name1
+                    text: qsTr(board.width + " - " + board.height)
+                    color: "#ffffffFF"
+                }
+            }
+        }
 }
