@@ -25,8 +25,7 @@ int main(int argc, char *argv[])
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
     view->setSource(SailfishApp::pathToMainQml());
-//    view->showFullScreen();
-    view->showNormal();
+    view->showFullScreen();
 
     int result = app->exec();
     CtGlobal::destroy();

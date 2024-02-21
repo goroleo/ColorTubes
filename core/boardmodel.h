@@ -31,6 +31,7 @@ public:
 
     TubeModel *   addNewTube();
     TubeModel *   addNewTube(TubeModel * tube);
+    TubeModel *   addNewTube(quint32 storedValue);
 
     void          clear();
     void          clearMoves();

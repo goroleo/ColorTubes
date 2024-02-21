@@ -4,7 +4,7 @@
 <context>
     <name>CoverPage</name>
     <message>
-        <source>My Cover</source>
+        <source>Color Tubes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -20,6 +20,13 @@
     </message>
     <message>
         <source>Hello Sailors</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MainPage</name>
+    <message>
+        <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

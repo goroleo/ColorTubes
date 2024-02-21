@@ -19,16 +19,27 @@ public:
 
     ~Game();
 
-    UsedColors *usedColors;
-    JctlFormat *jctl;
-//    GameBoard *board;
+    BoardModel * boardModel() {return m_board; }
+    UsedColors * usedColors() {return m_usedColors; }
+    JctlFormat * jctl() {return m_jctl; }
 
     void setMode(int newMode);
     int mode() {return gameMode;}
 
+    void load(QString fileName);
+    void save(QString fileName);
+
+
+signals:
+    void onGameLoaded();
+
 private:
     Game() {};
     void initialize();
+
+    UsedColors *m_usedColors;
+    JctlFormat *m_jctl;
+    BoardModel *m_board;
 
     int gameMode;
     static Game* m_instance;

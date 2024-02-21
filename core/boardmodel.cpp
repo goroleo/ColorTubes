@@ -35,8 +35,8 @@ void BoardModel::clear()
 
     if (!m_tubes->empty()) {
         do {
-            TubeModel tube = m_tubes->last();
-            delete &tube;
+//            TubeModel tube = m_tubes->last();
+//            delete &tube;
             m_tubes->remove(m_tubes->size() - 1);
         } while (!m_tubes->empty());
     }
@@ -73,7 +73,6 @@ void BoardModel::deleteCurrentMove()
         m_moves->remove(m_moves->size() - 1);
 }
 
-
 bool BoardModel::operator == (const BoardModel & other) const
 {
     if (tubesCount() != other.tubesCount())
@@ -87,7 +86,6 @@ bool BoardModel::operator == (const BoardModel & other) const
         stored1[i] = getTube(i)->storeColors();
         stored2[i] = other.getTube(i)->storeColors();
     }
-
 
     int j;
     quint32 temp;
@@ -125,7 +123,6 @@ bool BoardModel::operator == (const BoardModel & other) const
     return result;
 }
 
-
 TubeModel * BoardModel::getTube(int index) const
 {
     if (index >= 0 && index < m_tubes->size())
@@ -143,8 +140,16 @@ TubeModel * BoardModel::addNewTube()
 TubeModel * BoardModel::addNewTube(TubeModel * cloneTube)
 {
     TubeModel * tube = new TubeModel();
-    m_tubes->append(* tube);
     tube->assignColors(cloneTube);
+    m_tubes->append(* tube);
+    return tube;
+}
+
+TubeModel * BoardModel::addNewTube(quint32 storedValue)
+{
+    TubeModel * tube = new TubeModel();
+    tube->assignColors(storedValue);
+    m_tubes->append(* tube);
     return tube;
 }
 
@@ -153,7 +158,7 @@ QString BoardModel::toString() {
     if (m_tubes->isEmpty())
         return QString("");
 
-    QString str("  ");
+    QString str("\n  ");
     for (int i = 0; i < m_tubes->size(); i++) {
         str.append(QString::number(i, 16)).append("   ");
     }

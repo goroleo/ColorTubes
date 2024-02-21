@@ -5,6 +5,8 @@
 
 #include "src/ctglobal.h"
 #include "src/game.h"
+#include "boardmodel.h"
+#include "tubemodel.h"
 
 JctlFormat::JctlFormat()
 {
@@ -275,7 +277,7 @@ bool JctlFormat::checkTubes()
     quint32 stored;                                               // one of stored tubes
     quint8 color;
 
-    CtGlobal::game().usedColors->clearAllUsed();
+    CtGlobal::game().usedColors()->clearAllUsed();
 
     // fill used colors array
     for (quint16 i = 0; i < tubesCount; i++) {
@@ -284,7 +286,7 @@ bool JctlFormat::checkTubes()
         {
             color = stored & 0xff;
             if (color > 0)
-                CtGlobal::game().usedColors->incUsed(color);
+                CtGlobal::game().usedColors()->incUsed(color);
             stored >>= 8;
         }
     }
@@ -292,13 +294,30 @@ bool JctlFormat::checkTubes()
     // check used colors array
     color = 0;
     do {
-        if (CtGlobal::game().usedColors->getUsed(color) != 0
-            && CtGlobal::game().usedColors->getUsed(color) != 4)
+        if (CtGlobal::game().usedColors()->getUsed(color) != 0
+            && CtGlobal::game().usedColors()->getUsed(color) != 4)
         {
             return false;
         }
         color ++;
-    } while (color < CtGlobal::game().usedColors->size());
+    } while (color < CtGlobal::game().usedColors()->size());
 
     return true;
+}
+
+void JctlFormat::storeGame() {
+
+    level = 0;
+    gameMode = 0;
+
+    tubesCount = CtGlobal::game().boardModel()->tubesCount();
+    emptyCount = 0;
+    storedTubes->clear();
+    for (quint16 i = 0; i < CtGlobal::game().boardModel()->tubesCount(); i++) {
+        storedTubes->append(CtGlobal::game().boardModel()->getTube(i)->storeColors());
+    }
+
+    movesCount = 0;
+    movesDone = 0;
+    storedMoves->clear();
 }

@@ -1,20 +1,23 @@
 #include "game.h"
 
+#include "src/ctglobal.h"
+#include "src/io.h"
+
 #include "core/jctlformat.h"
 #include "core/boardmodel.h"
 #include "core/tubemodel.h"
 #include "core/usedcolors.h"
 
-#include "gui/tubeitem.h"
 #include "gui/gameboard.h"
+#include "gui/tubeitem.h"
 
 Game* Game::m_instance = nullptr;
 
 Game::~Game()
 {
-    delete usedColors;
-    delete jctl;
-//    delete board;
+    delete m_usedColors;
+    delete m_jctl;
+    delete m_board;
 
     delete m_instance;
     m_instance = nullptr;
@@ -36,12 +39,57 @@ Game& Game::instance()
 
 void Game::initialize()
 {
-    usedColors = new UsedColors; // UsedColors must be before JctlFormat
+    m_usedColors = new UsedColors; // UsedColors must be before JctlFormat
+    m_jctl = new JctlFormat();
 
-    jctl = new JctlFormat();
-//    board = new GameBoard();
 
-    qmlRegisterType <TubeItem> ("TubeItem", 1, 0, "TubeItem");
+    m_board = new BoardModel();
+
+//    qmlRegisterType <TubeItem> ("TubeItem", 1, 0, "TubeItem");
     qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
+
+    load(QLatin1String(":/jctl/example.jctl"));
 }
 
+void Game::load(QString fileName)
+{
+    QByteArray buffer;
+    bool result;
+
+    result = CtGlobal::io().loadGame(fileName, buffer);
+
+    if (result)
+        result = m_jctl->read(buffer);
+
+    if (result) {
+
+        m_board->clear();
+
+        quint32 stored;
+        for (quint16 i = 0; i < m_jctl->tubesCount; i++) {
+            stored = m_jctl->storedTubes->at(i);
+            m_board->addNewTube(stored);
+        }
+
+        // TODO: restore moves
+
+    }
+
+    if (result) {
+        // signal to redraw GameBoard
+        emit onGameLoaded();
+        qDebug() << "success";
+        qDebug() << m_board->toString();
+    } else
+        qDebug() << "unsuccessfuly";
+
+}
+
+void Game::save(QString fileName)
+{
+    QByteArray buffer;
+
+    m_jctl->storeGame();
+    m_jctl->write(buffer);
+    CtGlobal::io().saveGame(fileName, buffer);
+}

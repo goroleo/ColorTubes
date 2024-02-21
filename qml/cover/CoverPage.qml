@@ -15,6 +15,6 @@ CoverBackground {
     Label {
         id: label
         anchors.centerIn: parent
-        text: qsTr("My Cover")
+        text: qsTr("Color Tubes")
     }
 }

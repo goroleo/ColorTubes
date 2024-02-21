@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import TubeItem 1.0
 import GameBoard 1.0
 
 Page {
@@ -20,12 +19,12 @@ Page {
     SilicaFlickable {
         id: mySilica
 
-        contentWidth:  page.width - Theme.horizontalPageMargin*2;
+        contentWidth:  page.width // - Theme.horizontalPageMargin*2;
         contentHeight: page.height
         anchors.fill:  parent
 //        topMargin:   Theme.paddingLarge
-        leftMargin:  Theme.horizontalPageMargin
-        rightMargin: Theme.horizontalPageMargin
+//        leftMargin:  Theme.horizontalPageMargin
+//        rightMargin: Theme.horizontalPageMargin
 
         PullDownMenu {
             id: pulldown
@@ -107,23 +106,29 @@ Page {
                 }
             }
         }
-    }
 
-        TubeItem {
-            id: tube1
-            anchors.left: r1.right
 
-            scale: 1.2
 
-            shade: 0
+        Text {
+            id: levelNumber
 
+            text: qsTr("Level") + " " + "145"
+
+            width: parent.width
+            height: parent.height / 6
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.weight: Font.DemiBold
+            font.pixelSize: 40
+            color: Theme.lightPrimaryColor
         }
 
         GameBoard {
             id: board
-            anchors.top: tube1.bottom
+            anchors.top: levelNumber.bottom
             width: parent.width
-            height: parent.height - tube1.height;
+            height: parent.height - levelNumber.height;
 
             Rectangle {
 
@@ -138,4 +143,6 @@ Page {
                 }
             }
         }
+
+    }
 }

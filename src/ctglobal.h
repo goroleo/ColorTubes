@@ -32,7 +32,6 @@ namespace CtGlobal
     QString settingsFile();
 
     // game modes
-    void   setGameMode(int newMode);
     int    gameMode();
 
     static const int END_GAME    = 0;
@@ -45,7 +44,7 @@ namespace CtGlobal
     static const int NUM_OF_COLORS = 12;
 
     // properties
-    void onScaleChanged();
+//    void onScaleChanged();
 
 
     // services

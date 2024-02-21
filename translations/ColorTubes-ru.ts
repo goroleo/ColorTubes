@@ -4,8 +4,8 @@
 <context>
     <name>CoverPage</name>
     <message>
-        <source>My Cover</source>
-        <translation type="unfinished"></translation>
+        <source>Color Tubes</source>
+        <translation>Цветные пробирки</translation>
     </message>
 </context>
 <context>
@@ -21,6 +21,13 @@
     <message>
         <source>Hello Sailors</source>
         <translation>Привет матросам!</translation>
+    </message>
+</context>
+<context>
+    <name>MainPage</name>
+    <message>
+        <source>Level</source>
+        <translation>Уровень</translation>
     </message>
 </context>
 <context>

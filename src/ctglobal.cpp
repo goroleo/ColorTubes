@@ -34,7 +34,7 @@ void CtGlobal::destroy()
 
 int CtGlobal::gameMode()
 {
-    return game_mode;
+    return m_game.mode();
 }
 
 Game& CtGlobal::game()
@@ -81,12 +81,6 @@ QString CtGlobal::settingsFile()
         return QString("");
 }
 
-
-void CtGlobal::onScaleChanged()
-{
-
-}
-
 quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)
 {
     quint32 result = 0;
@@ -97,7 +91,7 @@ quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)
     else if (value.startsWith("0x"))
         size -= 2;
 
-    result = value.right(size).toInt(&ok, 16);
+    result = value.rightRef(size).toInt(&ok, 16);
     if (!ok)
         result = 0;
     else if (size <= 6)

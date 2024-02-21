@@ -3,16 +3,16 @@
 
 #include <QQuickItem>
 
+class BoardModel;
+
+
 class GameBoard : public QQuickItem
 {
     Q_OBJECT
+
 public:
     explicit GameBoard(QQuickItem *parent = nullptr);
     ~GameBoard();
-
-
-    void ready();
-//    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
 signals:
 
@@ -20,7 +20,9 @@ signals:
 private:
 
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void reScale();
 
+    BoardModel * m_model;
 };
 
 #endif // GAMEBOARD_H
