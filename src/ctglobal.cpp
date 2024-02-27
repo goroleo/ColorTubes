@@ -34,7 +34,7 @@ void CtGlobal::destroy()
 
 int CtGlobal::gameMode()
 {
-    return m_game.mode();
+    return game().mode();
 }
 
 Game& CtGlobal::game()

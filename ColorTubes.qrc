@@ -6,6 +6,9 @@
         <file>img/icon-gear.svg</file>
         <file>img/icon-star.svg</file>
         <file>img/icon-undo.svg</file>
-        <file>jctl/example.jctl</file>
+        <file>jctl/example1.jctl</file>
+        <file>jctl/example2.jctl</file>
+        <file>jctl/example3.jctl</file>
+        <file>jctl/example4.jctl</file>
     </qresource>
 </RCC>

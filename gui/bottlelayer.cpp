@@ -52,7 +52,7 @@ void BottleLayer::paint(QPainter *painter)
                             dy * scale(),
                             m_drawImage);
 
-        qDebug() << "bottle" << source();
+//        qDebug() << "bottle" << source();
     }
 }
 

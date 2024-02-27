@@ -117,7 +117,7 @@ void ColorsLayer::onScaleChanged()
     drawColors();
     update();
 
-    qDebug() << "Colors::onscaleChanged" << scale();
+//    qDebug() << "Colors::onscaleChanged" << scale();
 }
 
 void ColorsLayer::onAngleChanged()
@@ -128,7 +128,7 @@ void ColorsLayer::onAngleChanged()
 void ColorsLayer::paint(QPainter *painter)
 {
     painter->drawImage(0, 0, * m_drawImage);
-    qDebug() << "colors";
+//    qDebug() << "colors";
 }
 
 void ColorsLayer::drawColors()

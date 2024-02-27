@@ -130,7 +130,7 @@ Page {
             width: parent.width
             height: parent.height - levelNumber.height;
 
-            Rectangle {
+/*            Rectangle {
 
                 width:  board.width
                 height: board.height
@@ -142,7 +142,7 @@ Page {
                     color: "#ffffffFF"
                 }
             }
-        }
+ */       }
 
     }
 }

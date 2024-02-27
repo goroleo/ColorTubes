@@ -8,6 +8,7 @@ class BottleLayer;
 class ColorsLayer;
 class ShadeLayer;
 class TubeModel;
+class GameBoard;
 
 class TubeItem : public QQuickItem
 {
@@ -17,13 +18,19 @@ class TubeItem : public QQuickItem
     Q_PROPERTY(int shade READ shade WRITE setShade NOTIFY shadeChanged)
 
 public:
-    explicit TubeItem(QQuickItem *parent = 0);
+    explicit TubeItem(QQuickItem *parent = 0, TubeModel * tm = 0);
     ~TubeItem();
 
     qreal scale() const;
     qreal angle() const;
     int shade();
     void rotate();
+    TubeModel * model() {return m_model;}
+
+    QPointF pivotPoint() { return m_pivotPoint;}
+
+    void setPivotPoint(QPointF newPoint);
+
 
 public slots:
     void setScale(qreal newScale);
@@ -39,22 +46,26 @@ private slots:
     void onScaleChanged();
 
 private:
+    GameBoard   * m_board;
+
     CorkLayer   * cork;
     BottleLayer * front;
     ColorsLayer * colors;
     BottleLayer * back;
     ShadeLayer  * m_shade;
 
-    TubeModel   * model;
+    TubeModel   * m_model;
 
     qreal         m_angle = 0.0;
     qreal         m_angleIncrement;
 
     void mousePressEvent(QMouseEvent* event);
-    void resize();
+    void placeLayers();
 
-    void addAngle(qreal value);
+    void addAngleIncrement();
     QTimer      * m_rotateTimer;
+
+    QPointF      m_pivotPoint;
 
 
 };

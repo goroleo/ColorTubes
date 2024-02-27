@@ -48,7 +48,7 @@ void Game::initialize()
 //    qmlRegisterType <TubeItem> ("TubeItem", 1, 0, "TubeItem");
     qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
 
-    load(QLatin1String(":/jctl/example.jctl"));
+    load(QLatin1String(":/jctl/example4.jctl"));
 }
 
 void Game::load(QString fileName)
@@ -78,8 +78,8 @@ void Game::load(QString fileName)
     if (result) {
         // signal to redraw GameBoard
         emit onGameLoaded();
-        qDebug() << "success";
-        qDebug() << m_board->toString();
+//        qDebug() << "success";
+//        qDebug() << m_board->toString();
     } else
         qDebug() << "unsuccessfuly";
 
