@@ -127,7 +127,7 @@ int GameBoard::maxChildrenZ()
     {
         if (children().at(i)->inherits("TubeItem")
                 && result < ((TubeItem *) children().at(i))->z())
-            result = ((TubeItem*)children().at(i))->z();
+            result = ((TubeItem *) children().at(i))->z();
     }
     return result;
 }

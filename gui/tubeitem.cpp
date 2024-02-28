@@ -164,7 +164,7 @@ void TubeItem::placeLayers()
 
 void TubeItem::rotate()
 {
-    m_angleIncrement = std::copysign(0.5 * CT_DEG2RAD, m_angleIncrement);
+    m_angleIncrement = std::copysign(1.5 * CT_DEG2RAD, m_angleIncrement);
     setZ(m_board->maxChildrenZ() + 1); // above all other tubes
 //    qDebug() << z();
     m_rotateTimer->start(1);

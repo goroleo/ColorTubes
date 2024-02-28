@@ -117,7 +117,7 @@ Page {
             width: parent.width
             height: parent.height / 6
 
-            verticalAlignment: Text.AlignVCenter
+            verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignHCenter
             font.weight: Font.DemiBold
             font.pixelSize: 40
@@ -144,5 +144,19 @@ Page {
             }
  */       }
 
+
+        Image {
+            id: badge
+
+  //          scale: 0.8 * parent.width / badge.width
+            source: "qrc:/img/badge.svg?"
+            anchors.top: levelNumber.bottom
+
+            width:parent.width * 0.8
+
+
+            //        rightMargin: Theme.horizontalPageMargin
+
+        }
     }
 }
