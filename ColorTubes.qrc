@@ -11,5 +11,6 @@
         <file>jctl/example3.jctl</file>
         <file>jctl/example4.jctl</file>
         <file>img/badge.svg</file>
+        <file>jctl/difficult8.jctl</file>
     </qresource>
 </RCC>

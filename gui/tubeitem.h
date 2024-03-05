@@ -27,10 +27,17 @@ public:
     void rotate();
     TubeModel * model() {return m_model;}
 
-    QPointF pivotPoint() { return m_pivotPoint;}
+    QPointF pivotPoint();
 
     void setPivotPoint(QPointF newPoint);
+    void setYPrecision(qreal yp);
 
+    qreal yPresision() {return m_yPrecision;}
+
+    bool isCLosed();
+    bool isEmpty();
+    bool isPoured();
+    bool isDischarged();
 
 public slots:
     void setScale(qreal newScale);
@@ -67,7 +74,10 @@ private:
 
     QPointF      m_pivotPoint;
 
+    bool         m_poured;
+    bool         m_discharged;
 
+    qreal        m_yPrecision;
 };
 
 #endif // TUBEITEM_H

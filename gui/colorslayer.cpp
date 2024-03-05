@@ -9,7 +9,7 @@
 #include "src/tubeimages.h"
 #include "src/palette.h"
 #include "core/tubemodel.h"
-#include "tubeitem.h"
+#include "gui/tubeitem.h"
 
 ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
     QQuickPaintedItem((QQuickItem *) parent),
@@ -57,8 +57,6 @@ ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
         drawColors();
         update();
     }
-
-    m_Areas = new qreal[4];
 }
 
 ColorsLayer::~ColorsLayer()
@@ -67,21 +65,11 @@ ColorsLayer::~ColorsLayer()
     delete m_painter;
     delete m_drawImage;
     delete m_fillTimer;
-//  delete m_rotateTimer;
 
     delete [] tubeVertices;
     delete [] bottleLines;
     delete [] tubeSlices;
     delete [] colorSegments;
-
-    delete [] m_Areas;
-}
-
-void ColorsLayer::setModel(TubeModel *tm)
-{
-    m_model = tm;
-    drawColors();
-    update();
 }
 
 qreal ColorsLayer::scale()
@@ -92,11 +80,6 @@ qreal ColorsLayer::scale()
 qreal ColorsLayer::angle()
 {
     return parentTube->angle();
-}
-
-int ColorsLayer::count()
-{
-    return m_model->count();
 }
 
 void ColorsLayer::onScaleChanged()
@@ -117,7 +100,6 @@ void ColorsLayer::onScaleChanged()
     drawColors();
     update();
 
-//    qDebug() << "Colors::onscaleChanged" << scale();
 }
 
 void ColorsLayer::onAngleChanged()
@@ -151,11 +133,6 @@ void ColorsLayer::drawColors()
         m_colorCurrent = 0;
         m_sliceCurrent = 0;
 
-        m_Areas[0] = 0.0;
-        m_Areas[1] = 0.0;
-        m_Areas[2] = 0.0;
-        m_Areas[3] = 0.0;
-
         clearColorSegments();
 
         m_fillArea = CtGlobal::images().colorArea();
@@ -167,13 +144,6 @@ void ColorsLayer::drawColors()
             if (qFuzzyIsNull(m_fillArea))
                 m_fillArea = CtGlobal::images().colorArea();
         }
-/*
-        qDebug() << angle() * CT_RAD2DEG << ";"
-                 << m_Areas[0] << ";" << CtGlobal::images().colorArea() - m_Areas[0] << ";"
-                 << m_Areas[1] << ";" << CtGlobal::images().colorArea() - m_Areas[1] << ";"
-                 << m_Areas[2] << ";" << CtGlobal::images().colorArea() - m_Areas[2] << ";"
-                 << m_Areas[3] << ";" << CtGlobal::images().colorArea() - m_Areas[3] ;
-*/
     }
 
 }
@@ -291,6 +261,7 @@ void ColorsLayer::setAngle(qreal newAngle)
 
     if (qFuzzyIsNull(newAngle))
     {
+        parentTube->setYPrecision(0);
         drawColors();
         update();
         return;
@@ -350,6 +321,9 @@ void ColorsLayer::setAngle(qreal newAngle)
         }
         tubeVertices[j] = temp;
     }
+
+    parentTube->setYPrecision(tubeVertices[5].y);
+
 
 // --- calculate slices
     clearSlices();
@@ -412,7 +386,6 @@ void ColorsLayer::nextSegment()
         // Whole the segment is filled by the current color
 
         addColorSegment(m_topLine);
-        m_Areas[m_colorCurrent] += sliceArea;
         m_fillArea -= sliceArea;
         m_sliceCurrent++;
 
@@ -471,7 +444,6 @@ void ColorsLayer::nextSegment()
         addColorSegment(m_topLine);
         drawColorCell();
         clearColorSegments();
-        m_Areas[m_colorCurrent] += m_fillArea;
         m_fillArea = 0;
         m_colorCurrent ++;
     }
@@ -492,7 +464,7 @@ void ColorsLayer::drawColorCell()
     } while (i != 0);
     path.lineTo(colorSegments[0].x1, colorSegments[0].y);
 
-    path.translate(100 * scale(), 20 * scale());
+    path.translate(100 * scale(), 20 * scale() - parentTube->yPresision());
     m_painter->setBrush(QBrush(CtGlobal::palette().getColor(m_model->getColor(m_colorCurrent))));
     m_painter->setPen(Qt::NoPen);
     m_painter->drawPath(path);

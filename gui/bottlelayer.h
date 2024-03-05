@@ -41,7 +41,7 @@ private:
     TubeItem * parentTube;
 
     qreal    scale();
-    qreal    dy = 0;
+    qreal    startY = 0;
     quint8   m_source_id = CT_BOTTLE_NONE;
     qreal    m_angle = 0.0;
     QPixmap  m_drawImage;

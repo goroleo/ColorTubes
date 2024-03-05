@@ -19,7 +19,6 @@ public:
     ~ColorsLayer();
 
     void paint(QPainter *painter) override;
-    void setModel(TubeModel *tm);
 
 public slots:
 //    void fillColors(quint8 colorNum, quint8 count);
@@ -33,7 +32,7 @@ private:
     TubeModel * m_model;
     TubeItem * parentTube;
 
-    int      count();
+//    int      count();
     qreal    scale();
     qreal    angle();
     void     setAngle(qreal newAngle);
@@ -111,7 +110,7 @@ private:
     SliceF   m_topLine;
 
     // temporary
-    qreal  * m_Areas;
+//    qreal  * m_Areas;
 
 };
 

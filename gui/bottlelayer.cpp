@@ -33,7 +33,7 @@ void BottleLayer::paint(QPainter *painter)
 
     if (qFuzzyIsNull(m_angle)) {
 
-        painter->drawPixmap(0, dy * scale(), m_drawImage);
+        painter->drawPixmap(0, (startY + 20) * scale(), m_drawImage);
 
     } else {
 
@@ -42,14 +42,15 @@ void BottleLayer::paint(QPainter *painter)
                   : CtGlobal::images().vertex(5).x();
         x += 100 * scale();
 
-        qreal y = CtGlobal::images().vertex(0).y() + 20 * scale();
+        qreal y = CtGlobal::images().vertex(0).y()
+                + 20 * scale() - parentTube->yPresision();
 
         painter->translate(x, y);
         painter->rotate(m_angle * CT_RAD2DEG);
         painter->translate(-x, -y);
 
         painter->drawPixmap(100 * scale(),
-                            dy * scale(),
+                            (startY + 20) * scale() - parentTube->yPresision(),
                             m_drawImage);
 
 //        qDebug() << "bottle" << source();
@@ -98,21 +99,21 @@ void BottleLayer::setSource(quint8 newSourceId)
     case CT_BOTTLE_WHOLE:
         m_source_id = newSourceId;
         m_drawImage = CtGlobal::images().bottle();
-        dy = 20.0;
+        startY = 0.0;
         break;
     case CT_BOTTLE_FRONT:
         m_source_id = newSourceId;
         m_drawImage = CtGlobal::images().bottleFront();
-        dy = 35.5;
+        startY = 15.5;
         break;
     case CT_BOTTLE_BACK:
         m_source_id = newSourceId;
         m_drawImage = CtGlobal::images().bottleBack();
-        dy = 20.0;
+        startY = 0.0;
         break;
     default:
         m_source_id = CT_BOTTLE_NONE;
-        dy = 0.0;
+        startY = 0.0;
     }
 
     if (m_source_id != CT_BOTTLE_NONE) {

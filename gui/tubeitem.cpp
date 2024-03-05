@@ -22,22 +22,19 @@ TubeItem::TubeItem(QQuickItem *parent, TubeModel * tm) :
     m_board = (GameBoard *) parent;
 
     m_shade = new ShadeLayer(this);
-    m_shade->setVisible(true);
     m_shade->setShade(0);
-    m_shade->startShow();
 
     back = new BottleLayer(this);
     back->setSource(CT_BOTTLE_BACK);
-    back->setVisible(true);
 
-    colors = new ColorsLayer(this);
-    colors->setModel(m_model);
+    colors = new ColorsLayer(this, tm);
 
     front = new BottleLayer(this);
     front->setSource(CT_BOTTLE_FRONT);
 
     cork = new CorkLayer(this);
     cork->setVisible(false);
+
     placeLayers();
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
@@ -68,9 +65,6 @@ TubeItem::~TubeItem()
 void TubeItem::mousePressEvent(QMouseEvent* event)
 {
     QQuickItem::mousePressEvent(event);
-//    qDebug() << event->pos();
-//    qDebug() << this->z();
-//    this->setZ(100);
     rotate();
 }
 
@@ -119,9 +113,31 @@ void TubeItem::setAngle(qreal newAngle)
         return;
 
     m_angle = newAngle;
-    placeLayers();
+
+    if (qFuzzyIsNull(m_angle)) {
+        if (m_discharged)
+            placeLayers();
+    } else {
+        if (!m_discharged)
+            placeLayers();
+    }
+
 
     emit angleChanged(newAngle);
+}
+
+QPointF TubeItem::pivotPoint()
+{
+    if (qFuzzyIsNull(m_angle))
+        return m_pivotPoint;
+
+    qreal dx = 40 * scale();
+    qreal dy = 20 * scale();
+
+    if (m_angle > 0)
+        return QPointF(m_pivotPoint.x() - dx, m_pivotPoint.x() - dy);
+
+    return QPointF(m_pivotPoint.x() + dx, m_pivotPoint.x() - dy);
 }
 
 void TubeItem::setPivotPoint(QPointF newPoint)
@@ -130,35 +146,40 @@ void TubeItem::setPivotPoint(QPointF newPoint)
     placeLayers();
 }
 
+void TubeItem::setYPrecision(qreal yp)
+{
+    m_yPrecision = yp;
+    setY(m_pivotPoint.y() + m_yPrecision);
+}
+
 void TubeItem::placeLayers()
 {
-    m_shade->setY(20 * scale());
-    back->setX(0);
-    colors->setX(0);
-    front->setX(0);
-    this->setY(m_pivotPoint.y());
+    setY(m_pivotPoint.y());
 
     if (qFuzzyIsNull(m_angle)) {
 
-        m_shade->setX(0);
-        colors->setY(m_shade->y());
-        cork->setX(0);
-        this->setX(m_pivotPoint.x());
+            m_discharged = false;
+            m_shade->setY(20 * scale());
 
-        setWidth(80 * scale());
-        setHeight(200 * scale());
-        setClip(true);
+            colors->setY(m_shade->y());
+
+            setX(m_pivotPoint.x());
+            setY(m_pivotPoint.y());
+
+            setWidth(80 * scale());
+            setHeight(200 * scale());
+            setClip(true);
 
     } else {
 
-        m_shade->setX(100 * scale());
-        colors->setY(0);
-        cork->setX(m_shade->x());
-        this->setX(m_pivotPoint.x() - 100 * scale());
+            m_discharged = true;
+            colors->setY(0);
+            setX(m_pivotPoint.x() - 100 * scale());
+            setY(m_pivotPoint.y());
 
-        setWidth(0);
-        setHeight(0);
-        setClip(false);
+            setWidth(0);
+            setHeight(0);
+            setClip(false);
     }
 }
 
@@ -166,20 +187,47 @@ void TubeItem::rotate()
 {
     m_angleIncrement = std::copysign(1.5 * CT_DEG2RAD, m_angleIncrement);
     setZ(m_board->maxChildrenZ() + 1); // above all other tubes
-//    qDebug() << z();
+
+    qreal dx = std::copysign(40*scale(), m_angleIncrement);
+
+    setPivotPoint(QPointF(m_pivotPoint.x()-dx, m_pivotPoint.y() - 20 * scale()));
     m_rotateTimer->start(1);
 }
 
 void TubeItem::addAngleIncrement()
 {
     setAngle(m_angle + m_angleIncrement);
-    if (abs(m_angle) >= 125 * CT_DEG2RAD)
+    if (abs(m_angle) >= 118.6105 * CT_DEG2RAD)
         m_angleIncrement = - m_angle / 30.0;
     if (qFuzzyIsNull(m_angle)) {
         setAngle(0);
+
+        qreal dx = std::copysign(40*scale(), m_angleIncrement);
+
+        setPivotPoint(QPointF(m_pivotPoint.x()-dx, m_pivotPoint.y() + 20*scale()));
         m_rotateTimer->stop();
         setZ(0);
     }
+}
+
+bool TubeItem::isCLosed()
+{
+    return m_model->isClosed();
+}
+
+bool TubeItem::isEmpty()
+{
+    return m_model->isEmpty();
+}
+
+bool TubeItem::isPoured()
+{
+    return m_poured;
+}
+
+bool TubeItem::isDischarged()
+{
+    return m_discharged;
 }
 
 
