@@ -7,13 +7,13 @@ class CorkLayer;
 class BottleLayer;
 class ColorsLayer;
 class ShadeLayer;
+class FlowLayer;
 class TubeModel;
 class GameBoard;
 
 class TubeItem : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(qreal angle READ angle WRITE setAngle NOTIFY angleChanged)
     Q_PROPERTY(int shade READ shade WRITE setShade NOTIFY shadeChanged)
 
@@ -24,28 +24,33 @@ public:
     qreal scale() const;
     qreal angle() const;
     int shade();
-    void rotate();
-    TubeModel * model() {return m_model;}
+    TubeModel * model() { return m_model; }
 
     QPointF pivotPoint();
 
     void setPivotPoint(QPointF newPoint);
-    void setYPrecision(qreal yp);
+    void setYShift(qreal yp);
 
-    qreal yPresision() {return m_yPrecision;}
+    qreal yShift() {return m_yShift;}
 
     bool isCLosed();
     bool isEmpty();
     bool isPoured();
     bool isDischarged();
+    bool isSelected();
+
+    void setSelected(bool newSelected);
+
+    void rotate();
+    void flyTo(TubeItem * tube);
+    void flyBack();
+
 
 public slots:
-    void setScale(qreal newScale);
     void setAngle(qreal newAngle);
     void setShade(int newShade);
 
 signals:
-    void scaleChanged(const qreal newScale);
     void angleChanged(const qreal newAngle);
     void shadeChanged(const int newShade);
 
@@ -54,30 +59,39 @@ private slots:
 
 private:
     GameBoard   * m_board;
-
-    CorkLayer   * cork;
-    BottleLayer * front;
-    ColorsLayer * colors;
-    BottleLayer * back;
-    ShadeLayer  * m_shade;
-
     TubeModel   * m_model;
 
-    qreal         m_angle = 0.0;
-    qreal         m_angleIncrement;
+    CorkLayer   * m_cork;
+    BottleLayer * m_front;
+    ColorsLayer * m_colors;
+    BottleLayer * m_back;
+    ShadeLayer  * m_shade;
+    FlowLayer   * m_flow;
+
 
     void mousePressEvent(QMouseEvent* event);
     void placeLayers();
 
     void addAngleIncrement();
-    QTimer      * m_rotateTimer;
 
-    QPointF      m_pivotPoint;
+    bool          m_poured = false;
+    bool          m_discharged = false;
+    bool          m_selected = false;
 
-    bool         m_poured;
-    bool         m_discharged;
+    QPointF       m_pivotPoint;
+    qreal         m_yShift;
 
-    qreal        m_yPrecision;
+    QTimer      * m_timer;
+    QPointF       startPoint;
+    QPointF       endPoint;
+    QPointF       currentPoint;
+    QPointF       moveIncrement;
+
+    qreal         startAngle;
+    qreal         endAngle;
+    qreal         m_angle = 0.0;
+    qreal         m_angleIncrement;
+
 };
 
 #endif // TUBEITEM_H

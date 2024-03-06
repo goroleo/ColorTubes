@@ -9,20 +9,17 @@
 class CorkLayer : public QQuickPaintedItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal scale READ scale WRITE setScale NOTIFY scaleChanged)
     Q_PROPERTY(bool visible READ visible  WRITE setVisible NOTIFY visibleChanged)
 
 public:
     explicit CorkLayer(QQuickItem *parent = 0);
     ~CorkLayer();
 
-    qreal scale();
     bool visible();
 
     void paint(QPainter *painter) override;
 
 public slots:
-    void setScale(qreal newScale);
     void setVisible(bool newVisible);
     void startShow();
     void startHide();
@@ -36,6 +33,8 @@ private slots:
     void onScaleChanged();
 
 private:
+
+    qreal scale();
 
     QTimer *internalTimer;
 
@@ -52,7 +51,6 @@ private:
     const float ALPHA_INC_DOWN = -0.12;
     const int   PATH_SIZE = 20;
     const int   TIMER_TICKS = 5;
-
 };
 
 #endif // COLORSLAYER_H

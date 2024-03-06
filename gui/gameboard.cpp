@@ -21,6 +21,10 @@ GameBoard::GameBoard(QQuickItem *parent) :
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
+
+    setAcceptedMouseButtons(Qt::AllButtons);
+    setFlag(ItemAcceptsInputMethod, true);
+
 }
 
 GameBoard::~GameBoard()
@@ -48,6 +52,12 @@ void GameBoard::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
         reScale();
 }
 
+void GameBoard::mousePressEvent(QMouseEvent* event)
+{
+//    QQuickItem::mousePressEvent(event);
+    clickTube(nullptr);
+}
+
 void GameBoard::reScale()
 {
     qreal newScale = 0.0;
@@ -61,12 +71,8 @@ void GameBoard::reScale()
 
     newScale = qMin(qreal(width() / tubesWidth), qreal(height() / tubesHeight));
 
-    qDebug() << "rescale" << m_model->tubesCount() << cols << "newScale" << newScale << "imgScale" << scale();
-    qDebug() << "width" << width() << "height" << height();
-
     if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(scale(), newScale))
     {
-        qDebug() << "newScale" << newScale;
         CtGlobal::images().setScale(newScale);
     } else {
         placeTubes();
@@ -75,25 +81,16 @@ void GameBoard::reScale()
 
 void GameBoard::placeTubes()
 {
-    TubeItem * tube;
-
-    int cols = m_model->tubesCount() / 2;
-    if (cols * 2 < m_model->tubesCount())
-        cols ++;
+    int columns = m_model->tubesCount() / 2 + m_model->tubesCount() % 2 ;
 
     qreal leftMargin = scale() * spaceX;
     qreal rowWidth = width() - leftMargin * 2;
     qreal tubeWidth = scale() * 80;
-    int rowColumns = cols;
+    int   rowColumns = columns;
     qreal rowSpace = (rowWidth - rowColumns * tubeWidth) / (rowColumns + 1);
 
     qreal realHeight = scale() * (400 + 3 * spaceY);
     qreal topMargin = qreal (height() - realHeight) / 2;
-
-    qDebug() << "height" << height()
-             << "realHeight" << realHeight
-             << "top" << topMargin
-             << "total" << topMargin * 2 + realHeight;
 
     int row = 0;
     int col = 0;
@@ -101,23 +98,19 @@ void GameBoard::placeTubes()
 
     while (tubeNumber < m_model->tubesCount()) {
 
-        if (tubeNumber == cols) {
+        if (tubeNumber == columns) {
             row = 1;
-            rowColumns = m_model->tubesCount() - cols;
+            rowColumns = m_model->tubesCount() - columns;
             rowSpace = (rowWidth - rowColumns * tubeWidth) / (rowColumns + 1);
         }
 
-        col = tubeNumber - row * cols;
+        col = tubeNumber - row * columns;
 
-        tube = m_tubes->at(tubeNumber);
-
-        tube->setPivotPoint(
+        m_tubes->at(tubeNumber)->setPivotPoint(
                     QPointF(leftMargin + rowSpace + col * (tubeWidth + rowSpace),
                             topMargin + scale() * (spaceY + row * (200 + spaceY))));
-
         tubeNumber ++;
     }
-
 }
 
 int GameBoard::maxChildrenZ()
@@ -130,5 +123,54 @@ int GameBoard::maxChildrenZ()
             result = ((TubeItem *) children().at(i))->z();
     }
     return result;
+}
+
+void GameBoard::clickTube(TubeItem * tube)
+{
+    if (tube == nullptr) {
+        if (selectedTube != nullptr) {
+            qDebug() << "disable selection";
+            selectedTube->setSelected(false);
+            selectedTube = nullptr;
+        }
+    }
+    else if (selectedTube == nullptr) {
+        if (tube->model()->canExtractColor()) {
+            qDebug() << "new selection";
+            tube->setSelected(true);
+            selectedTube = tube;
+        }
+    }
+    else {
+
+        selectedTube->setSelected(false);
+
+        if (tube == selectedTube) {
+            qDebug() << "disable selection";
+            selectedTube = nullptr;
+        } else if (tube->model()->canPutColor(selectedTube->model()->currentColor())) {
+            qDebug() << "put color";
+            // put color
+            selectedTube = nullptr;
+        } else {
+            qDebug() << "change selection";
+            selectedTube = tube;
+            tube->setSelected(true);
+        }
+    }
+
+    int i = 0;
+    while (i < m_model->tubesCount()) {
+        tube = m_tubes->at(i);
+
+        if (selectedTube != nullptr
+                && selectedTube != tube
+                && tube->model()->canPutColor(selectedTube->model()->currentColor())                    )
+            tube->setShade(1);
+        else {
+            tube->setShade(0);
+        }
+        i++;
+    }
 }
 

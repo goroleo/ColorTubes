@@ -169,8 +169,8 @@ QString BoardModel::toString() {
 
         for (quint8 j = 0; j < m_tubes->size(); ++j) {
 
-            if (getTube(j)->getColor(i) != 0) {
-                str.append(QString::number(getTube(j)->getColor(i), 16));
+            if (getTube(j)->color(i) != 0) {
+                str.append(QString::number(getTube(j)->color(i), 16));
             } else {
                 str.append(" ");
             }

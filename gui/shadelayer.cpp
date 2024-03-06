@@ -23,8 +23,9 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
-    internalTimer = new QTimer(this);
-    connect(internalTimer, &QTimer::timeout, [=](){
+    shadingTimer = new QTimer(this);
+
+    connect(shadingTimer, &QTimer::timeout, [=](){
         nextAlpha();
         prepareImage();
         update();
@@ -33,7 +34,7 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
 
 ShadeLayer::~ShadeLayer()
 {
-    delete internalTimer;
+    delete shadingTimer;
 }
 
 void ShadeLayer::startShow()
@@ -41,9 +42,7 @@ void ShadeLayer::startShow()
     m_visible = true;
     m_pulse = false;
     m_alphaIncrement = ALPHA_INC_UP;
-    if (!internalTimer->isActive()) {
-        internalTimer->start(TIMER_TICKS);
-    }
+    shadingTimer->start(TIMER_TICKS);
 }
 
 void ShadeLayer::startHide()
@@ -51,9 +50,7 @@ void ShadeLayer::startHide()
     m_visible = false;
     m_pulse = false;
     m_alphaIncrement = ALPHA_INC_DOWN;
-    if (!internalTimer->isActive()) {
-        internalTimer->start(TIMER_TICKS);
-    }
+    shadingTimer->start(TIMER_TICKS);
 }
 
 void ShadeLayer::startPulse()
@@ -61,9 +58,7 @@ void ShadeLayer::startPulse()
     m_pulse = true;
     m_visible = true;
     m_alphaIncrement = ALPHA_INC_UP;
-    if (!internalTimer->isActive()) {
-        internalTimer->start(TIMER_PULSE_TICKS);
-    }
+    shadingTimer->start(TIMER_PULSE_TICKS);
     emit pulseChanged(m_pulse);
 }
 
@@ -72,9 +67,7 @@ void ShadeLayer::stopPulse()
     m_pulse = false;
     m_visible = false;
     m_alphaIncrement = ALPHA_INC_DOWN;
-    if (!internalTimer->isActive()) {
-        internalTimer->start(TIMER_PULSE_TICKS);
-    }
+    shadingTimer->start(TIMER_PULSE_TICKS);
     emit pulseChanged(m_pulse);
 }
 
@@ -89,7 +82,7 @@ void ShadeLayer::nextAlpha()
                 m_visible = false;
                 m_alphaIncrement = ALPHA_INC_DOWN;
             } else {
-                internalTimer->stop();
+                shadingTimer->stop();
             }
         }
     } else {
@@ -99,7 +92,7 @@ void ShadeLayer::nextAlpha()
                 m_visible = true;
                 m_alphaIncrement = ALPHA_INC_UP;
             } else {
-                internalTimer->stop();
+                shadingTimer->stop();
             }
         }
     }
@@ -128,11 +121,6 @@ void ShadeLayer::paint(QPainter *painter)
 qreal ShadeLayer::scale()
 {
     return CtGlobal::images().scale();
-}
-
-void ShadeLayer::setScale(qreal newScale)
-{
-    CtGlobal::images().setScale(newScale);
 }
 
 void ShadeLayer::onScaleChanged()

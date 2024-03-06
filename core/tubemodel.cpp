@@ -15,12 +15,19 @@ void TubeModel::clear()
     m_items.stored = 0;
     m_state = 0;
     m_count = 0;
-    m_closed = false;
+    m_needStateUpdate = false;
 }
 
 bool TubeModel::isEmpty()
 {
     return (m_count == 0);
+}
+
+bool TubeModel::isClosed()
+{
+    if (m_needStateUpdate)
+        return checkClosed();
+    return (m_state == 3);
 }
 
 bool TubeModel::checkClosed()
@@ -39,6 +46,7 @@ bool TubeModel::checkClosed()
 
 void TubeModel::updateState()
 {
+    m_needStateUpdate = false;
     switch (m_count) {
     case 0:
         m_state = 0;             // STATE_EMPTY
@@ -62,7 +70,7 @@ quint8 TubeModel::currentColor() const
     return m_items.colors[m_count - 1];
 }
 
-quint8 TubeModel::getColor(quint8 index)
+quint8 TubeModel::color(quint8 index)
 {
     if (index > 4)
         return 0;
@@ -82,6 +90,9 @@ bool TubeModel::hasColor(quint8 colorNumber)
 
 bool TubeModel::canPutColor(quint8 colorNumber)
 {
+    if (colorNumber == 0)
+        return false;
+
     switch(m_count) {
     case 0:
         return true;
@@ -107,6 +118,7 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
 
     // update tube's state
     if (updateState) {
+        m_needStateUpdate = false;
         if (m_count < 4) {
             m_state = 1;                 // STATE_REGULAR
         } else if (checkClosed()) {
@@ -114,8 +126,18 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
         } else {
             m_state = 2;                 // STATE_FILLED
         }
+    } else {
+        m_needStateUpdate = true;
     }
+
     return true;
+}
+
+bool TubeModel::canExtractColor()
+{
+    if (m_needStateUpdate)
+        updateState();
+    return (m_state == 1 || m_state == 2);
 }
 
 quint8 TubeModel::extractColor()
@@ -133,6 +155,7 @@ quint8 TubeModel::extractColor()
     } else {
         m_state = 1;                     // STATE_REGULAR;
     }
+    m_needStateUpdate = false;
     return result;
 }
 
@@ -175,7 +198,7 @@ void TubeModel::assignColors(TubeModel * tm)
         m_items.stored = tm->storeColors();
         m_state = tm->state();
         m_count = tm->count();
-        m_closed = tm->isClosed();
+        m_needStateUpdate = tm->m_needStateUpdate;
     }
 }
 

@@ -27,7 +27,6 @@ CorkLayer::CorkLayer(QQuickItem *parent) :
 
     onScaleChanged();
     m_visible = false;
-
 }
 
 CorkLayer::~CorkLayer()
@@ -38,11 +37,6 @@ CorkLayer::~CorkLayer()
 qreal CorkLayer::scale()
 {
     return CtGlobal::images().scale();
-}
-
-void CorkLayer::setScale(qreal newScale)
-{
-    CtGlobal::images().setScale(newScale);
 }
 
 bool CorkLayer::visible()

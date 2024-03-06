@@ -20,20 +20,21 @@ public:
     quint8 state() {return m_state;}
 
     // state routines
-    bool isClosed() {return m_closed;}
+    bool isClosed();
     bool isEmpty();
     void updateState();
 
     //  get color(s)
     quint8 currentColor() const;
-    quint8 getColor(quint8 index);
+    quint8 color(quint8 index);
     bool hasColor(quint8 colorNumber);
 
     //  put color
     bool canPutColor(quint8 colorNumber);
     bool putColor(quint8 colorNumber);
 
-    //  extract color
+    //  extract color(s)
+    bool canExtractColor();
     quint8 extractColor();
     quint8 sameColorsCount() const;
 
@@ -52,7 +53,7 @@ private:
     TubeCells m_items;
     int m_state;
     int m_count;
-    bool m_closed;
+    bool m_needStateUpdate = false;
 };
 
 #endif // TUBEMODEL_H

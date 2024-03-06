@@ -43,14 +43,14 @@ void BottleLayer::paint(QPainter *painter)
         x += 100 * scale();
 
         qreal y = CtGlobal::images().vertex(0).y()
-                + 20 * scale() - parentTube->yPresision();
+                + 20 * scale() - parentTube->yShift();
 
         painter->translate(x, y);
         painter->rotate(m_angle * CT_RAD2DEG);
         painter->translate(-x, -y);
 
         painter->drawPixmap(100 * scale(),
-                            (startY + 20) * scale() - parentTube->yPresision(),
+                            (startY + 20) * scale() - parentTube->yShift(),
                             m_drawImage);
 
 //        qDebug() << "bottle" << source();

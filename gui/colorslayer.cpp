@@ -110,7 +110,6 @@ void ColorsLayer::onAngleChanged()
 void ColorsLayer::paint(QPainter *painter)
 {
     painter->drawImage(0, 0, * m_drawImage);
-//    qDebug() << "colors";
 }
 
 void ColorsLayer::drawColors()
@@ -125,7 +124,8 @@ void ColorsLayer::drawColors()
         for (quint8 i = 0; i < m_model->count(); ++i)
         {
             m_colorRect = CtGlobal::images().colorRect(i);
-            m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(m_model->getColor(i)));
+            m_colorRect.translate(0, 20 * scale());
+            m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(m_model->color(i)));
         }
     }
     else
@@ -261,7 +261,7 @@ void ColorsLayer::setAngle(qreal newAngle)
 
     if (qFuzzyIsNull(newAngle))
     {
-        parentTube->setYPrecision(0);
+        parentTube->setYShift(0);
         drawColors();
         update();
         return;
@@ -322,7 +322,7 @@ void ColorsLayer::setAngle(qreal newAngle)
         tubeVertices[j] = temp;
     }
 
-    parentTube->setYPrecision(tubeVertices[5].y);
+    parentTube->setYShift(tubeVertices[5].y);
 
 
 // --- calculate slices
@@ -464,8 +464,8 @@ void ColorsLayer::drawColorCell()
     } while (i != 0);
     path.lineTo(colorSegments[0].x1, colorSegments[0].y);
 
-    path.translate(100 * scale(), 20 * scale() - parentTube->yPresision());
-    m_painter->setBrush(QBrush(CtGlobal::palette().getColor(m_model->getColor(m_colorCurrent))));
+    path.translate(100 * scale(), 20 * scale() - parentTube->yShift());
+    m_painter->setBrush(QBrush(CtGlobal::palette().getColor(m_model->color(m_colorCurrent))));
     m_painter->setPen(Qt::NoPen);
     m_painter->drawPath(path);
 }
