@@ -14,8 +14,7 @@ GameBoard::GameBoard(QQuickItem *parent) :
     m_tubes = new QVector<TubeItem *>;
 
     for (int i=0; i < m_model->tubesCount(); ++i) {
-        TubeModel * tm = CtGlobal::game().boardModel()->getTube(i);
-        TubeItem * tube = new TubeItem(this, tm);
+        TubeItem * tube = new TubeItem(this, CtGlobal::game().boardModel()->getTube(i));
         m_tubes->append(tube);
     }
 
@@ -24,7 +23,6 @@ GameBoard::GameBoard(QQuickItem *parent) :
 
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
-
 }
 
 GameBoard::~GameBoard()
@@ -54,7 +52,6 @@ void GameBoard::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
 
 void GameBoard::mousePressEvent(QMouseEvent* event)
 {
-//    QQuickItem::mousePressEvent(event);
     clickTube(nullptr);
 }
 
@@ -106,7 +103,7 @@ void GameBoard::placeTubes()
 
         col = tubeNumber - row * columns;
 
-        m_tubes->at(tubeNumber)->setPivotPoint(
+        m_tubes->at(tubeNumber)->setPosition(
                     QPointF(leftMargin + rowSpace + col * (tubeWidth + rowSpace),
                             topMargin + scale() * (spaceY + row * (200 + spaceY))));
         tubeNumber ++;
@@ -125,52 +122,82 @@ int GameBoard::maxChildrenZ()
     return result;
 }
 
+int GameBoard::indexOf(TubeItem * tube)
+{
+    if (tube) {
+        return m_tubes->indexOf(tube);
+    } else
+        return -1;
+}
+
 void GameBoard::clickTube(TubeItem * tube)
 {
     if (tube == nullptr) {
-        if (selectedTube != nullptr) {
-            qDebug() << "disable selection";
-            selectedTube->setSelected(false);
-            selectedTube = nullptr;
+        if (m_selectedTube != nullptr) {
+            // qDebug() << "disable selection 1";
+            m_selectedTube->setSelected(false);
+            m_selectedTube = nullptr;
         }
-    }
-    else if (selectedTube == nullptr) {
-        if (tube->model()->canExtractColor()) {
-            qDebug() << "new selection";
+    } else if (m_selectedTube == nullptr) {
+        if (tube->canExtractColor()) {
+            // qDebug() << "new selection";
             tube->setSelected(true);
-            selectedTube = tube;
+            if (tube->isSelected())
+                m_selectedTube = tube;
+            else
+                m_selectedTube = nullptr;
         }
-    }
-    else {
-
-        selectedTube->setSelected(false);
-
-        if (tube == selectedTube) {
-            qDebug() << "disable selection";
-            selectedTube = nullptr;
-        } else if (tube->model()->canPutColor(selectedTube->model()->currentColor())) {
-            qDebug() << "put color";
-            // put color
-            selectedTube = nullptr;
+    } else {
+        if (tube == m_selectedTube) {
+            // qDebug() << "disable selection 2";
+            m_selectedTube->setSelected(false);
+            m_selectedTube = nullptr;
+        } else if (tube->canPutColor(m_selectedTube->currentColor())) {
+            // qDebug() << "put color";
+            m_selectedTube->dropColorsTo(tube);
+            m_selectedTube = nullptr;
         } else {
-            qDebug() << "change selection";
-            selectedTube = tube;
+            // qDebug() << "change selection";
+            m_selectedTube->setSelected(false);
             tube->setSelected(true);
+            if (tube->isSelected())
+                m_selectedTube = tube;
+            else
+                m_selectedTube = nullptr;
         }
     }
 
+    // show possible moves, hide previous
     int i = 0;
     while (i < m_model->tubesCount()) {
         tube = m_tubes->at(i);
 
-        if (selectedTube != nullptr
-                && selectedTube != tube
-                && tube->model()->canPutColor(selectedTube->model()->currentColor())                    )
-            tube->setShade(1);
+        if (m_selectedTube != nullptr
+                && m_selectedTube != tube
+                && tube->isActive()
+                && tube->canPutColor(m_selectedTube->currentColor()))
+            tube->setShade(2);
         else {
-            tube->setShade(0);
+            if (!tube->isClosed())
+                tube->setShade(0);
         }
         i++;
     }
 }
 
+void GameBoard::moveColor(TubeItem * tubeFrom, TubeItem * tubeTo)
+{
+    if (tubeFrom == nullptr || tubeTo == nullptr)
+        return;
+
+    tubeFrom->dropColorsTo(tubeTo);
+}
+
+void GameBoard::moveColor(int tubeFromIndex, int tubeToIndex)
+{
+    if (tubeFromIndex < 0 || tubeFromIndex >= m_model->tubesCount()
+            || tubeToIndex < 0 || tubeToIndex >= m_model->tubesCount())
+        return;
+
+    moveColor(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
+}

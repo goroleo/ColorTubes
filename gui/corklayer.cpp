@@ -109,7 +109,7 @@ void CorkLayer::nextStep()
         }
     }
 
-    m_currY = (20 * scale()) * exp(-0.5 * (1 - m_alpha));
+    m_currY = -20 * scale() + (40 * scale()) * exp(-0.5 * (1 - m_alpha));
 }
 
 void CorkLayer::prepareImage()

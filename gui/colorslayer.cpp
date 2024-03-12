@@ -1,9 +1,5 @@
 #include "colorslayer.h"
 
-#include <QPainter>
-#include <QBrush>
-#include <QtMath>
-
 #include "src/ctglobal.h"
 #include "src/game.h"
 #include "src/tubeimages.h"
@@ -11,20 +7,10 @@
 #include "core/tubemodel.h"
 #include "gui/tubeitem.h"
 
-ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
-    QQuickPaintedItem((QQuickItem *) parent),
-    m_model(tm)
+ColorsLayer::ColorsLayer(TubeItem * parent) :
+    QQuickPaintedItem((QQuickItem *) parent)
 {
-
-    parentTube = parent;
-
-// tilt angles
-    m_tiltAngles = new qreal[5];
-    m_tiltAngles[0] = 118.6105 * CT_DEG2RAD;
-    m_tiltAngles[1] = 85.252   * CT_DEG2RAD;
-    m_tiltAngles[2] = 77.666   * CT_DEG2RAD;
-    m_tiltAngles[3] = 71.5285  * CT_DEG2RAD;
-    m_tiltAngles[4] = 26.9970  * CT_DEG2RAD;
+    m_tube = parent;
 
 // coordinates
     tubeVertices = new PointF[6];
@@ -49,19 +35,16 @@ ColorsLayer::ColorsLayer(TubeItem * parent, TubeModel * tm) :
 
     m_fillTimer = new QTimer(this);
     connect(m_fillTimer, &QTimer::timeout, [=]() {
-        addFillArea(m_fillAreaInc);
+//        addFillArea(m_fillAreaInc);
         update();
     });
 
-    if (m_model) {
-        drawColors();
-        update();
-    }
+    if (m_tube->model())
+        refresh();
 }
 
 ColorsLayer::~ColorsLayer()
 {
-    delete [] m_tiltAngles;
     delete m_painter;
     delete m_drawImage;
     delete m_fillTimer;
@@ -77,9 +60,9 @@ qreal ColorsLayer::scale()
     return CtGlobal::images().scale();
 }
 
-qreal ColorsLayer::angle()
+TubeModel * ColorsLayer::model()
 {
-    return parentTube->angle();
+    return m_tube->model();
 }
 
 void ColorsLayer::onScaleChanged()
@@ -99,169 +82,16 @@ void ColorsLayer::onScaleChanged()
 
     drawColors();
     update();
-
 }
 
 void ColorsLayer::onAngleChanged()
 {
-    setAngle(parentTube->angle());
-}
 
-void ColorsLayer::paint(QPainter *painter)
-{
-    painter->drawImage(0, 0, * m_drawImage);
-}
+    qreal angle = m_tube->angle();
 
-void ColorsLayer::drawColors()
-{
-
-    m_drawImage->fill(0x00ffffff);
-    if (!m_model)
-        return;
-
-    if (qFuzzyIsNull(angle()))
+    if (qFuzzyIsNull(angle))
     {
-        for (quint8 i = 0; i < m_model->count(); ++i)
-        {
-            m_colorRect = CtGlobal::images().colorRect(i);
-            m_colorRect.translate(0, 20 * scale());
-            m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(m_model->color(i)));
-        }
-    }
-    else
-    {
-        m_colorCurrent = 0;
-        m_sliceCurrent = 0;
-
-        clearColorSegments();
-
-        m_fillArea = CtGlobal::images().colorArea();
-
-        while (m_sliceCurrent < m_slicesCount-1
-               && m_colorCurrent < m_model->count())
-        {
-            nextSegment();
-            if (qFuzzyIsNull(m_fillArea))
-                m_fillArea = CtGlobal::images().colorArea();
-        }
-    }
-
-}
-
-/*
-void ColorsLayer::fillColors(quint8 colorNum, quint8 count)
-{
-    if (!m_model)
-        return;
-
-    if (!qFuzzyIsNull(angle()) || m_rotateTimer->isActive())
-        return;
-
-    count = qMin(count, quint8 (4 - m_model->count()));
-    if (count == 0)
-        return;
-
-    if (m_fillTimer->isActive())
-    {
-        if (m_model->getColor(m_model->count() - 1) == colorNum)
-            m_fillCount += count;
-    }
-    else
-    {
-        drawColors();
-        update();
-
-        m_fillArea = 0;
-        m_fillAreaInc = CtGlobal::images().colorArea() / 40;
-        m_fillColor = CtGlobal::palette().getColor(colorNum);
-        m_fillCount = count;
-        m_fillJetWidth = 3 * scale();
-
-        m_colorRect = CtGlobal::images().colorRect(m_model->count());
-        m_colorRect.translate(100 * scale(), 20 * scale());
-        m_colorBottom = m_colorRect.bottom();
-
-        m_fillTimer->start(20);
-    }
-
-}
-*/
-
-void ColorsLayer::dropColors(quint8 count)
-{
-    if (!m_model)
-        return;
-
-//    if (m_fillTimer->isActive() || m_rotateTimer->isActive())
-//        return;
-
-    m_dropCount = qMin(count, m_model->count());
-    if (m_dropCount == 0)
-        return;
-
-    m_startAngle = m_tiltAngles[m_model->count()];
-    setAngle(m_tiltAngles[m_model->count()]);
-    m_endAngle = m_tiltAngles[m_model->count() - m_dropCount];
-
-//    m_angleInc = (m_endAngle - m_startAngle) / 60 / count;
-//    m_rotateTimer->start(20);
-}
-
-void ColorsLayer::addFillArea(qreal fillAreaInc)
-{
-    m_fillArea += fillAreaInc;
-
-    qreal maxJetHeight = m_colorBottom - 20 * scale();
-    qreal maxJetArea = m_fillJetWidth * maxJetHeight;
-
-    QRectF jetRect = QRectF((m_colorRect.right() + m_colorRect.left() - m_fillJetWidth) / 2,
-                            20 * scale(), m_fillJetWidth, maxJetHeight);
-
-    qreal fillArea = qMin(m_fillArea, CtGlobal::images().colorArea() * m_fillCount);
-    qreal heelArea = m_fillArea - fillArea;
-    qreal jetArea = qMin (fillArea, maxJetArea) - heelArea;
-    if (jetArea < 0) jetArea = 0.0;
-    qreal cupArea = fillArea - jetArea;
-
-    qreal cupHeight = cupArea / CtGlobal::images().colorWidth();
-    qreal jetHeight = jetArea / m_fillJetWidth;
-
-    if (!qFuzzyCompare(cupHeight + jetHeight, m_colorBottom))
-    {
-        if (jetArea > 0)
-        {
-            if (qFuzzyIsNull(heelArea))
-            {   // draws jet rectangle from top
-                jetRect.setHeight(jetHeight);
-                m_painter->fillRect(jetRect, m_fillColor);
-            }
-            else
-            {   // erases top of the jet rectangle
-                jetRect.setHeight(maxJetHeight - jetHeight);
-                for (int x = 0; x < jetRect.toRect().width(); x++)
-                    for (int y = 0; y < jetRect.toRect().height(); y++)
-                        m_drawImage->setPixel(x + jetRect.toRect().x(),
-                                              y + jetRect.toRect().y(),
-                                              0x00ffffff);
-            }
-        }
-        else m_fillTimer->stop();
-    }
-
-    if (cupArea > 0)
-    {
-        m_colorRect.setTop(m_colorBottom - cupHeight);
-        m_painter->fillRect(m_colorRect, m_fillColor);
-    }
-}
-
-void ColorsLayer::setAngle(qreal newAngle)
-{
-
-
-    if (qFuzzyIsNull(newAngle))
-    {
-        parentTube->setYShift(0);
+        m_tube->setVerticalShift(0);
         drawColors();
         update();
         return;
@@ -269,7 +99,7 @@ void ColorsLayer::setAngle(qreal newAngle)
 
 // ---- set rotation point
     quint8 rVertexNumber; // rotation vertex number
-    if (newAngle > 0)
+    if (angle > 0)
         rVertexNumber = 0;
     else
         rVertexNumber = 5;
@@ -279,8 +109,8 @@ void ColorsLayer::setAngle(qreal newAngle)
     tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
 
 // --- calculate new coordinates of other vertices after rotation
-    qreal cos = qCos(newAngle);
-    qreal sin = qSin(newAngle);
+    qreal cos = qCos(angle);
+    qreal sin = qSin(angle);
 
     for (quint8 i = 0; i < 6; i++)
     {
@@ -322,8 +152,7 @@ void ColorsLayer::setAngle(qreal newAngle)
         tubeVertices[j] = temp;
     }
 
-    parentTube->setYShift(tubeVertices[5].y);
-
+    m_tube->setVerticalShift(tubeVertices[5].y);
 
 // --- calculate slices
     clearSlices();
@@ -332,7 +161,7 @@ void ColorsLayer::setAngle(qreal newAngle)
         quint8 currentVertex;
 
         // lowest point(s)
-        if ( qFuzzyCompare(qAbs(newAngle), (qreal) CT_PI2) )
+        if ( qFuzzyCompare(qAbs(angle), (qreal) CT_PI2) )
         {
             // when angle = +-90 degrees, we have two lowest points
             addSlice(tubeVertices[1].v, tubeVertices[0].x,
@@ -358,6 +187,46 @@ void ColorsLayer::setAngle(qreal newAngle)
 
     drawColors();
     update();
+}
+
+void ColorsLayer::paint(QPainter *painter)
+{
+    painter->drawImage(0, 0, * m_drawImage);
+}
+
+void ColorsLayer::drawColors()
+{
+
+    m_drawImage->fill(0x30ff8888);
+    if (!model())
+        return;
+
+    if (qFuzzyIsNull(m_tube->angle()))
+    {
+        for (quint8 i = 0; i < model()->count(); ++i)
+        {
+            m_colorRect = CtGlobal::images().colorRect(i);
+            m_colorRect.translate(0, 20 * scale());
+            m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(model()->color(i)));
+        }
+    }
+    else
+    {
+        m_colorCurrent = 0;
+        m_sliceCurrent = 0;
+
+        clearColorSegments();
+
+        m_fillArea = CtGlobal::images().colorArea();
+
+        while (m_sliceCurrent < m_slicesCount-1
+               && m_colorCurrent < model()->count())
+        {
+            nextSegment();
+            if (qFuzzyIsNull(m_fillArea))
+                m_fillArea = CtGlobal::images().colorArea();
+        }
+    }
 }
 
 void ColorsLayer::nextSegment()
@@ -419,7 +288,7 @@ void ColorsLayer::nextSegment()
         } else {
 
             /*
-             * The current segment is a trapeze or triangle.
+             * The current segment is a trapeze or a triangle.
              * We have to solve a sqare equation:
              *   ( k/2 ) * x^2 + dx0 * x - S = 0,
              * where k   - a trapeze's coefficient
@@ -464,8 +333,8 @@ void ColorsLayer::drawColorCell()
     } while (i != 0);
     path.lineTo(colorSegments[0].x1, colorSegments[0].y);
 
-    path.translate(100 * scale(), 20 * scale() - parentTube->yShift());
-    m_painter->setBrush(QBrush(CtGlobal::palette().getColor(m_model->color(m_colorCurrent))));
+    path.translate(100 * scale(), 20 * scale() - m_tube->verticalShift());
+    m_painter->setBrush(QBrush(CtGlobal::palette().getColor(model()->color(m_colorCurrent))));
     m_painter->setPen(Qt::NoPen);
     m_painter->drawPath(path);
 }
@@ -522,3 +391,8 @@ qreal ColorsLayer::getIntersectionX(quint8 vertex)
     return -1000;
 }
 
+void ColorsLayer::refresh()
+{
+    drawColors();
+    update();
+}

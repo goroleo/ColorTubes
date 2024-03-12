@@ -14,7 +14,6 @@ class Palette;
 #define CT_DEG2RAD     0.01745329251994329576922222222222  // PI/180
 #define CT_RAD2DEG     57.295779513082320876846364344191   // 180/PI
 
-
 namespace CtGlobal
 {
     void create();
@@ -43,9 +42,13 @@ namespace CtGlobal
     // number of game colors
     static const int NUM_OF_COLORS = 12;
 
-    // properties
-//    void onScaleChanged();
-
+    static const qreal TILT_ANGLE[5] = {
+        118.6105 * CT_DEG2RAD,      // all cells are flowed
+        85.2159  * CT_DEG2RAD,      // start of flowing forth color cell
+        76.2664  * CT_DEG2RAD,      // start of flowing third color cell
+        65.6270  * CT_DEG2RAD,      // start of flowing second color cell
+        25.9394  * CT_DEG2RAD       // start of flowing top color cell
+    };
 
     // services
     quint32 colorStrToRgb(bool &ok, QString value);

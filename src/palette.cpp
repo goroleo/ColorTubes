@@ -83,7 +83,7 @@ void Palette::setDefault()
     m_items[10] = 0xffff7abc; // 11
     m_items[11] = 0xffffeb04; // 12
     m_background = QColor(0xff282828);
-    m_dialog = QColor(0xff1c1127);
+    m_dialogColor = QColor(0xff1c1127);
 }
 
 bool Palette::load()
@@ -146,7 +146,7 @@ bool Palette::load()
             value = jColors["dialog"].toString();
             if ((value.length() == 7) && value.startsWith("#"))
             {
-                m_dialog = QColor(CtGlobal::colorStrToRgb(result, value));
+                m_dialogColor = QColor(CtGlobal::colorStrToRgb(result, value));
             } else result = false;
         } else result = false;
     }
@@ -173,7 +173,7 @@ bool Palette::save()
 
     // adds system colors
     jItem["background"] = CtGlobal::colorRgbToStr(m_background.rgb());
-    jItem["dialog"] = CtGlobal::colorRgbToStr(m_dialog.rgb());;
+    jItem["dialog"] = CtGlobal::colorRgbToStr(m_dialogColor.rgb());;
     jObj["colors"] = jItem;
 
     // save

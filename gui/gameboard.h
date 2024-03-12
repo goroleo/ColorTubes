@@ -17,8 +17,10 @@ public:
     ~GameBoard();
 
     int maxChildrenZ();
+    int indexOf(TubeItem * tube);
 
     void clickTube(TubeItem * tube);
+    TubeItem * selectedTube() { return m_selectedTube;}
 
 signals:
 
@@ -32,6 +34,9 @@ private:
     qreal scale() const;
     void reScale();
     void placeTubes();
+    void moveColor(TubeItem * tubeFrom, TubeItem * tubeTo);
+    void moveColor(int tubeFromIndex, int tubeToIndex);
+
 
     BoardModel * m_model;
 
@@ -43,7 +48,7 @@ private:
     qreal spaceX = 5.0;
     qreal spaceY = 120.0;
 
-    TubeItem * selectedTube = nullptr;
+    TubeItem * m_selectedTube = nullptr;
 };
 
 #endif // GAMEBOARD_H

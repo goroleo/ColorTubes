@@ -6,13 +6,10 @@
 #include "src/tubeimages.h"
 
 #include "core/tubemodel.h"
-
 #include "bottlelayer.h"
 #include "corklayer.h"
 #include "colorslayer.h"
 #include "shadelayer.h"
-#include "flowlayer.h"
-
 #include "gameboard.h"
 
 TubeItem::TubeItem(QQuickItem *parent, TubeModel * tm) :
@@ -28,10 +25,7 @@ TubeItem::TubeItem(QQuickItem *parent, TubeModel * tm) :
     m_back = new BottleLayer(this);
     m_back->setSource(CT_BOTTLE_BACK);
 
-    m_flow = new FlowLayer(this, tm);
-    m_flow->setVisible(false);
-
-    m_colors = new ColorsLayer(this, tm);
+    m_colors = new ColorsLayer(this);
 
     m_front = new BottleLayer(this);
     m_front->setSource(CT_BOTTLE_FRONT);
@@ -49,7 +43,7 @@ TubeItem::TubeItem(QQuickItem *parent, TubeModel * tm) :
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, [=]() {
-        addAngleIncrement();
+        nextFrame();
         update();
     });
 }
@@ -64,7 +58,6 @@ TubeItem::~TubeItem()
     delete m_colors;
     delete m_back;
     delete m_shade;
-    delete m_flow;
 }
 
 void TubeItem::mousePressEvent(QMouseEvent * event)
@@ -89,11 +82,15 @@ void TubeItem::setShade(int newShade)
     emit shadeChanged(newShade);
 }
 
+int TubeItem::tubeIndex()
+{
+    return m_board->indexOf(this);
+}
+
 qreal TubeItem::scale() const
 {
     return CtGlobal::images().scale();
 }
-
 
 void TubeItem::onScaleChanged()
 {
@@ -107,6 +104,9 @@ qreal TubeItem::angle() const
 
 void TubeItem::setAngle(qreal newAngle)
 {
+/*
+    // check for external angle changes, don't need inside the app
+
     newAngle = fmod(newAngle, CT_2PI);
     if (qAbs(newAngle) > CT_PI) {
         newAngle = std::signbit(newAngle)
@@ -114,19 +114,12 @@ void TubeItem::setAngle(qreal newAngle)
                 : newAngle - CT_2PI;
     }
 
+*/
+
     if (qFuzzyCompare(m_angle, newAngle))
         return;
 
     m_angle = newAngle;
-
-    if (qFuzzyIsNull(m_angle)) {
-        if (m_discharged)
-            placeLayers();
-    } else {
-        if (!m_discharged)
-            placeLayers();
-    }
-
     emit angleChanged(newAngle);
 }
 
@@ -135,97 +128,220 @@ QPointF TubeItem::pivotPoint()
     return m_pivotPoint;
 }
 
-void TubeItem::setPivotPoint(QPointF newPoint)
+void TubeItem::setPosition(const QPointF newPoint)
 {
     m_pivotPoint = newPoint;
+    m_positionPoint = newPoint;
     placeLayers();
 }
 
-void TubeItem::setYShift(qreal ys)
+void TubeItem::setPivotPoint(QPointF newPoint)
 {
-    m_yShift = ys;
-    setY(m_pivotPoint.y() + m_yShift);
+    m_pivotPoint = newPoint;
+
+    if (qFuzzyIsNull(m_angle)) {
+        QQuickItem::setPosition(m_pivotPoint);
+    } else {
+        setX(m_pivotPoint.x() - 100 * scale());
+        setY(m_pivotPoint.y() + m_verticalShift);
+    }
+}
+
+void TubeItem::setVerticalShift(qreal yShift)
+{
+    m_verticalShift = yShift;
+    setY(m_pivotPoint.y() + m_verticalShift);
 }
 
 void TubeItem::placeLayers()
 {
     if (qFuzzyIsNull(m_angle)) {
         m_shade->setY(20 * scale());
-        m_discharged = false;
-        setPosition(m_pivotPoint);
+        QQuickItem::setPosition(m_pivotPoint);
         setWidth(80 * scale());
         setHeight(200 * scale());
         setClip(true);
     } else {
-        m_discharged = true;
         setX(m_pivotPoint.x() - 100 * scale());
-        setY(m_pivotPoint.y());
+        setY(m_pivotPoint.y() + m_verticalShift);
         setWidth(0);
         setHeight(0);
         setClip(false);
     }
+//    qDebug() << "placeLayers()" << m_angle * CT_RAD2DEG << currentStageId;
 }
 
-void TubeItem::rotate()
+void TubeItem::startMove() {
+    if (m_timer->isActive())
+        m_timer->stop();
+
+    m_moveIncrement.setX((m_endPoint.x() - m_startPoint.x()) / steps);
+    m_moveIncrement.setY((m_endPoint.y() - m_startPoint.y()) / steps);
+    m_angleIncrement = (m_endAngle - m_startAngle) / steps;
+    m_timer->start(TIMER_TICKS);
+}
+
+void TubeItem::moveUp()
 {
-    m_angleIncrement = std::copysign(1.5 * CT_DEG2RAD, m_angleIncrement);
-    setZ(m_board->maxChildrenZ() + 1); // above all other tubes
-    m_timer->start(10);
+    if (currentStageId != STAGE_DEFAULT)
+        return;
+    m_startPoint = m_positionPoint;
+    m_endPoint = QPointF(m_positionPoint.x(), m_positionPoint.y() - 20 * scale());
+    m_startAngle = 0;
+    m_endAngle = 0;
+    steps = STEPS_UP;
+    setZ(m_board->maxChildrenZ() + 1);
+    currentStageId = STAGE_SELECT;
+    nextStageId = STAGE_SELECT;
+    startMove();
 }
 
-int steps = 20;
+void TubeItem::moveDown()
+{
+    if (currentStageId != STAGE_SELECT)
+        return;
+    m_startPoint = m_pivotPoint;
+    m_endPoint = m_positionPoint;
+    m_startAngle = m_angle;
+    m_endAngle = 0;
+    steps = STEPS_DOWN;
+    nextStageId = STAGE_DEFAULT;
+    startMove();
+}
 
 void TubeItem::flyTo(TubeItem * tube)
 {
-
-    if (!isSelected() || (tube == nullptr)
-            || tube->isSelected()
-            || tube->isCLosed()
-            || tube->isDischarged())
+    if (currentStageId != STAGE_SELECT)
         return;
 
-    startPoint = QPointF(x(), y());
-    endPoint = QPointF(
-                tube->pivotPoint().x() + 20 * scale(),
-                tube->pivotPoint().y() + 20 * scale());
+    setClip(false);
+    setWidth(0);
+    setHeight(0);
 
-    startAngle = 0;
-    endAngle = 26.9970  * CT_DEG2RAD;
+    currentStageId = STAGE_FLY;
+
+    m_recipient = tube;
+    m_recipient->m_flowingTubes ++;
+    m_recipient->m_dropColors += m_dropColors;
+
+    m_recipient->currentStageId = STAGE_POUR;
+    m_startAngle = m_angle;
+    m_endAngle = (tube->pivotPoint().x() > m_board->width() / 2)
+            ? CtGlobal::TILT_ANGLE[m_model->count()]
+            : - CtGlobal::TILT_ANGLE[m_model->count()];
+
+    m_startPoint = m_pivotPoint;
+    m_endPoint = QPointF(
+                (m_endAngle > 0)
+                    ? tube->pivotPoint().x() - 20 * scale()
+                    : tube->pivotPoint().x() + 20 * scale(),
+                tube->pivotPoint().y() - 40 * scale());
 
 
+    steps = STEPS_FLY;
+    nextStageId = STAGE_DISCHARGE;
+    startMove();
+}
 
+void TubeItem::discharge()
+{
+    m_startPoint = m_pivotPoint;
+    m_endPoint = m_pivotPoint;
+    m_startAngle = m_angle;
+
+    m_endAngle = (m_angle > 0)
+            ? CtGlobal::TILT_ANGLE[m_model->count() - m_dropColors]
+            : - CtGlobal::TILT_ANGLE[m_model->count() - m_dropColors];
+
+    nextStageId = STAGE_RETURN;
+    steps = STEPS_DISCHARGE * m_dropColors;
+
+    startMove();
 }
 
 void TubeItem::flyBack()
 {
-    startPoint = QPointF(x(), y());
-    endPoint = pivotPoint();
-    startAngle = m_angle;
-    endAngle = 0;
+    m_startPoint = m_pivotPoint;
+    m_endPoint = m_positionPoint;
+    m_startAngle = m_angle;
+    m_endAngle = 0;
+    steps = STEPS_FLYBACK;
+    nextStageId = STAGE_DEFAULT;
 
-    steps = 20;
+    startMove();
 }
 
-
-void TubeItem::addAngleIncrement()
+void TubeItem::nextStage()
 {
-    setAngle(m_angle + m_angleIncrement);
-    if (abs(m_angle) >= 118.6105 * CT_DEG2RAD)
-        m_angleIncrement = - m_angle / 30.0;
-    if (qFuzzyIsNull(m_angle)) {
-        setAngle(0);
+    currentStageId = nextStageId;
 
-//------------
-//        qreal xShift = std::copysign(20*scale(), m_angleIncrement);
-//        setPivotPoint(QPointF(m_pivotPoint.x() - xShift, m_pivotPoint.y() + 20 * scale()));
-//        m_flow->setX(0);
+    switch (currentStageId) {
+    case STAGE_DISCHARGE:
+        discharge();
+        return;
+    case STAGE_RETURN:
 
-        m_timer->stop();
+        if (m_recipient) {
+            m_recipient->m_flowingTubes --;
+            m_recipient->m_dropColors -= this->m_dropColors;
+            if (m_recipient->m_flowingTubes == 0) {
+                m_recipient->m_colors->refresh();
+                m_recipient->nextStageId = STAGE_DEFAULT;
+                m_fillColor = 0;
+                m_recipient->nextStage();
+            }
+            m_recipient = nullptr;
+        }
+
+        while (m_dropColors > 0) {
+            m_model->extractColor();
+            m_dropColors --;
+        }
+        flyBack();
+        return;
+    case STAGE_DEFAULT:
+
         setZ(0);
+        if (isClosed()) {
+            m_shade->startHide();
+            m_cork->setVisible(true);
+            m_shade->setShadeAfterHiding(3);
+        }
+
+        m_shade->setY(20 * scale());
+        QQuickItem::setPosition(m_pivotPoint);
+        setWidth(80 * scale());
+        setHeight(200 * scale());
+        setClip(true);
+
+        if (m_board->selectedTube()
+                && canPutColor(m_board->selectedTube()->currentColor())
+                ) {
+            setShade(2);
+        }
+
     }
 }
 
-bool TubeItem::isCLosed()
+void TubeItem::nextFrame()
+{
+    if (steps == 0) {
+        if (!qFuzzyIsNull(m_angleIncrement))
+           setAngle(m_endAngle);
+        setPivotPoint(m_endPoint);
+        m_timer->stop();
+        nextStage();
+    } else {
+        if (!qFuzzyIsNull(m_angleIncrement))
+            setAngle(m_angle + m_angleIncrement);
+        setPivotPoint(m_pivotPoint + m_moveIncrement);
+        steps --;
+    }
+
+//    qDebug() << index() << currentStageId << steps << m_startPoint << m_endPoint << m_pivotPoint;
+}
+
+bool TubeItem::isClosed()
 {
     return m_model->isClosed();
 }
@@ -235,27 +351,86 @@ bool TubeItem::isEmpty()
     return m_model->isEmpty();
 }
 
-bool TubeItem::isPoured()
+bool TubeItem::isActive()
 {
-    return m_poured;
+    return !m_model->isClosed()
+            && currentStageId != STAGE_POUR
+            && currentStageId <= STAGE_SELECT;
 }
 
-bool TubeItem::isDischarged()
+bool TubeItem::isPoured()
 {
-    return m_discharged;
+    return currentStageId == STAGE_POUR;
+}
+
+bool TubeItem::isTilted()
+{
+    return (currentStageId != STAGE_POUR)
+            && (currentStageId > STAGE_SELECT);
 }
 
 bool TubeItem::isSelected()
 {
-    return m_selected;
+    return currentStageId == STAGE_SELECT;
 }
 
-void TubeItem::setSelected(bool newSelected)
+void TubeItem::setSelected(bool value)
 {
-    if (newSelected == m_selected)
+    if (!isActive() || isEmpty())
         return;
-    m_selected = newSelected;
-//    setShade(0);
-    setYShift((m_selected)? -20 * scale() : 0);
+
+    if (value) {
+        moveUp();
+    } else {
+        moveDown();
+    }
 }
 
+quint8 TubeItem::extractColor()
+{
+    quint8 result = m_model->extractColor();
+    m_colors->refresh();
+    return result;
+}
+
+void TubeItem::putColor(quint8 colorNum)
+{
+    m_model->putColor(colorNum);
+
+/*    if (isClosed()) {
+        m_shade->startHide();
+        m_cork->setVisible(true);
+        m_shade->setShadeAfterHiding(3);
+    }
+    */
+}
+
+void TubeItem::dropColorsTo(TubeItem * tube)
+{
+    if (!tube)
+        return;
+
+    m_dropColors = qMin(m_model->sameColorsCount(),
+                       tube->model()->rest());
+
+    for (int i = 0; i < m_dropColors; i++)
+        tube->putColor(m_model->currentColor());
+    flyTo(tube);
+}
+
+bool TubeItem::canPutColor(quint8 colorNum)
+{
+    return m_model->canPutColor(colorNum)
+            || m_fillColor == colorNum;
+}
+
+bool TubeItem::canExtractColor()
+{
+    return m_model->canExtractColor()
+            || isActive();
+}
+
+quint8 TubeItem::currentColor()
+{
+    return m_model->currentColor();
+}

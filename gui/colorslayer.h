@@ -15,56 +15,37 @@ class ColorsLayer : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    explicit ColorsLayer(TubeItem *parent = 0, TubeModel *tm = 0);
+    explicit ColorsLayer(TubeItem *parent = 0);
     ~ColorsLayer();
 
-    void paint(QPainter *painter) override;
-
-public slots:
-//    void fillColors(quint8 colorNum, quint8 count);
-    void dropColors(quint8 count);
+    void paint(QPainter * painter) override;
+    void refresh();
 
 private slots:
     void onScaleChanged();
     void onAngleChanged();
 
 private:
-    TubeModel * m_model;
-    TubeItem * parentTube;
+    TubeItem  * m_tube;
 
-//    int      count();
-    qreal    scale();
-    qreal    angle();
-    void     setAngle(qreal newAngle);
+    qreal       scale();
+//    qreal       angle();
+    TubeModel * model();
 
 //  draw colors
-    void     drawColors();
-    QImage   * m_drawImage;
-    QPainter * m_painter;
+    void        drawColors();
+    QImage    * m_drawImage;
+    QPainter  * m_painter;
 
 //  fill colors from another tube
-    void     addFillArea(qreal fillAreaInc);
-    QTimer * m_fillTimer;
-    qreal    m_fillArea;                  // currently filled area
-    qreal    m_fillAreaInc;               // area increment
-    QColor   m_fillColor;                 // color to fill color cells
-    quint8   m_fillCount;                 // number of filled color cells
-    qreal    m_fillJetWidth;              // width of the jet
-    QRectF   m_colorRect;                 // rect of the color
-    qreal    m_colorBottom;               // bottom vertical coordinate
+    void        addFillArea(qreal fillAreaInc);
+    QTimer    * m_fillTimer;
+    qreal       m_fillArea;                  // currently filled area
+    QRectF      m_colorRect;                 // rect of the color
 
 //  drop colors to another tube
-    void     nextSegment();
-    void     drawColorCell();
-
-//    void addAngle(qreal angleInc);
-//    QTimer * m_rotateTimer;
-//    qreal    m_angleInc = 0.00001;                   // angle increment
-
-    qreal  * m_tiltAngles;                 //
-    qreal    m_startAngle;
-    qreal    m_endAngle;
-    quint8   m_dropCount;                  // number of dropped color cells
+    void        nextSegment();
+    void        drawColorCell();
 
 //  rotation coordinates & routines
     struct PointF {
@@ -89,25 +70,25 @@ private:
         qreal b;    // koeff b
     };
 
-    PointF * tubeVertices;                      // coordinates after rotation
-    LineF  * bottleLines;                       // bottle edge lines
-    qreal    getIntersectionX(quint8 vertex);   // the intersection of the horizontal line from bottle vertices
+    PointF    * tubeVertices;                      // coordinates after rotation
+    LineF     * bottleLines;                       // bottle edge lines
+    qreal       getIntersectionX(quint8 vertex);   // the intersection of the horizontal line from bottle vertices
 
-    void     addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
-    void     clearSlices();
-    SliceF * tubeSlices;                         // tube is sliced by horizontal lines passing through its vertices
-    qint8    m_slicesCount;
-    qint8    m_sliceCurrent;
+    void        addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
+    void        clearSlices();
+    SliceF    * tubeSlices;                         // tube is sliced by horizontal lines passing through its vertices
+    qint8       m_slicesCount;
+    qint8       m_sliceCurrent;
 
-    void     addColorSegment(SliceF line);
-    void     clearColorSegments();
-    SliceF * colorSegments;                       // color segments coordinates
-    qint8    m_segmentsCount;
-    qint8    m_colorCurrent;
-    qreal    m_segmentArea;
+    void        addColorSegment(SliceF line);
+    void        clearColorSegments();
+    SliceF    * colorSegments;                       // color segments coordinates
+    qint8       m_segmentsCount;
+    qint8       m_colorCurrent;
+    qreal       m_segmentArea;
 
-    SliceF   m_bottomLine;
-    SliceF   m_topLine;
+    SliceF      m_bottomLine;
+    SliceF      m_topLine;
 
     // temporary
 //    qreal  * m_Areas;

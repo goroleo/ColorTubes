@@ -50,6 +50,7 @@ void ShadeLayer::startHide()
     m_visible = false;
     m_pulse = false;
     m_alphaIncrement = ALPHA_INC_DOWN;
+    m_shadeAfterHiding = 0;
     shadingTimer->start(TIMER_TICKS);
 }
 
@@ -93,6 +94,12 @@ void ShadeLayer::nextAlpha()
                 m_alphaIncrement = ALPHA_INC_UP;
             } else {
                 shadingTimer->stop();
+
+                if (m_shadeAfterHiding > 0) {
+                    setShade(m_shadeAfterHiding);
+                    startShow();
+                    m_shadeAfterHiding = 0;
+                }
             }
         }
     }
@@ -171,6 +178,16 @@ void ShadeLayer::setShade(int newShadeNumber)
     case 3:
         m_shadeImage = CtGlobal::images().shadeBlue().toImage();
         break;
+    }
+}
+
+void ShadeLayer::setShadeAfterHiding(int newShadeNumber)
+{
+    if (shadingTimer->isActive() || isVisible())
+            m_shadeAfterHiding = newShadeNumber;
+    else {
+        setShade(newShadeNumber);
+        startShow();
     }
 }
 

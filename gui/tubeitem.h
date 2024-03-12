@@ -26,25 +26,29 @@ public:
     int shade();
     TubeModel * model() { return m_model; }
 
+    void    setPosition(const QPointF newPoint);
+    void    setPivotPoint(QPointF newPoint);
     QPointF pivotPoint();
 
-    void setPivotPoint(QPointF newPoint);
-    void setYShift(qreal yp);
+    void setVerticalShift(qreal yp);
+    qreal verticalShift() {return m_verticalShift;}
 
-    qreal yShift() {return m_yShift;}
-
-    bool isCLosed();
+    bool isClosed();
     bool isEmpty();
+    bool isActive();
     bool isPoured();
-    bool isDischarged();
+    bool isTilted();
     bool isSelected();
 
-    void setSelected(bool newSelected);
+    bool canPutColor(quint8 colorNumber);
+    bool canExtractColor();
+    quint8 currentColor();
 
-    void rotate();
-    void flyTo(TubeItem * tube);
-    void flyBack();
+    int tubeIndex();
 
+    void setSelected(bool value);
+
+    void dropColorsTo(TubeItem * tube);
 
 public slots:
     void setAngle(qreal newAngle);
@@ -66,32 +70,65 @@ private:
     ColorsLayer * m_colors;
     BottleLayer * m_back;
     ShadeLayer  * m_shade;
-    FlowLayer   * m_flow;
 
+    TubeItem    * m_recipient = nullptr;
 
     void mousePressEvent(QMouseEvent* event);
     void placeLayers();
 
-    void addAngleIncrement();
+//    void addAngleIncrement();
 
-    bool          m_poured = false;
-    bool          m_discharged = false;
-    bool          m_selected = false;
+    void startMove();
+    void nextFrame();
 
+// moving & animation stages
+    void nextStage();
+    void moveUp();
+    void moveDown();
+    void flyTo(TubeItem * tube);
+    void flyBack();
+    void discharge();
+
+    QPointF       m_positionPoint;
     QPointF       m_pivotPoint;
-    qreal         m_yShift;
+    qreal         m_verticalShift;
 
     QTimer      * m_timer;
-    QPointF       startPoint;
-    QPointF       endPoint;
-    QPointF       currentPoint;
-    QPointF       moveIncrement;
+    QPointF       m_startPoint;
+    QPointF       m_endPoint;
+    QPointF       m_currentPoint;
+    QPointF       m_moveIncrement;
 
-    qreal         startAngle;
-    qreal         endAngle;
+    qreal         m_startAngle;
+    qreal         m_endAngle;
     qreal         m_angle = 0.0;
     qreal         m_angleIncrement;
+    quint8        m_dropColors;         // number of dropped color cells
+    quint8        m_flowingTubes;       // number of tubes which are flew colors to this tube
+
+    static const int STAGE_DEFAULT = 0;
+    static const int STAGE_SELECT = 1;
+    static const int STAGE_FLY = 2;
+    static const int STAGE_DISCHARGE = 3;
+    static const int STAGE_RETURN = 4;
+    static const int STAGE_POUR = 10;
+    int           currentStageId = 0;
+    int           nextStageId = 0;
+
+    static const int TIMER_TICKS = 10;
+    static const int STEPS_UP = 5;
+    static const int STEPS_DOWN = 3;
+    static const int STEPS_FLY = 20;
+    static const int STEPS_DISCHARGE = 26;
+    static const int STEPS_FLYBACK = 15;
+    int           steps;
+
+    quint8 extractColor();
+    void putColor(quint8 colorNum);
+
+    quint8        m_fillColor;
 
 };
+
 
 #endif // TUBEITEM_H

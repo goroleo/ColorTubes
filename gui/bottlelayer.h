@@ -30,9 +30,6 @@ public slots:
     void     setSource(QString newSource);
     void     setSource(quint8 newSourceId);
 
-signals:
-//    void     sourceChanged();
-
 private slots:
     void     onScaleChanged();
     void     onAngleChanged();

@@ -10,8 +10,8 @@
 class Io
 {
 public:
-    static Io& create();
-    static Io& instance() {return *m_instance;}
+    static Io & create();
+    static Io & instance() {return *m_instance;}
     ~Io();
 
     QString localDir() {return m_dir;}

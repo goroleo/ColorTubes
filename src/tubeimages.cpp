@@ -29,6 +29,7 @@ TubeImages::~TubeImages()
     delete m_shadeYellow;
     delete m_shadeGreen;
     delete m_shadeBlue;
+    delete m_shadeRed;
     delete m_cork;
     delete m_vertices;
 }
@@ -51,6 +52,7 @@ void TubeImages::initialize()
     m_shadeYellow = new QPixmap;
     m_shadeGreen = new QPixmap;
     m_shadeBlue = new QPixmap;
+    m_shadeRed = new QPixmap;
     m_cork = new QPixmap;
     m_vertices = new QPointF[6];
 
@@ -60,7 +62,7 @@ void TubeImages::initialize()
 
 TubeImages& TubeImages::instance()
 {
-    return *m_instance;
+    return * m_instance;
 }
 
 QRectF TubeImages::colorRect(quint8 index)
@@ -80,10 +82,6 @@ void TubeImages::setScale(qreal value)
         m_scale = value;
         scalePoints();
         renderImages();
-        m_centerPoint = QPointF(
-                (m_vertices[0].x() + m_vertices[5].x()) / 2,
-                (m_vertices[0].y() + m_vertices[5].y()) / 2);
-
         emit scaleChanged(m_scale);
     }
 }
@@ -219,6 +217,12 @@ void TubeImages::renderImages()
     elementRect = scaleRect(elementRect);
     m_source->render(&painter, QLatin1String("shade_blue"), elementRect);
     m_shadeBlue->convertFromImage(image);
+
+    image.fill(0x00ffffff);
+    elementRect  = m_source->boundsOnElement(QLatin1String("shade_red"));
+    elementRect = scaleRect(elementRect);
+    m_source->render(&painter, QLatin1String("shade_red"), elementRect);
+    m_shadeRed->convertFromImage(image);
 
 //----------------- cork
     elementRect  = m_source->boundsOnElement(QLatin1String("cork"));

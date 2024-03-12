@@ -17,6 +17,7 @@ public:
     void clear();
 
     quint8 count() const {return m_count;}
+    quint8 rest() const {return 4 - m_count;}
     quint8 state() {return m_state;}
 
     // state routines

@@ -30,6 +30,8 @@ public:
     void startPulse();
     void stopPulse();
 
+    void setShadeAfterHiding(int newShadeNumber);
+
 public slots:
     void setShade(int newShadeNumber);
     void setPulse(bool newPulse);
@@ -46,6 +48,7 @@ private:
     void prepareImage();
 
     quint8      m_shadeNumber = 0;
+    quint8      m_shadeAfterHiding = 0;
     bool        m_visible = false;
     bool        m_pulse = false;
 
@@ -58,7 +61,7 @@ private:
 
     const float ALPHA_INC_UP = 0.05;
     const float ALPHA_INC_DOWN = -0.08;
-    const int   TIMER_TICKS = 10;
+    const int   TIMER_TICKS = 8;
     const int   TIMER_PULSE_TICKS = 30;
 };
 
