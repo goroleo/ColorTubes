@@ -11,7 +11,7 @@ class ShadeLayer : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(int shade READ shade WRITE setShade NOTIFY shadeChanged)
-    Q_PROPERTY(bool visible READ visible )
+    Q_PROPERTY(bool visible READ isVisible )
     Q_PROPERTY(bool pulse READ pulse WRITE setPulse NOTIFY pulseChanged)
 
 public:
@@ -22,7 +22,7 @@ public:
 
     qreal scale();
     int shade();
-    bool visible();
+    bool isVisible();
     bool pulse();
 
     void startShow();

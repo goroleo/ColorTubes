@@ -36,9 +36,12 @@ public:
     bool isClosed();
     bool isEmpty();
     bool isActive();
-    bool isPoured();
+    bool isPouredIn();
     bool isTilted();
     bool isSelected();
+
+    void showAvailable(bool value);
+    void showClosed(bool value);
 
     bool canPutColor(quint8 colorNumber);
     bool canExtractColor();
@@ -47,8 +50,7 @@ public:
     int tubeIndex();
 
     void setSelected(bool value);
-
-    void dropColorsTo(TubeItem * tube);
+    void pourOutTo(TubeItem * tube);
 
 public slots:
     void setAngle(qreal newAngle);
@@ -76,18 +78,16 @@ private:
     void mousePressEvent(QMouseEvent* event);
     void placeLayers();
 
-//    void addAngleIncrement();
-
-    void startMove();
+    void startAnimation();
     void nextFrame();
 
-// moving & animation stages
+//  animation stages
     void nextStage();
     void moveUp();
     void moveDown();
     void flyTo(TubeItem * tube);
     void flyBack();
-    void discharge();
+    void pourOut();
 
     QPointF       m_positionPoint;
     QPointF       m_pivotPoint;
@@ -101,32 +101,40 @@ private:
 
     qreal         m_startAngle;
     qreal         m_endAngle;
-    qreal         m_angle = 0.0;
+    qreal         m_currentAngle    = 0.0;
     qreal         m_angleIncrement;
-    quint8        m_dropColors;         // number of dropped color cells
-    quint8        m_flowingTubes;       // number of tubes which are flew colors to this tube
 
-    static const int STAGE_DEFAULT = 0;
-    static const int STAGE_SELECT = 1;
-    static const int STAGE_FLY = 2;
-    static const int STAGE_DISCHARGE = 3;
-    static const int STAGE_RETURN = 4;
-    static const int STAGE_POUR = 10;
+    static const int STAGE_REGULAR  = 0;
+    static const int STAGE_SELECT   = 1;
+    static const int STAGE_FLY      = 2;
+    static const int STAGE_POUR_OUT = 3;
+    static const int STAGE_RETURN   = 4;
+    static const int STAGE_POUR_IN  = 10;
     int           currentStageId = 0;
     int           nextStageId = 0;
 
-    static const int TIMER_TICKS = 10;
-    static const int STEPS_UP = 5;
-    static const int STEPS_DOWN = 3;
-    static const int STEPS_FLY = 20;
-    static const int STEPS_DISCHARGE = 26;
-    static const int STEPS_FLYBACK = 15;
+    static const int TIMER_TICKS    = 10;
+    static const int STEPS_UP       = 3;
+    static const int STEPS_DOWN     = 5;
+    static const int STEPS_FLY      = 20;
+    static const int STEPS_POUR_OUT = 26;
+    static const int STEPS_FLYBACK  = 15;
     int           steps;
 
     quint8 extractColor();
     void putColor(quint8 colorNum);
 
-    quint8        m_fillColor;
+//  recipient procedures
+    void addPouringTube(TubeItem * tube);
+    void removePouringTube(TubeItem * tube);
+    quint8        m_fillingColor;           // color number
+    quint8        m_pouringCells = 0;      // number of pouring color cells
+    quint8        m_pouringTubes = 0;       // number of tubes which are pour colors to this tube
+    qreal         m_pouringArea = 0;       // number of tubes which are pour colors to this tube
+    qreal         m_oneStepPouringArea = 04;
+
+    void addPouringArea();
+    qreal getPouringArea();
 
 };
 

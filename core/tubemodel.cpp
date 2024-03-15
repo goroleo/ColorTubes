@@ -65,7 +65,7 @@ void TubeModel::updateState()
 
 quint8 TubeModel::currentColor() const
 {
-    if (m_count == 0)
+    if (m_count == 0 || m_state == 3)
         return 0;
     return m_items.colors[m_count - 1];
 }

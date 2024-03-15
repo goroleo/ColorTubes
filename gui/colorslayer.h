@@ -21,6 +21,12 @@ public:
     void paint(QPainter * painter) override;
     void refresh();
 
+    // pouring
+    void  addPouringArea(qreal drawArea, quint8 colorNum);
+    qreal getPouringArea() {return m_pouringArea;}
+    void resetPouringArea() {m_pouringArea = 0;}
+
+
 private slots:
     void onScaleChanged();
     void onAngleChanged();
@@ -38,10 +44,11 @@ private:
     QPainter  * m_painter;
 
 //  fill colors from another tube
-    void        addFillArea(qreal fillAreaInc);
+//    void        addFillArea(qreal fillAreaInc);
     QTimer    * m_fillTimer;
     qreal       m_fillArea;                  // currently filled area
     QRectF      m_colorRect;                 // rect of the color
+    qreal       m_pouringArea;
 
 //  drop colors to another tube
     void        nextSegment();
@@ -90,8 +97,8 @@ private:
     SliceF      m_bottomLine;
     SliceF      m_topLine;
 
-    // temporary
-//    qreal  * m_Areas;
+    QRectF      m_jetRect;                 // rect of the color
+
 
 };
 

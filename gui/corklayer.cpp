@@ -9,10 +9,7 @@
 #include "src/palette.h"
 
 CorkLayer::CorkLayer(QQuickItem *parent) :
-    QQuickPaintedItem(parent),
-    m_visible(false),
-    m_alpha(0.0),
-    m_currY(0.0)
+    QQuickPaintedItem(parent)
 {
     internalTimer = new QTimer(this);
 
@@ -26,7 +23,6 @@ CorkLayer::CorkLayer(QQuickItem *parent) :
     });
 
     onScaleChanged();
-    m_visible = false;
 }
 
 CorkLayer::~CorkLayer()
@@ -39,7 +35,7 @@ qreal CorkLayer::scale()
     return CtGlobal::images().scale();
 }
 
-bool CorkLayer::visible()
+bool CorkLayer::isVisible()
 {
     return m_visible;
 }
@@ -90,7 +86,7 @@ void CorkLayer::onScaleChanged()
 
 void CorkLayer::paint(QPainter *painter)
 {
-    painter->drawImage(0, m_currY, m_drawImage);
+    painter->drawImage(0, m_currentY, m_drawImage);
 }
 
 void CorkLayer::nextStep()
@@ -109,7 +105,7 @@ void CorkLayer::nextStep()
         }
     }
 
-    m_currY = -20 * scale() + (40 * scale()) * exp(-0.5 * (1 - m_alpha));
+    m_currentY = -20 * scale() + (40 * scale()) * exp(-0.5 * (1 - m_alpha));
 }
 
 void CorkLayer::prepareImage()

@@ -48,7 +48,7 @@ void Game::initialize()
 //    qmlRegisterType <TubeItem> ("TubeItem", 1, 0, "TubeItem");
     qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
 
-    load(QLatin1String(":/jctl/difficult8.jctl"));
+    load(QLatin1String(":/jctl/example2.jctl"));
 }
 
 void Game::load(QString fileName)

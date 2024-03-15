@@ -18,6 +18,7 @@ public:
 
     int maxChildrenZ();
     int indexOf(TubeItem * tube);
+    int tubesCount();
 
     void clickTube(TubeItem * tube);
     TubeItem * selectedTube() { return m_selectedTube;}

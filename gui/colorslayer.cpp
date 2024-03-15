@@ -197,7 +197,9 @@ void ColorsLayer::paint(QPainter *painter)
 void ColorsLayer::drawColors()
 {
 
-    m_drawImage->fill(0x30ff8888);
+    //    m_drawImage->fill(0x30ff8888);
+    m_drawImage->fill(0);
+
     if (!model())
         return;
 
@@ -209,6 +211,14 @@ void ColorsLayer::drawColors()
             m_colorRect.translate(0, 20 * scale());
             m_painter->fillRect(m_colorRect, CtGlobal::palette().getColor(model()->color(i)));
         }
+
+        m_bottomLine.y = CtGlobal::images().vertex(3).y()
+                - CtGlobal::images().colorHeight() * model()->count()
+                + 20 * scale();
+        m_bottomLine.x1 = CtGlobal::images().vertex(3).x();
+        m_bottomLine.x2 = CtGlobal::images().vertex(2).x();
+//        qDebug() << model()->count() << m_bottomLine.y << m_bottomLine.x1 << m_bottomLine.x2;
+
     }
     else
     {
@@ -219,7 +229,7 @@ void ColorsLayer::drawColors()
 
         m_fillArea = CtGlobal::images().colorArea();
 
-        while (m_sliceCurrent < m_slicesCount-1
+        while (m_sliceCurrent < m_slicesCount - 1
                && m_colorCurrent < model()->count())
         {
             nextSegment();
@@ -263,11 +273,8 @@ void ColorsLayer::nextSegment()
             drawColorCell();
             clearColorSegments();
 
-//          if (!qFuzzyIsNull(endAngle))
-//                drawFlow(colorArea - sliceArea);
-
-            m_fillArea = 0;
             m_colorCurrent ++;
+//            m_pouringArea = m_fillArea + (model()->count() - m_colorCurrent) * CtGlobal::images().colorArea();
         }
 
     } else {
@@ -389,6 +396,42 @@ qreal ColorsLayer::getIntersectionX(quint8 vertex)
         line++;
     }
     return -1000;
+}
+bool working = false;
+
+void ColorsLayer::addPouringArea(qreal area, quint8 colorNum)
+{
+    if (! working) {
+        working = true;
+        m_pouringArea += area;
+        QColor clr = CtGlobal::palette().getColor(colorNum);
+//        qDebug() << model()->currentColor() << colorNum << area << m_pouringArea << m_bottomLine.y;
+        qreal jetArea = m_bottomLine.y * CtGlobal::images().jetWidth();
+        m_colorRect.setX(CtGlobal::images().jetRect().x());
+        m_colorRect.setY(CtGlobal::images().jetRect().y());
+        m_colorRect.setWidth(CtGlobal::images().jetWidth());
+
+        if (m_pouringArea < jetArea) {
+            m_colorRect.setHeight(m_pouringArea / m_colorRect.width());
+            m_painter->fillRect(m_colorRect, clr);
+
+        } else {
+            m_colorRect.setHeight(m_bottomLine.y);
+            m_painter->fillRect(m_colorRect, clr);
+
+            qreal newHeight = (m_pouringArea - jetArea)
+                    / (CtGlobal::images().colorWidth() - CtGlobal::images().jetWidth());
+
+            m_colorRect.setY(m_bottomLine.y - newHeight);
+            m_colorRect.setX(m_bottomLine.x1);
+            m_colorRect.setWidth(CtGlobal::images().colorWidth());
+            m_colorRect.setHeight(newHeight);
+            m_painter->fillRect(m_colorRect, clr);
+        }
+        update();
+        working = false;
+    } else
+        addPouringArea(area, colorNum);
 }
 
 void ColorsLayer::refresh()

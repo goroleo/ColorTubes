@@ -9,13 +9,13 @@
 class CorkLayer : public QQuickPaintedItem
 {
     Q_OBJECT
-    Q_PROPERTY(bool visible READ visible  WRITE setVisible NOTIFY visibleChanged)
+    Q_PROPERTY(bool visible READ isVisible  WRITE setVisible NOTIFY visibleChanged)
 
 public:
     explicit CorkLayer(QQuickItem *parent = 0);
     ~CorkLayer();
 
-    bool visible();
+    bool isVisible();
 
     void paint(QPainter *painter) override;
 
@@ -42,10 +42,10 @@ private:
     void prepareImage();
 
     QImage m_drawImage;
-    bool m_visible;
-    qreal m_alpha;
+    bool m_visible = false;
+    qreal m_alpha = 0.0;
     qreal m_alphaIncrement;
-    qreal m_currY;
+    qreal m_currentY = 0;
 
     const float ALPHA_INC_UP = 0.08;
     const float ALPHA_INC_DOWN = -0.12;

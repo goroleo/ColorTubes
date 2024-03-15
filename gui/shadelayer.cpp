@@ -148,10 +148,13 @@ void ShadeLayer::onScaleChanged()
 
 int ShadeLayer::shade()
 {
-    return m_shadeNumber;
+    if (m_visible)
+        return m_shadeNumber;
+    else
+        return 0;
 }
 
-bool ShadeLayer::visible()
+bool ShadeLayer::isVisible()
 {
     return m_visible;
 }
@@ -183,9 +186,12 @@ void ShadeLayer::setShade(int newShadeNumber)
 
 void ShadeLayer::setShadeAfterHiding(int newShadeNumber)
 {
-    if (shadingTimer->isActive() || isVisible())
-            m_shadeAfterHiding = newShadeNumber;
-    else {
+//    qDebug() << shadingTimer->isActive() << isVisible();
+
+    if (shadingTimer->isActive() || isVisible()) {
+        m_shadeAfterHiding = newShadeNumber;
+        startHide();
+    } else {
         setShade(newShadeNumber);
         startShow();
     }

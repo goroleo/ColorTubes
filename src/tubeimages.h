@@ -37,8 +37,14 @@ public:
 
     QRectF    colorRect(quint8 index);
     qreal     colorHeight() {return m_colorHeight;}
-    qreal     colorWidth() {return m_colorWidth;}
-    qreal     colorArea() {return m_colorArea;}
+    qreal     colorWidth()  {return m_colorWidth;}
+    qreal     colorArea()   {return m_colorArea;}
+    qreal     jetWidth()    {return m_jetWidth;}
+    qreal     jetHeight(quint8 index)
+                 {return m_vertices[3].y() - m_colorHeight * index;}
+
+    QRectF    jetRect()    {return m_jetRect;}
+
 
     QRectF    scaleRect (QRectF rect);
 
@@ -67,6 +73,7 @@ private:
     QPixmap      * m_shadeGreen;
     QPixmap      * m_shadeBlue;
     QPixmap      * m_shadeRed;
+    QPixmap      * m_shadeGray;
     QPixmap      * m_cork;
 
     QPointF      * m_vertices;   // vertices of the егиу
@@ -74,6 +81,8 @@ private:
     qreal          m_colorHeight; // width of the one color cell after scaling
     qreal          m_colorWidth;
     qreal          m_colorArea;   // colorWidth * colorHeight
+    qreal          m_jetWidth;
+    QRectF         m_jetRect;
 };
 
 #endif // TUBEIMAGES_H
