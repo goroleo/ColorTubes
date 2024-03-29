@@ -35,9 +35,7 @@ SOURCES += src/ColorTubes.cpp \
 
 DISTFILES += qml/ColorTubes.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/FirstPage.qml \
     qml/pages/MainPage.qml \
-    qml/pages/SecondPage.qml \
     rpm/ColorTubes.changes.in \
     rpm/ColorTubes.changes.run.in \
     rpm/ColorTubes.spec \
@@ -82,4 +80,5 @@ RESOURCES += \
 QT += \
     core \
     svg \
-    quick
+    quick \
+    widgets

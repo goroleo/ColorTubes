@@ -4,7 +4,6 @@
 #include <QtMath>
 #include <QPainter>
 
-#include <QDebug>
 #include "ctglobal.h"
 
 TubeImages* TubeImages::m_instance = nullptr;
@@ -44,6 +43,15 @@ TubeImages& TubeImages::create()
     return *m_instance;
 }
 
+TubeImages& TubeImages::instance()
+{
+    if (m_instance == nullptr) {
+        m_instance = new TubeImages();
+        m_instance->initialize();
+    }
+    return * m_instance;
+}
+
 void TubeImages::initialize()
 {
     m_source = new QSvgRenderer(QLatin1String(":/img/tube.svg"));
@@ -60,21 +68,6 @@ void TubeImages::initialize()
 
     scalePoints();
     renderImages();
-}
-
-TubeImages& TubeImages::instance()
-{
-    return * m_instance;
-}
-
-QRectF TubeImages::colorRect(quint8 index)
-{
-    QRectF result;
-    result.setX(m_vertices[3].x());
-    result.setY(m_vertices[3].y() - m_colorHeight * (index+1));
-    result.setHeight(m_colorHeight);
-    result.setWidth(m_colorWidth);
-    return result;
 }
 
 void TubeImages::setScale(qreal value)
@@ -107,10 +100,15 @@ void TubeImages::scalePoints()
 
 QRectF TubeImages::scaleRect(QRectF rect)
 {
-    QRectF result;
-    result.setTopLeft(rect.topLeft() * m_scale);
-    result.setSize(rect.size() * m_scale);
-    return result;
+    return QRectF(rect.topLeft() * m_scale, rect.size() * m_scale);
+}
+
+QRectF TubeImages::colorRect(quint8 index)
+{
+    return QRectF(m_vertices[3].x(),
+            m_vertices[3].y() - m_colorHeight * (index+1),
+            m_colorWidth,
+            m_colorHeight);
 }
 
 void TubeImages::renderImages()
@@ -124,8 +122,6 @@ void TubeImages::renderImages()
     QPainter painter(&image);
 
     image.fill(0x00ffffff);
-    QRgb pix;
-    int alpha, newAlpha;
 
 //----------------- shine
     elementRect = m_source->boundsOnElement(QLatin1String("shine"));
@@ -138,13 +134,17 @@ void TubeImages::renderImages()
     QPainter shinePainter(&shineImage);
     m_source->render(&shinePainter, QLatin1String("shine"), elementRect);
 
+    qreal part;            // part of the image's height/width
+    QRgb pix;              // current pixel
+    int alpha, newAlpha;   // alpha values of the pixel
+
     // transparency mask
     for (int y = 0; y < shineImage.height(); ++y) {
-        qreal dy = qreal(y) / shineImage.height();
-        if (dy < 0.3) {
+        part = qreal(y) / shineImage.height();
+        if (part < 0.3) {
             alpha = 0x88;
-        } else if (dy < 0.9) {
-            alpha = 0x88 - round(0x88 / 0.6 * (dy-0.3));
+        } else if (part < 0.9) {
+            alpha = 0x88 - round(0x88 / 0.6 * (part - 0.3));
         } else {
             alpha = 0;
         }
@@ -172,11 +172,11 @@ void TubeImages::renderImages()
 
     // transparency mask
     for (int x = 0; x < sideImage.width(); ++x) {
-        qreal dx = qreal(x) / sideImage.width();
-        if (dx < 0.2) {
-            alpha = 0x44 - round((0x44-0x11) / 0.2 * dx);
+        part = qreal(x) / sideImage.width();
+        if (part < 0.2) {
+            alpha = 0x44 - round((0x44-0x11) / 0.2 * part);
         } else {
-            alpha = 0x11 + round((0x88-0x11) / 0.8 * (dx - 0.2));
+            alpha = 0x11 + round((0x88-0x11) / 0.8 * (part - 0.2));
         }
 
         for (int y = 0; y < sideImage.height(); ++y) {

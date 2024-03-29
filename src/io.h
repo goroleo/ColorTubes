@@ -11,7 +11,7 @@ class Io
 {
 public:
     static Io & create();
-    static Io & instance() {return *m_instance;}
+    static Io & instance();
     ~Io();
 
     QString localDir() {return m_dir;}
@@ -31,7 +31,7 @@ private:
     Io() {};
     void initialize();
 
-    static Io *m_instance;
+    static Io * m_instance;
     QString m_dir;
     QString m_sep;
 };

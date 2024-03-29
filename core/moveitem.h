@@ -27,20 +27,37 @@ public:
     void         setTubeFrom(quint8 idxTubeFrom);
     void         setTubeTo(quint8 idxTubeTo);
     void         setRank(qint8 newRank);
+    void         addRank(qint8 newRank);
 
     const MoveItem   * parentMove()  { return m_parentMove; }
     const BoardModel * boardBefore() { return m_boardBefore; }
     BoardModel * boardAfter()  { return m_boardAfter; }
-    quint8       tubeFrom()    { return m_tubeFrom; }
-    quint8       tubeTo()      { return m_tubeTo; }
+    quint8       tubeFrom()    { return m_data.fields.tubeFrom; }
+    quint8       tubeTo()      { return m_data.fields.tubeTo; }
     qint8        rank()        { return m_rank;}
 
 private:
 
-    quint8       m_tubeFrom;
+    struct MoveFields {
+        quint8 tubeFrom;
+        quint8 tubeTo;
+        quint8 count;
+        quint8 color;
+    };
+
+    union MoveData {
+        MoveFields fields;
+        quint32 stored;
+    };
+
+
+/*    quint8       m_tubeFrom;
     quint8       m_tubeTo;
     quint8       m_color;
     quint8       m_count;
+*/
+
+    MoveData     m_data;
     qint8        m_rank;
 
     const MoveItem   * m_parentMove = nullptr;

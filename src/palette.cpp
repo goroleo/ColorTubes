@@ -6,7 +6,6 @@
 #include "ctglobal.h"
 #include "io.h"
 
-
 Palette* Palette::m_instance = nullptr;
 
 Palette& Palette::create()
@@ -20,18 +19,20 @@ Palette& Palette::create()
 
 Palette& Palette::instance()
 {
+    if (m_instance == nullptr) {
+        m_instance = new Palette();
+        m_instance->initialize();
+    }
     return *m_instance;
 }
 
 void Palette::initialize()
 {
     m_items = new quint32[CtGlobal::NUM_OF_COLORS];
-    for (int i = 0; i < CtGlobal::NUM_OF_COLORS; i++)
-    {
+    for (int i = 0; i < CtGlobal::NUM_OF_COLORS; i++) {
         m_items[i] = 0;
     }
-    if (!load())
-    {
+    if (!load()) {
         setDefault();
         save();
     }
@@ -41,7 +42,6 @@ Palette::~Palette()
 {
     save();
     delete[] m_items;
-    delete m_instance;
     m_instance = nullptr;
 }
 
@@ -49,7 +49,6 @@ int Palette::size()
 {
     return CtGlobal::NUM_OF_COLORS;
 }
-
 
 QColor Palette::getColor(int index)
 {

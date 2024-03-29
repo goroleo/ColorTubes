@@ -4,30 +4,26 @@
 
 #include <math.h>
 
-
 MoveItem::MoveItem()
 {
-
 }
 
 MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
 {
     m_boardBefore = board;
-    m_tubeFrom = idxTubeFrom;
-    m_tubeTo = idxTubeTo;
     m_parentMove = board->parentMove();
-    m_color = m_boardBefore->getTube(idxTubeFrom)->currentColor();
-    m_count = qMin( board->getTube(idxTubeFrom)->sameColorsCount(),
-                   quint8(4 - board->getTube(idxTubeTo)->count()) );
+    m_data.fields.tubeFrom = idxTubeFrom;
+    m_data.fields.tubeTo = idxTubeTo;
+    m_data.fields.count = board->colorsToMove(idxTubeFrom, idxTubeFrom);
+    m_data.fields.color = board->getTube(idxTubeFrom)->currentColor();
+    m_rank = 0;
 }
 
 MoveItem::~MoveItem()
 {
     if (m_boardAfter)
         delete m_boardAfter;
-
 }
-
 
 bool MoveItem::doMove()
 {
@@ -51,12 +47,12 @@ void MoveItem::setBoardBefore(BoardModel *bm)
 
 void MoveItem::setTubeFrom(quint8 idxTubeFrom)
 {
-    m_tubeFrom = idxTubeFrom;
+    m_data.fields.tubeFrom = idxTubeFrom;
 }
 
 void MoveItem::setTubeTo(quint8 idxTubeTo)
 {
-    m_tubeFrom = idxTubeTo;
+    m_data.fields.tubeTo = idxTubeTo;
 }
 
 void MoveItem::setRank(qint8 newRank)
@@ -65,9 +61,11 @@ void MoveItem::setRank(qint8 newRank)
 }
 
 quint32 MoveItem::storeMove() {
-    return ((m_tubeFrom & 0xff) << 24)
+/*    return ((m_tubeFrom & 0xff) << 24)
            | ((m_tubeTo & 0xff) << 16)
            | ((m_count & 0xff) << 8)
            | ((m_color) & 0xff);
-}
+*/
 
+    return m_data.stored;
+}

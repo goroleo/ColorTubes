@@ -27,10 +27,56 @@ GameBoard::GameBoard(QQuickItem *parent) :
 
 GameBoard::~GameBoard()
 {
-    for (int i=m_model->tubesCount(); i > 0; --i) {
-        delete m_tubes->at(i-1);
-    }
+    if (!m_tubes->isEmpty())
+        qDeleteAll(m_tubes->begin(), m_tubes->end());
+    m_tubes->clear();
     delete m_tubes;
+}
+
+int GameBoard::tubesCount()
+{
+    return m_model->tubesCount();
+}
+
+int GameBoard::indexOf(TubeItem * tube)
+{
+    if (tube) {
+        return m_tubes->indexOf(tube);
+    } else
+        return -1;
+}
+
+int GameBoard::maxChildrenZ()
+{
+    int result = 0;
+    for (int i = 0; i < this->children().size(); ++i)
+    {
+        if (children().at(i)->inherits("TubeItem")
+                && result < ((TubeItem *) children().at(i))->z())
+            result = ((TubeItem *) children().at(i))->z();
+    }
+    return result;
+}
+
+void GameBoard::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    if (oldGeometry.width() != width() || oldGeometry.height() != height())
+    {
+        // rescale and replace all tubes
+
+        int cols = m_model->tubesCount() / 2 + m_model->tubesCount() % 2;
+        int boardWidth = cols * (80 + spaceX) + spaceX;
+        int boardHeight = 400 + 3 * spaceY;
+
+        qreal newScale = qMin(qreal(width() / boardWidth), qreal(height() / boardHeight));
+
+        if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(scale(), newScale)) {
+            CtGlobal::images().setScale(newScale);
+        } else {
+            placeTubes();
+        }
+    }
 }
 
 qreal GameBoard::scale() const
@@ -41,39 +87,6 @@ qreal GameBoard::scale() const
 void GameBoard::onScaleChanged()
 {
     placeTubes();
-}
-
-void GameBoard::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
-{
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
-    if (oldGeometry.width() != width() || oldGeometry.height() != height())
-        reScale();
-}
-
-void GameBoard::mousePressEvent(QMouseEvent* event)
-{
-    clickTube(nullptr);
-}
-
-void GameBoard::reScale()
-{
-    qreal newScale = 0.0;
-
-    int cols = m_model->tubesCount() / 2;
-    if (cols * 2 < m_model->tubesCount())
-        cols ++;
-
-    int tubesWidth = cols * (80 + spaceX) + spaceX;
-    int tubesHeight = 400 + 3 * spaceY;
-
-    newScale = qMin(qreal(width() / tubesWidth), qreal(height() / tubesHeight));
-
-    if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(scale(), newScale))
-    {
-        CtGlobal::images().setScale(newScale);
-    } else {
-        placeTubes();
-    }
 }
 
 void GameBoard::placeTubes()
@@ -110,44 +123,23 @@ void GameBoard::placeTubes()
     }
 }
 
-int GameBoard::maxChildrenZ()
+void GameBoard::mousePressEvent(QMouseEvent* event)
 {
-    int result = 0;
-    for (int i = 0; i < this->children().size(); ++i)
-    {
-        if (children().at(i)->inherits("TubeItem")
-                && result < ((TubeItem *) children().at(i))->z())
-            result = ((TubeItem *) children().at(i))->z();
-    }
-//    qDebug() << result;
-    return result;
-}
-
-int GameBoard::indexOf(TubeItem * tube)
-{
-    if (tube) {
-        return m_tubes->indexOf(tube);
-    } else
-        return -1;
-}
-
-int GameBoard::tubesCount()
-{
-    return m_model->tubesCount();
+    clickTube(nullptr);
 }
 
 void GameBoard::clickTube(TubeItem * tube)
 {
     if (tube == nullptr) {
         if (m_selectedTube != nullptr) {
-            // qDebug() << "disable selection 1";
-            m_selectedTube->setSelected(false);
+        // qDebug() << "disable selection 1";
+            m_selectedTube->showSelected(false);
             m_selectedTube = nullptr;
         }
     } else if (m_selectedTube == nullptr) {
         if (tube->canExtractColor()) {
-            // qDebug() << "new selection";
-            tube->setSelected(true);
+         // qDebug() << "new selection";
+            tube->showSelected(true);
             if (tube->isSelected())
                 m_selectedTube = tube;
             else
@@ -155,17 +147,17 @@ void GameBoard::clickTube(TubeItem * tube)
         }
     } else {
         if (tube == m_selectedTube) {
-            // qDebug() << "disable selection 2";
-            m_selectedTube->setSelected(false);
+         // qDebug() << "disable selection 2";
+            m_selectedTube->showSelected(false);
             m_selectedTube = nullptr;
         } else if (tube->canPutColor(m_selectedTube->currentColor())) {
-            // qDebug() << "put color";
-            m_selectedTube->pourOutTo(tube);
+         // qDebug() << "put color";
+            m_selectedTube->moveColorTo(tube);
             m_selectedTube = nullptr;
         } else {
-            // qDebug() << "change selection";
-            m_selectedTube->setSelected(false);
-            tube->setSelected(true);
+         // qDebug() << "change selection";
+            m_selectedTube->showSelected(false);
+            tube->showSelected(true);
             if (tube->isSelected())
                 m_selectedTube = tube;
             else
@@ -173,7 +165,13 @@ void GameBoard::clickTube(TubeItem * tube)
         }
     }
 
-    // show possible moves & hide previous selection
+    showAvailableMoves();
+}
+
+void GameBoard::showAvailableMoves()
+{
+    TubeItem * tube;
+
     int i = 0;
     while (i < tubesCount()) {
         tube = m_tubes->at(i);
@@ -194,8 +192,7 @@ void GameBoard::moveColor(TubeItem * tubeFrom, TubeItem * tubeTo)
 {
     if (tubeFrom == nullptr || tubeTo == nullptr)
         return;
-
-    tubeFrom->pourOutTo(tubeTo);
+    tubeFrom->moveColorTo(tubeTo);
 }
 
 void GameBoard::moveColor(int tubeFromIndex, int tubeToIndex)
@@ -206,3 +203,10 @@ void GameBoard::moveColor(int tubeFromIndex, int tubeToIndex)
 
     moveColor(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
 }
+
+bool GameBoard::checkSolved()
+{
+    m_solved = m_model->isSolved();
+    return m_solved;
+}
+

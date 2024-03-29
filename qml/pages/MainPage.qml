@@ -6,157 +6,159 @@ Page {
     id: page
     allowedOrientations: Orientation.Portrait
 
-
     Image {
         id: backgroundImage
 
-        source: "qrc:/img/bg-pattern.png"
+        source: "qrc:/img/bg.png"
         fillMode: Image.Tile
         width: parent.width
         height: parent.height
     }
 
-    SilicaFlickable {
-        id: mySilica
+    Row {
+        id: topMenu
+        width: parent.width - Theme.horizontalPageMargin * 2
+        height: btnNewGame.height
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.horizontalPageMargin
+        anchors.top: parent.top
+        anchors.topMargin: Theme.paddingLarge
 
-        contentWidth:  page.width // - Theme.horizontalPageMargin*2;
-        contentHeight: page.height
-        anchors.fill:  parent
-//        topMargin:   Theme.paddingLarge
-//        leftMargin:  Theme.horizontalPageMargin
-//        rightMargin: Theme.horizontalPageMargin
+        spacing: (width - (Theme.iconSizeMedium * 4)) / 3
 
-        PullDownMenu {
-            id: pulldown
-
-            MenuItem {
-
-                Row {
-                    id: topMenu
-
-                    spacing: (parent.width - (Theme.iconSizeMedium * 4)) / 3
-
-                    IconButton {
-                        id: btnNewGame
-
-                        height: Theme.iconSizeMedium
-                        width: Theme.iconSizeMedium
-                        icon.scale: Theme.iconSizeMedium / icon.height
-
-                        icon.source: "qrc:/img/icon-star.svg?"
-                                     + (pressed
-                                        ? Theme.lightHighlightColor
-                                        : Theme.lightPrimaryColor)
-                        onClicked: {
-                            console.log("[NewGameButton] pressed")
-                            pulldown.close(false)
-                        }
-                    }
-
-                    IconButton {
-                        id: btnUndoMove
-
-                        height: Theme.iconSizeMedium
-                        width: Theme.iconSizeMedium
-                        icon.scale: Theme.iconSizeMedium / icon.height
-
-                        icon.source: "qrc:/img/icon-undo.svg?"
-                                     + (pressed
-                                        ? Theme.lightHighlightColor
-                                        : Theme.lightPrimaryColor)
-                        onClicked: {
-                            console.log("[UndoButton] pressed")
-                            pulldown.close(false)
-                        }
-                    }
-
-                    IconButton {
-                        id: btnSolve
-
-                        height: Theme.iconSizeMedium
-                        width: Theme.iconSizeMedium
-                        icon.scale: Theme.iconSizeMedium / icon.height
-
-                        icon.source: "qrc:/img/icon-dice.svg?"
-                                     + (pressed
-                                        ? Theme.lightHighlightColor
-                                        : Theme.lightPrimaryColor)
-                        onClicked: {
-                            console.log("[SolveButton] pressed")
-                            pulldown.close(false)
-                        }
-                    }
-
-                    IconButton {
-                        id: btnSettings
-
-                        height: Theme.iconSizeMedium
-                        width: Theme.iconSizeMedium
-                        icon.scale: Theme.iconSizeMedium / icon.height
-
-                        icon.source: "qrc:/img/icon-gear.svg?"
-                                     + (pressed
-                                        ? Theme.lightHighlightColor
-                                        : Theme.lightPrimaryColor)
-                        onClicked: {
-                            console.log("[SettingsButton] pressed")
-                            pulldown.close(false)
-                        }
-                    }
-                }
-            }
-        }
-
-
-
-        Text {
-            id: levelNumber
-
-            text: qsTr("Level") + " " + "145"
-
-            width: parent.width
-            height: parent.height / 6
-
-            verticalAlignment: Text.AlignBottom
-            horizontalAlignment: Text.AlignHCenter
-            font.weight: Font.DemiBold
-            font.pixelSize: 40
+        Icon {
+            id: btnNewGame
+            source: "qrc:/img/icon-star.svg"
+            height: Theme.iconSizeMedium
+            width: Theme.iconSizeMedium
+            opacity: enabled? 1.0 : Theme.opacityLow
             color: Theme.lightPrimaryColor
-        }
+            highlightColor: Theme.highlightColor
 
-        GameBoard {
-            id: board
-            anchors.top: levelNumber.bottom
-            width: parent.width
-            height: parent.height - levelNumber.height;
+            MouseArea {
+                width: parent.width
+                height: parent.height
 
-/*            Rectangle {
-
-                width:  board.width
-                height: board.height
-                color: "#22ff22FF"
-
-                Text {
-                    id: name1
-                    text: qsTr(board.width + " - " + board.height)
-                    color: "#ffffffFF"
+                onPressedChanged: {
+                    btnNewGame.highlighted = pressed;
+                }
+                onClicked: {
+                    console.log("[NewGame] button pressed")
                 }
             }
- */       }
+        }
 
+        Icon {
+            id: btnUndoMove
+            source: "qrc:/img/icon-undo.svg"
+            enabled: false
 
-        Image {
-            id: badge
+            height: Theme.iconSizeMedium
+            width: Theme.iconSizeMedium
+            opacity: enabled? 1.0 : Theme.opacityLow
+            color: Theme.lightPrimaryColor
+            highlightColor: Theme.highlightColor
 
-  //          scale: 0.8 * parent.width / badge.width
-            source: "qrc:/img/badge.svg?"
-            anchors.top: levelNumber.bottom
+            MouseArea {
+                width: parent.width
+                height: parent.height
 
-            width:parent.width * 0.8
+                onPressedChanged: {
+                    btnUndoMove.highlighted = pressed;
+                }
 
+                onClicked: {
+                    console.log("[UndoMove] button clicked")
+                }
+            }
+        }
 
-            //        rightMargin: Theme.horizontalPageMargin
+        Icon {
+            id: btnSolve
+            source: "qrc:/img/icon-dice.svg"
 
+            height: Theme.iconSizeMedium
+            width: Theme.iconSizeMedium
+            opacity: enabled? 1.0 : Theme.opacityLow
+            color: Theme.lightPrimaryColor
+            highlightColor: Theme.highlightColor
+
+            MouseArea {
+                width: parent.width
+                height: parent.height
+
+                onPressedChanged: {
+                    btnSolve.highlighted = pressed;
+                }
+
+                onClicked: {
+                    console.log("[Solve] button clicked")
+                }
+            }
+        }
+
+        Icon {
+            id: btnSettings
+            source: "qrc:/img/icon-gear.svg"
+
+            height: Theme.iconSizeMedium
+            width: Theme.iconSizeMedium
+            opacity: enabled? 1.0 : Theme.opacityLow
+
+            color: Theme.lightPrimaryColor
+            highlightColor: Theme.highlightColor
+
+            MouseArea {
+                width: parent.width
+                height: parent.height
+
+                onPressedChanged: {
+                    btnSettings.highlighted = pressed;
+                }
+
+                onClicked: {
+                    console.log("[Settings] button clicked")
+                    btnUndoMove.enabled = !btnUndoMove.enabled
+                }
+            }
         }
     }
+
+    Text {
+        id: levelNumber
+
+        text: qsTr("Level") + " " + "145"
+
+        width: parent.width
+        anchors.top: topMenu.bottom
+        anchors.topMargin: Theme.paddingLarge
+
+        verticalAlignment: Text.AlignBottom
+        horizontalAlignment: Text.AlignHCenter
+        font.pointSize: Theme.fontSizeLarge
+
+        font.family: Theme.fontFamilyHeading
+        color: Theme.highlightColor
+
+        MouseArea {
+            width: parent.width
+            height: parent.height
+            onClicked: {
+                console.log("fontSize "
+                            + "Large " + Theme.fontSizeLarge + ", "
+                            + "ExtraLarge " + Theme.fontSizeExtraLarge + ", "
+                            + "Huge " + Theme.fontSizeHuge + " "
+                            )
+                console.log("pixel size: " + levelNumber.font.pixelSize + ", point size: " + levelNumber.font.pointSize)
+            }
+        }
+    }
+
+    GameBoard {
+        id: board
+        anchors.top: levelNumber.bottom
+        anchors.bottom: parent.bottom
+        width: parent.width
+    }
+
 }

@@ -314,7 +314,7 @@ void JctlFormat::storeGame() {
     emptyCount = 0;
     storedTubes->clear();
     for (quint16 i = 0; i < CtGlobal::game().boardModel()->tubesCount(); i++) {
-        storedTubes->append(CtGlobal::game().boardModel()->getTube(i)->storeColors());
+        storedTubes->append(CtGlobal::game().boardModel()->getTube(i)->store());
     }
 
     movesCount = 0;

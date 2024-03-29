@@ -8,21 +8,29 @@
 
 #include <QDebug>
 
-Io* Io::m_instance = nullptr;
+Io * Io::m_instance = nullptr;
 
 Io::~Io()
 {
-    delete m_instance;
     m_instance = nullptr;
 }
 
-Io& Io::create()
+Io & Io::create()
 {
     if (m_instance == nullptr) {
         m_instance = new Io();
         m_instance->initialize();
     }
-    return *m_instance;
+    return * m_instance;
+}
+
+Io & Io::instance()
+{
+    if (m_instance == nullptr) {
+        m_instance = new Io();
+        m_instance->initialize();
+    }
+    return * m_instance;
 }
 
 bool Io::created()

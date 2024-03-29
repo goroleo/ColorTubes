@@ -31,11 +31,16 @@ public:
 
     TubeModel *   addNewTube();
     TubeModel *   addNewTube(TubeModel * tube);
-    TubeModel *   addNewTube(quint32 storedValue);
+    TubeModel *   addNewTube(quint32 storedTube);
 
     void          clear();
+    void          clearTubes();
     void          clearMoves();
     bool          isSolved();
+
+    bool          canDoMove(int tubeFromIndex, int tubeToIndex);
+    quint8        colorsToMove(int tubeFromIndex, int tubeToIndex);
+    quint32       getMove(int tubeFromIndex, int tubeToIndex);
 
     bool operator == (const BoardModel &other) const;
 
@@ -50,8 +55,8 @@ private:
     const BoardModel  * m_rootBoard = nullptr;
     const MoveItem    * m_parentMove = nullptr;
 
-    QVector<TubeModel> * m_tubes;
-    QVector<MoveItem>  * m_moves;
+    QVector<TubeModel *> * m_tubes;
+    QVector<MoveItem *>  * m_moves;
 
 
 };

@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     app->setApplicationName("ColorTubes");
-    app->setOrganizationName("legoru / leogoro");
+    app->setOrganizationName("com.me.legoru");
 
     CtGlobal::create();
 

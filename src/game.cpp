@@ -11,7 +11,7 @@
 #include "gui/gameboard.h"
 #include "gui/tubeitem.h"
 
-Game* Game::m_instance = nullptr;
+Game * Game::m_instance = nullptr;
 
 Game::~Game()
 {
@@ -19,7 +19,6 @@ Game::~Game()
     delete m_jctl;
     delete m_board;
 
-    delete m_instance;
     m_instance = nullptr;
 }
 
@@ -34,6 +33,10 @@ Game& Game::create()
 
 Game& Game::instance()
 {
+    if (m_instance == nullptr) {
+        m_instance = new Game();
+        m_instance->initialize();
+    }
     return *m_instance;
 }
 
@@ -42,10 +45,7 @@ void Game::initialize()
     m_usedColors = new UsedColors; // UsedColors must be before JctlFormat
     m_jctl = new JctlFormat();
 
-
     m_board = new BoardModel();
-
-//    qmlRegisterType <TubeItem> ("TubeItem", 1, 0, "TubeItem");
     qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
 
     load(QLatin1String(":/jctl/example2.jctl"));

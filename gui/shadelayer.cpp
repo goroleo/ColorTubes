@@ -54,6 +54,20 @@ void ShadeLayer::startHide()
     shadingTimer->start(TIMER_TICKS);
 }
 
+void ShadeLayer::hideImmediately()
+{
+    m_visible = false;
+    m_pulse = false;
+    m_alpha = 0.0;
+    prepareImage();
+    update();
+    if (m_shadeAfterHiding > 0) {
+        setShade(m_shadeAfterHiding);
+        startShow();
+        m_shadeAfterHiding = 0;
+    }
+}
+
 void ShadeLayer::startPulse()
 {
     m_pulse = true;
@@ -166,6 +180,8 @@ bool ShadeLayer::pulse()
 
 void ShadeLayer::setShade(int newShadeNumber)
 {
+    if (m_shadeNumber == newShadeNumber)
+        return;
     m_shadeNumber = newShadeNumber;
     switch (m_shadeNumber)
     {
@@ -182,12 +198,11 @@ void ShadeLayer::setShade(int newShadeNumber)
         m_shadeImage = CtGlobal::images().shadeBlue().toImage();
         break;
     }
+    emit shadeChanged(m_shadeNumber);
 }
 
 void ShadeLayer::setShadeAfterHiding(int newShadeNumber)
 {
-//    qDebug() << shadingTimer->isActive() << isVisible();
-
     if (shadingTimer->isActive() || isVisible()) {
         m_shadeAfterHiding = newShadeNumber;
         startHide();
@@ -204,6 +219,7 @@ void ShadeLayer::setPulse(bool newPulse)
             startPulse();
         else
             stopPulse();
+        emit pulseChanged(newPulse);
     }
 }
 

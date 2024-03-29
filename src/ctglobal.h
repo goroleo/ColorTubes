@@ -2,6 +2,7 @@
 #define CTGLOBAL_H
 
 #include <QtGlobal>
+#include <QColor>
 
 class Game;
 class Io;
@@ -32,6 +33,8 @@ namespace CtGlobal
 
     // game modes
     int    gameMode();
+
+    QColor paletteColor(quint8 colorIndex);
 
     static const int END_GAME    = 0;
     static const int FILL_MODE   = 100;

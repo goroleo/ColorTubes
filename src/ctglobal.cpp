@@ -1,7 +1,7 @@
 #include "ctglobal.h"
 
 #include <QString>
-#include <QObject>
+#include <QDebug>
 
 #include "io.h"
 #include "palette.h"
@@ -30,11 +30,15 @@ void CtGlobal::create()
 void CtGlobal::destroy()
 {
     created = false;
+    m_game.instance().~Game();
+    m_images.instance().~TubeImages();
+    m_palette.instance().~Palette();
+    m_io.instance().~Io();
 }
 
 int CtGlobal::gameMode()
 {
-    return game().mode();
+    return m_game.instance().mode();
 }
 
 Game& CtGlobal::game()
@@ -52,6 +56,11 @@ Palette& CtGlobal::palette()
     return m_palette.instance();
 }
 
+QColor CtGlobal::paletteColor(quint8 colorIndex)
+{
+    return m_palette.instance().getColor(colorIndex);
+}
+
 TubeImages& CtGlobal::images()
 {
     return m_images.instance();
@@ -59,26 +68,17 @@ TubeImages& CtGlobal::images()
 
 QString CtGlobal::localFile(QString fName)
 {
-    if (m_io.instance().created())
-        return m_io.instance().localFileName(fName);
-    else
-        return QString("");
+    return m_io.instance().localFileName(fName);
 }
 
 QString CtGlobal::paletteFile()
 {
-    if (m_io.instance().created())
-        return m_io.instance().paletteFileName();
-    else
-        return QString("");
+    return m_io.instance().paletteFileName();
 }
 
 QString CtGlobal::settingsFile()
 {
-    if (m_io.instance().created())
-        return m_io.instance().settingsFileName();
-    else
-        return QString("");
+    return m_io.instance().settingsFileName();
 }
 
 quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)

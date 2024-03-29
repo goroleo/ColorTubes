@@ -30,11 +30,6 @@ CorkLayer::~CorkLayer()
     delete internalTimer;
 }
 
-qreal CorkLayer::scale()
-{
-    return CtGlobal::images().scale();
-}
-
 bool CorkLayer::isVisible()
 {
     return m_visible;
@@ -69,7 +64,6 @@ void CorkLayer::startHide()
     }
 }
 
-
 void CorkLayer::onScaleChanged()
 {
     m_drawImage = QImage(CtGlobal::images().cork().width(),
@@ -77,7 +71,7 @@ void CorkLayer::onScaleChanged()
                          QImage::Format_ARGB32);
 
     setWidth(m_drawImage.width());
-    setHeight(m_drawImage.height() + PATH_SIZE * scale());
+    setHeight(m_drawImage.height() + 20 * CtGlobal::images().scale());
 
     m_drawImage.fill(0x00ffffff);
     prepareImage();
@@ -105,7 +99,8 @@ void CorkLayer::nextStep()
         }
     }
 
-    m_currentY = -20 * scale() + (40 * scale()) * exp(-0.5 * (1 - m_alpha));
+    m_currentY = - 20 * CtGlobal::images().scale()
+            + 40 * CtGlobal::images().scale() * exp(-0.5 * (1 - m_alpha));
 }
 
 void CorkLayer::prepareImage()

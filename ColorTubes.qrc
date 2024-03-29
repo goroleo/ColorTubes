@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/tube.svg</file>
-        <file>img/bg-pattern.png</file>
+        <file>img/bg.png</file>
         <file>img/icon-dice.svg</file>
         <file>img/icon-gear.svg</file>
         <file>img/icon-star.svg</file>
@@ -12,5 +11,7 @@
         <file>jctl/example4.jctl</file>
         <file>img/badge.svg</file>
         <file>jctl/difficult8.jctl</file>
+        <file>img/tube.svg</file>
+        <file>img/icon-cover.png</file>
     </qresource>
 </RCC>

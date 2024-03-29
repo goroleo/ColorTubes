@@ -27,6 +27,7 @@ public:
 
     void startShow();
     void startHide();
+    void hideImmediately();
     void startPulse();
     void stopPulse();
 

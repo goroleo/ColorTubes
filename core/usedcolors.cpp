@@ -120,7 +120,7 @@ quint8 UsedColors::getRandomColor()
     int clrIndex;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    QRandomGenerator *rg = QRandomGenerator::global();
+    QRandomGenerator * rg = QRandomGenerator::global();
     clrIndex = rg->bounded(0, numberOfAvailableCells());
 #else
     qsrand(QTime::currentTime().msec());

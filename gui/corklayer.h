@@ -24,7 +24,6 @@ public slots:
     void startShow();
     void startHide();
 
-
 signals:
     void scaleChanged(const qreal newScale);
     bool visibleChanged(const bool newVisible);
@@ -33,8 +32,6 @@ private slots:
     void onScaleChanged();
 
 private:
-
-    qreal scale();
 
     QTimer *internalTimer;
 
@@ -49,7 +46,6 @@ private:
 
     const float ALPHA_INC_UP = 0.08;
     const float ALPHA_INC_DOWN = -0.12;
-    const int   PATH_SIZE = 20;
     const int   TIMER_TICKS = 5;
 };
 
