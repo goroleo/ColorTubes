@@ -5,18 +5,18 @@
     <name>CoverPage</name>
     <message id="app_title">
         <source>Color Tubes</source>
-        <translation type="unfinished"></translation>
+        <translation>Color Tubes</translation>
     </message>
 </context>
 <context>
     <name>MainPage</name>
     <message id="level">
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Level</translation>
     </message>
     <message id="victory">
         <source>Victory!</source>
-        <translation type="unfinished"></translation>
+        <translation>Victory!</translation>
     </message>
 </context>
 </TS>
