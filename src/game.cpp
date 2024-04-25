@@ -10,6 +10,7 @@
 
 #include "gui/gameboard.h"
 #include "gui/tubeitem.h"
+#include "gui/flowerlayer.h"
 
 Game * Game::m_instance = nullptr;
 
@@ -24,11 +25,7 @@ Game::~Game()
 
 Game& Game::create()
 {
-    if (m_instance == nullptr) {
-        m_instance = new Game();
-        m_instance->initialize();
-    }
-    return *m_instance;
+    return instance();
 }
 
 Game& Game::instance()
@@ -47,8 +44,9 @@ void Game::initialize()
 
     m_board = new BoardModel();
     qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
+    qmlRegisterType <FlowerLayer> ("FlowerLayer", 1, 0, "FlowerLayer");
 
-    load(QLatin1String(":/jctl/example2.jctl"));
+    load(QLatin1String(":/jctl/difficult8.jctl"));
 }
 
 void Game::load(QString fileName)

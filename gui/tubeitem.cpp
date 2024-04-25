@@ -10,7 +10,7 @@
 #include "shadelayer.h"
 #include "gameboard.h"
 
-TubeItem::TubeItem(QQuickItem *parent, TubeModel * tm) :
+TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
     QQuickItem(parent),
     m_model(tm)
 {
@@ -84,7 +84,7 @@ bool TubeItem::isPouredIn()
     return currentStageId == STAGE_POUR_IN;
 }
 
-bool TubeItem::isTilted()
+bool TubeItem::isFlyed()
 {
     return (currentStageId != STAGE_POUR_IN)
             && (currentStageId > STAGE_SELECT);
@@ -95,60 +95,6 @@ bool TubeItem::isSelected()
     return currentStageId == STAGE_SELECT;
 }
 
-quint8 TubeItem::currentColor()
-{
-    return m_model->currentColor();
-}
-
-quint8 TubeItem::getColor(quint8 index)
-{
-    return m_model->color(index);
-}
-
-bool TubeItem::canExtractColor()
-{
-    return m_model->canExtractColor();
-}
-
-quint8 TubeItem::extractColor()
-{
-    quint8 result = m_model->extractColor();
-    m_colors->refresh();
-    return result;
-}
-
-bool TubeItem::canPutColor(quint8 colorNum)
-{
-    return (currentStageId == STAGE_REGULAR
-                && m_model->canPutColor(colorNum))
-
-            || (currentStageId == STAGE_POUR_IN
-                && m_fillingColor == colorNum
-                && m_pouringCells < m_model->rest());
-}
-
-void TubeItem::putColor(quint8 colorNumber)
-{
-    m_model->putColor(colorNumber);
-    m_colors->refresh();
-}
-
-void TubeItem::moveColorTo(TubeItem * tube)
-{
-    if (tube)
-        flyTo(tube);
-}
-
-qreal TubeItem::scale() const
-{
-    return CtGlobal::images().scale();
-}
-
-void TubeItem::onScaleChanged()
-{
-    regularTube();
-}
-
 int TubeItem::shade()
 {
     return m_shade->shade();
@@ -156,7 +102,7 @@ int TubeItem::shade()
 
 void TubeItem::setShade(int newShade)
 {
-    if (m_shade->shade() == newShade || isTilted())
+    if (m_shade->shade() == newShade || isFlyed())
         return;
 
     m_shade->setShade(newShade);
@@ -165,7 +111,7 @@ void TubeItem::setShade(int newShade)
     emit shadeChanged(newShade);
 }
 
-void TubeItem::showSelected(bool value)
+void TubeItem::setSelected(bool value)
 {
     if (!isActive() || isEmpty())
         return;
@@ -199,6 +145,85 @@ void TubeItem::showClosed(bool value)
     }
 }
 
+quint8 TubeItem::currentColor()
+{
+    return m_model->currentColor();
+}
+
+quint8 TubeItem::colorAt(quint8 index)
+{
+    return m_model->color(index);
+}
+
+bool TubeItem::canPutColor(quint8 colorNum)
+{
+    return (currentStageId == STAGE_REGULAR
+                && m_model->canPutColor(colorNum))
+
+            || (currentStageId == STAGE_POUR_IN
+                && m_fillingColor == colorNum
+                && m_pouringCells < m_model->rest());
+}
+
+void TubeItem::putColor(quint8 colorNumber)
+{
+    m_model->putColor(colorNumber);
+    m_colors->refresh();
+}
+
+bool TubeItem::canExtractColor()
+{
+    return m_model->canExtractColor();
+}
+
+quint8 TubeItem::extractColor()
+{
+    quint8 result = m_model->extractColor();
+    m_colors->refresh();
+    return result;
+}
+
+void TubeItem::moveColorTo(TubeItem * tube)
+{
+    if (tube)
+        flyTo(tube);
+}
+
+qreal TubeItem::scale() const
+{
+    return CtGlobal::images().scale();
+}
+
+void TubeItem::onScaleChanged()
+{
+    regularTube();
+}
+
+void TubeItem::setPosition(const QPointF newPoint)
+{
+    m_regularPosition = newPoint;
+    m_currentPosition = newPoint;
+    regularTube();
+}
+
+void TubeItem::setCurrentPosition(QPointF newPoint)
+{
+    m_currentPosition = newPoint;
+
+    if (qFuzzyIsNull(m_currentAngle)) {
+        QQuickItem::setPosition(m_currentPosition);
+    } else {
+        setX(m_currentPosition.x() - CtGlobal::images().shiftWidth());
+        setY(m_currentPosition.y() + m_verticalShift);
+    }
+}
+
+void TubeItem::setVerticalShift(qreal yShift)
+{
+    m_verticalShift = yShift;
+    setY(m_currentPosition.y() + m_verticalShift);
+}
+
 qreal TubeItem::angle() const
 {
     return m_currentAngle;
@@ -207,7 +232,7 @@ qreal TubeItem::angle() const
 void TubeItem::setAngle(qreal newAngle)
 {
 /*
- * checking for external angle changes, doesn't need inside the app
+    checking for external angle changes, doesn't need inside the app
 
     newAngle = fmod(newAngle, CT_2PI);
     if (qAbs(newAngle) > CT_PI) {
@@ -215,43 +240,12 @@ void TubeItem::setAngle(qreal newAngle)
                 ? CT_2PI + newAngle
                 : newAngle - CT_2PI;
     }
-
 */
     if (qFuzzyCompare(m_currentAngle, newAngle))
         return;
 
     m_currentAngle = newAngle;
     emit angleChanged(newAngle);
-}
-
-QPointF TubeItem::pivotPoint()
-{
-    return m_pivotPoint;
-}
-
-void TubeItem::setPosition(const QPointF newPoint)
-{
-    m_pivotPoint = newPoint;
-    m_position = newPoint;
-    regularTube();
-}
-
-void TubeItem::setPivotPoint(QPointF newPoint)
-{
-    m_pivotPoint = newPoint;
-
-    if (qFuzzyIsNull(m_currentAngle)) {
-        QQuickItem::setPosition(m_pivotPoint);
-    } else {
-        setX(m_pivotPoint.x() - 100 * scale());
-        setY(m_pivotPoint.y() + m_verticalShift);
-    }
-}
-
-void TubeItem::setVerticalShift(qreal yShift)
-{
-    m_verticalShift = yShift;
-    setY(m_pivotPoint.y() + m_verticalShift);
 }
 
 void TubeItem::startAnimation() {
@@ -266,21 +260,22 @@ void TubeItem::startAnimation() {
 
 void TubeItem::currentFrame()
 {
-    if (steps == 0) {
-        m_timer->stop();
-        if (!qFuzzyIsNull(m_angleIncrement))
-            setAngle(m_endAngle);
-        setPivotPoint(m_endPoint);
-        nextStage();
-    } else {
+    if (steps > 0) {
         if (!qFuzzyIsNull(m_angleIncrement))
             setAngle(m_currentAngle + m_angleIncrement);
-        setPivotPoint(m_pivotPoint + m_moveIncrement);
+        setCurrentPosition(m_currentPosition + m_moveIncrement);
 
         if (currentStageId == STAGE_POUR_OUT && m_recipient) {
             m_recipient->addPouringArea();
         }
         steps --;
+    } else {
+        steps = 0;
+        m_timer->stop();
+        if (!qFuzzyIsNull(m_angleIncrement))
+            setAngle(m_endAngle);
+        setCurrentPosition(m_endPoint);
+        nextStage();
     }
 }
 
@@ -307,30 +302,26 @@ void TubeItem::regularTube()
 {
     currentStageId = STAGE_REGULAR;
 
-    setZ(0);
-    m_shade->setY(20 * scale());
-    QQuickItem::setPosition(m_pivotPoint);
-    setWidth(80 * scale());
-    setHeight(200 * scale());
+    QQuickItem::setPosition(m_regularPosition);
+
+    setWidth(CtGlobal::images().tubeWidth());
+    setHeight(CtGlobal::images().tubeFullHeight());
     setClip(true);
+    setZ(0);
+    m_shade->setY(CtGlobal::images().shiftHeight());
+
     if (m_board->selectedTube()
             && canPutColor(m_board->selectedTube()->currentColor()))
         showAvailable(true);
 
     if (isClosed()) {
         showClosed(true);
-        m_board->checkSolved();
-        qDebug() << "Closed tube" << tubeIndex() << "| Solved:" << m_board->isSolved();
-    }
-
-    if (m_board->isSolved()) {
-        if (m_board->maxChildrenZ() == 0) {
-            qDebug() << "All on their places. Tube" << tubeIndex();
+        qDebug() << "Closed tube" << tubeIndex();
+        if (m_board->isSolved()) {
             qDebug() << "!!! SOLVED !!!";
-        } else {
-            qDebug() << "Not on places yet... Tube" << tubeIndex();
         }
     }
+
 }
 
 void TubeItem::moveUp()
@@ -339,8 +330,9 @@ void TubeItem::moveUp()
         return;
     currentStageId = STAGE_SELECT;
 
-    m_startPoint = m_position;
-    m_endPoint = QPointF(m_position.x(), m_position.y() - 20 * scale());
+    m_startPoint = m_regularPosition;
+    m_endPoint = QPointF(m_regularPosition.x(),
+                         m_regularPosition.y() - CtGlobal::images().shiftHeight());
     m_startAngle = 0;
     m_endAngle = 0;
     steps = STEPS_UP;
@@ -354,8 +346,8 @@ void TubeItem::moveDown()
     if (currentStageId != STAGE_SELECT)
         return;
 
-    m_startPoint = m_pivotPoint;
-    m_endPoint = m_position;
+    m_startPoint = m_currentPosition;
+    m_endPoint = m_regularPosition;
     m_startAngle = m_currentAngle;
     m_endAngle = 0;
     steps = STEPS_DOWN;
@@ -366,7 +358,8 @@ void TubeItem::moveDown()
 
 void TubeItem::flyTo(TubeItem * tubeTo)
 {
-    if (currentStageId != STAGE_SELECT)
+    if (currentStageId != STAGE_SELECT
+            || !tubeTo)
         return;
 
     setClip(false);
@@ -378,18 +371,18 @@ void TubeItem::flyTo(TubeItem * tubeTo)
     m_pouringCells = qMin(m_model->sameColorCount(),
                         tubeTo->model()->rest());
     if (m_recipient)
-        m_recipient->connectPouringTube(this);
+        m_recipient->connectTube(this);
 
     m_startAngle = m_currentAngle;
-    m_endAngle = ((tubeTo->pivotPoint().x() + 40 * scale()) >= m_board->width() / 2)
+    m_endAngle = ((tubeTo->m_currentPosition.x() * 2 + CtGlobal::tubeWidth()) >= m_board->width())
             ? CtGlobal::TILT_ANGLE[m_model->count()]
             : -CtGlobal::TILT_ANGLE[m_model->count()];
 
-    m_startPoint = m_pivotPoint;
+    m_startPoint = m_currentPosition;
     m_endPoint = QPointF((m_endAngle > 0)
-                ? tubeTo->pivotPoint().x() - 20 * scale()
-                : tubeTo->pivotPoint().x() + 20 * scale(),
-                tubeTo->pivotPoint().y() - 40 * scale());
+                         ? tubeTo->m_currentPosition.x() - CtGlobal::images().vertex(5).x()
+                         : tubeTo->m_currentPosition.x() + CtGlobal::images().vertex(5).x(),
+                         tubeTo->m_currentPosition.y() - CtGlobal::images().shiftHeight() * 2);
     steps = STEPS_FLY;
     setZ(m_board->maxChildrenZ() + 1);
 
@@ -402,8 +395,8 @@ void TubeItem::pourOut()
     if (m_recipient)
         m_recipient->m_pouredTubes ++;
 
-    m_startPoint = m_pivotPoint;
-    m_endPoint = m_pivotPoint;
+    m_startPoint = m_currentPosition;
+    m_endPoint = m_currentPosition;
 
     m_startAngle = m_currentAngle;
     m_endAngle = (m_currentAngle > 0)
@@ -421,8 +414,8 @@ void TubeItem::flyBack()
     if (m_recipient)
         m_recipient->removeConnectedTube(this);
 
-    m_startPoint = m_pivotPoint;
-    m_endPoint = m_position;
+    m_startPoint = m_currentPosition;
+    m_endPoint = m_regularPosition;
     m_startAngle = m_currentAngle;
     m_endAngle = 0;
     steps = STEPS_FLYBACK;
@@ -431,7 +424,7 @@ void TubeItem::flyBack()
     startAnimation();
 }
 
-void TubeItem::connectPouringTube(TubeItem * tubeFrom)
+void TubeItem::connectTube(TubeItem * tubeFrom)
 {
     if (!tubeFrom)
         return;

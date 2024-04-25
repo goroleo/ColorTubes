@@ -10,6 +10,18 @@ class MoveItem
 
 public:
 
+    struct MoveFields {
+        quint8 tubeFrom;
+        quint8 tubeTo;
+        quint8 count;
+        quint8 color;
+    };
+
+    union MoveData {
+        MoveFields fields;
+        quint32 stored;
+    };
+
     MoveItem();
     MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo);
     ~MoveItem();
@@ -37,25 +49,6 @@ public:
     qint8        rank()        { return m_rank;}
 
 private:
-
-    struct MoveFields {
-        quint8 tubeFrom;
-        quint8 tubeTo;
-        quint8 count;
-        quint8 color;
-    };
-
-    union MoveData {
-        MoveFields fields;
-        quint32 stored;
-    };
-
-
-/*    quint8       m_tubeFrom;
-    quint8       m_tubeTo;
-    quint8       m_color;
-    quint8       m_count;
-*/
 
     MoveData     m_data;
     qint8        m_rank;

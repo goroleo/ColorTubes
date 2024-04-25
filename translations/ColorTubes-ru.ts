@@ -3,16 +3,20 @@
 <TS version="2.1">
 <context>
     <name>CoverPage</name>
-    <message>
+    <message id="app_title">
         <source>Color Tubes</source>
         <translation>Цветные пробирки</translation>
     </message>
 </context>
 <context>
     <name>MainPage</name>
-    <message>
+    <message id="level">
         <source>Level</source>
         <translation>Уровень</translation>
+    </message>
+    <message id="victory">
+        <source>Victory!</source>
+        <translation>Победа!</translation>
     </message>
 </context>
 </TS>

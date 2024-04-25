@@ -32,27 +32,26 @@ void BottleLayer::paint(QPainter *painter)
 
     if (qFuzzyIsNull(parentTube->angle())) {
 
-        painter->drawPixmap(0, (startY + 20) * CtGlobal::images().scale(), m_drawPixMap);
+        painter->drawPixmap(0, (startY + CtGlobal::images().shiftHeight()), m_drawPixMap);
 
     } else {
 
         qreal x = (parentTube->angle() > 0)
                   ? CtGlobal::images().vertex(0).x()
                   : CtGlobal::images().vertex(5).x();
-        x += 100 * CtGlobal::images().scale();
+        x += CtGlobal::images().shiftWidth();
 
         qreal y = CtGlobal::images().vertex(0).y()
-                + 20 * CtGlobal::images().scale()
-                - parentTube->verticalShift();
+                + CtGlobal::images().shiftHeight()
+                - parentTube->m_verticalShift;
 
         painter->translate(x, y);
         painter->rotate(parentTube->angle() * CT_RAD2DEG);
         painter->translate(-x, -y);
 
         painter->drawPixmap(
-                    100 * CtGlobal::images().scale(),
-                    (startY + 20) * CtGlobal::images().scale()
-                      - parentTube->verticalShift(),
+                    CtGlobal::images().shiftWidth(),
+                    startY + CtGlobal::images().shiftHeight() - parentTube->m_verticalShift,
                     m_drawPixMap);
     }
 }
@@ -101,7 +100,7 @@ void BottleLayer::setSource(quint8 newSourceId)
     case CT_BOTTLE_FRONT:
         m_source_id = newSourceId;
         m_drawPixMap = CtGlobal::images().bottleFront();
-        startY = 15.5;
+        startY = CtGlobal::images().vertex(0).y();
         break;
     case CT_BOTTLE_BACK:
         m_source_id = newSourceId;
@@ -114,8 +113,8 @@ void BottleLayer::setSource(quint8 newSourceId)
     }
 
     if (m_source_id != CT_BOTTLE_NONE) {
-        setWidth(280 * CtGlobal::images().scale());
-        setHeight(200 * CtGlobal::images().scale());
+        setWidth(CtGlobal::images().tubeFullWidth());
+        setHeight(CtGlobal::images().tubeFullHeight());
         update();
     }
 }
@@ -124,7 +123,6 @@ void BottleLayer::onScaleChanged()
 {
     if (m_source_id != CT_BOTTLE_NONE) {
         setSource(m_source_id);
-//        update();
     }
 }
 

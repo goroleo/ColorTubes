@@ -10,7 +10,7 @@ CoverBackground {
         width: parent.width
         anchors.top: parent.top
         anchors.topMargin: Theme.horizontalPageMargin
-        text: qsTr("Color Tubes")
+        text: qsTrId("app_title")
         wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignTop

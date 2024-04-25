@@ -79,37 +79,43 @@ bool BoardModel::operator == (const BoardModel & other) const
     quint32 * stored2 = new quint32[tubesCount()];
 
     for (int i = 0; i < tubesCount(); ++i) {
-        stored1[i] = getTube(i)->store();
-        stored2[i] = other.getTube(i)->store();
+        stored1[i] = tubeAt(i)->store();
+        stored2[i] = other.tubeAt(i)->store();
     }
 
-    int j;
-    quint32 temp;
+    int j1, j2;
+    quint32 temp1, temp2;
 
 //    std::sort(stored1[0], stored1[tubesCount()-1]);
 //    std::sort(stored2[0], stored2[tubesCount()-1]);
 
-    // sort stored1
+    // sort stored1 & 2
     for (int i = 1; i < tubesCount(); ++i) {
-        temp = stored1[i];
-        j = i;
-        while ( (j > 0) && (stored1[j-1] < temp) ) {
-            stored1[j] = stored1[j-1];
-            j--;
+        temp1 = stored1[i];
+        temp2 = stored2[i];
+        j1 = j2 = i;
+        while ( (j1 > 0) && (stored1[j1-1] < temp1) ) {
+            stored1[j1] = stored1[j1-1];
+            j1--;
         }
-        stored1[j] = temp;
+        while ( (j2 > 0) && (stored2[j2-1] < temp2) ) {
+            stored2[j2] = stored2[j2-1];
+            j2--;
+        }
+        stored1[j1] = temp1;
+        stored2[j2] = temp2;
     }
-
-    // sort stored2
+/*
     for (int i = 1; i < tubesCount(); ++i) {
-        temp = stored2[i];
-        j = i;
-        while ( (j > 0) && (stored2[j-1] < temp) ) {
-            stored2[j] = stored2[j-1];
-            j--;
+        temp2 = stored2[i];
+        j2 = i;
+        while ( (j2 > 0) && (stored2[j2-1] < temp2) ) {
+            stored2[j2] = stored2[j2-1];
+            j2--;
         }
-        stored2[j] = temp;
+        stored2[j2] = temp2;
     }
+*/
 
     for (int i = 0; i < tubesCount(); ++i) {
         if (stored1[i] != stored2[i])
@@ -122,7 +128,7 @@ bool BoardModel::operator == (const BoardModel & other) const
     return result;
 }
 
-TubeModel * BoardModel::getTube(int index) const
+TubeModel * BoardModel::tubeAt(int index) const
 {
     if (index >= 0 && index < m_tubes->size())
         return m_tubes->at(index);
@@ -157,25 +163,26 @@ QString BoardModel::toString() {
     if (m_tubes->isEmpty())
         return QString("");
 
-    QString str("\n  ");
+    QString str("");
+
+    str.append(CtGlobal::endOfLine()).append("  ");
     for (int i = 0; i < m_tubes->size(); i++) {
         str.append(QString::number(i, 16)).append("   ");
     }
-    str.append("\n");
+    str.append(CtGlobal::endOfLine());
 
     for (int i = 3; i >= 0; i--) {
         str.append("| ");
 
         for (quint8 j = 0; j < m_tubes->size(); ++j) {
-
-            if (getTube(j)->color(i) != 0) {
-                str.append(QString::number(getTube(j)->color(i), 16));
+            if (tubeAt(j)->color(i) != 0) {
+                str.append(QString::number(tubeAt(j)->color(i), 16));
             } else {
                 str.append(" ");
             }
             str.append(" | ");
         }
-        str.append("\n");
+        str.append(CtGlobal::endOfLine());
     }
     return str;
 }
@@ -200,7 +207,7 @@ bool BoardModel::canDoMove(int tubeFromIndex, int tubeToIndex)
          || tubeToIndex < 0 || tubeToIndex >= m_tubes->size())
         return false;
 
-    return m_tubes->at(tubeToIndex)->canPutColor(m_tubes->at(tubeToIndex)->currentColor());
+    return m_tubes->at(tubeToIndex)->canPutColor(m_tubes->at(tubeFromIndex)->currentColor());
 }
 
 quint8 BoardModel::colorsToMove(int tubeFromIndex, int tubeToIndex)
@@ -214,11 +221,13 @@ quint8 BoardModel::colorsToMove(int tubeFromIndex, int tubeToIndex)
 
 quint32 BoardModel::getMove(int tubeFromIndex, int tubeToIndex)
 {
-    if (canDoMove(tubeFromIndex, tubeToIndex))
-        return ((tubeFromIndex & 0xff) << 24)                               // tube from
-                | ((tubeToIndex & 0xff) << 16)                              // tube to
-                | ((colorsToMove(tubeFromIndex, tubeToIndex) & 0xff) << 8)  // count
-                | ((m_tubes->at(tubeFromIndex)->currentColor()) & 0xff);    // color
-    else
+    if (!canDoMove(tubeFromIndex, tubeToIndex))
         return 0;
+
+    MoveItem::MoveData move;
+    move.fields.tubeFrom = tubeFromIndex;
+    move.fields.tubeTo = tubeToIndex;
+    move.fields.count = colorsToMove(tubeFromIndex, tubeToIndex);
+    move.fields.color = m_tubes->at(tubeFromIndex)->currentColor();
+    return move.stored;
 }

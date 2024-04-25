@@ -1,4 +1,5 @@
 #include "io.h"
+#include "sailfishapp.h"
 
 #include <QIODevice>
 #include <QDir>
@@ -17,11 +18,7 @@ Io::~Io()
 
 Io & Io::create()
 {
-    if (m_instance == nullptr) {
-        m_instance = new Io();
-        m_instance->initialize();
-    }
-    return * m_instance;
+    return instance();
 }
 
 Io & Io::instance()
@@ -43,11 +40,12 @@ void Io::initialize()
     QDir qdir;
     m_sep = qdir.separator();
 
-    QString dirName = qdir.homePath() + m_sep + ".colortubes";
-
-    qdir.remove(dirName);
+    QString dirName = SailfishApp::pathToSharedDir().toString();
+//    qdir.remove(dirName);
     qdir.mkpath(dirName);
     qdir.setPath(dirName);
+
+    qDebug() << dirName;
     m_dir = qdir.path();
 }
 
@@ -55,7 +53,7 @@ bool Io::loadJson(QString fName, QJsonObject &jsonObj)
 {
     QFile loadFile(fName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "LoadJson" << "Couldn't open save file." << fName;
+        qDebug() << "LoadJson" << "Couldn't open file" << fName;
         return false;
     }
 
@@ -70,7 +68,7 @@ bool Io::saveJson(QString fName, QJsonObject &jsonObj)
 {
     QFile saveFile(fName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
-        qDebug() << "saveJson" << "Couldn't open save file." << fName;
+        qDebug() << "saveJson" << "Couldn't open file" << fName;
         return false;
     }
 
@@ -82,7 +80,7 @@ bool Io::loadGame(QString fName, QByteArray &buffer)
 {
     QFile loadFile(fName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "loadGame" << "Couldn't open save file." << fName;
+        qDebug() << "loadGame" << "Couldn't open file" << fName;
         return false;
     }
 
@@ -94,7 +92,7 @@ bool Io::saveGame(QString fName, QByteArray &buffer)
 {
     QFile saveFile(fName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
-        qDebug() << "saveGame"<< "Couldn't open save file." << fName;
+        qDebug() << "saveGame" << "Couldn't open file" << fName;
         return false;
     }
 

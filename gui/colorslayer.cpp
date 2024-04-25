@@ -18,14 +18,14 @@ ColorsLayer::ColorsLayer(TubeItem * parent) :
     tubeSlices = new SliceF[6];
     colorSegments = new SliceF[6];
 
-    m_drawImage = new QImage(280 * CtGlobal::images().scale(),
-                             200 * CtGlobal::images().scale(),
+    m_drawImage = new QImage(CtGlobal::images().tubeFullWidth(),
+                             CtGlobal::images().tubeFullHeight(),
                              QImage::Format_ARGB32);
     m_painter = new QPainter(m_drawImage);
     m_painter->setPen(Qt::NoPen);
 
-    setWidth(280 * scale());
-    setHeight(200 * scale());
+    setWidth(CtGlobal::images().tubeFullWidth());
+    setHeight(CtGlobal::images().tubeFullHeight());
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
@@ -70,12 +70,15 @@ void ColorsLayer::onScaleChanged()
         delete m_drawImage;
     }
 
-    m_drawImage = new QImage(280 * scale(), 200 * scale(), QImage::Format_ARGB32);
+    m_drawImage = new QImage(
+                CtGlobal::images().tubeFullWidth(),
+                CtGlobal::images().tubeFullHeight(),
+                QImage::Format_ARGB32);
     m_painter = new QPainter(m_drawImage);
     m_painter->setPen(Qt::NoPen);
 
-    setWidth(280 * scale());
-    setHeight(200 * scale());
+    setWidth(CtGlobal::images().tubeFullWidth());
+    setHeight(CtGlobal::images().tubeFullHeight());
 
     drawColors();
     update();
@@ -147,6 +150,7 @@ void ColorsLayer::onAngleChanged()
         tubeVertices[j] = temp;
     }
 
+    //
     m_tube->setVerticalShift(tubeVertices[5].y);
 
 // --- calculate slices
@@ -196,13 +200,13 @@ void ColorsLayer::drawColors()
         for (quint8 i = 0; i < m_tube->model()->count(); ++i)
         {
             m_colorRect = CtGlobal::images().colorRect(i);
-            m_colorRect.translate(0, 20 * scale());
-            m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_tube->getColor(i)));
+            m_colorRect.translate(0, CtGlobal::images().shiftHeight());
+            m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_tube->colorAt(i)));
         }
 
         m_bottomLine.y = CtGlobal::images().vertex(3).y()
                 - CtGlobal::images().colorHeight() * m_tube->model()->count()
-                + 20 * scale();
+                + CtGlobal::images().shiftHeight();
         m_bottomLine.x1 = CtGlobal::images().vertex(3).x();
 
     } else {
@@ -320,8 +324,9 @@ void ColorsLayer::drawColorCell()
     } while (i != 0);
     path.lineTo(colorSegments[0].x1, colorSegments[0].y);
 
-    path.translate(100 * scale(), 20 * scale() - m_tube->verticalShift());
-    m_painter->setBrush(QBrush(CtGlobal::paletteColor(m_tube->getColor(m_colorIndex))));
+    path.translate(CtGlobal::images().shiftWidth(),
+                   CtGlobal::images().shiftHeight() - m_tube->m_verticalShift);
+    m_painter->setBrush(QBrush(CtGlobal::paletteColor(m_tube->colorAt(m_colorIndex))));
     m_painter->drawPath(path);
 }
 

@@ -36,11 +36,7 @@ TubeImages::~TubeImages()
 
 TubeImages& TubeImages::create()
 {
-    if (m_instance == nullptr) {
-        m_instance = new TubeImages();
-        m_instance->initialize();
-    }
-    return *m_instance;
+    return instance();
 }
 
 TubeImages& TubeImages::instance()
@@ -88,14 +84,22 @@ void TubeImages::scalePoints()
     m_vertices[3] = QPointF(14.0, 166.0) * m_scale;
     m_vertices[4] = QPointF(14.0, 26.0) * m_scale;
     m_vertices[5] = QPointF(20.0, 15.5) * m_scale;
+    m_tubeWidth   = 80.0 * m_scale;
+    m_shiftWidth  = 100.0 * m_scale;
+    m_tubeFullWidth  = m_tubeWidth + m_shiftWidth * 2;
+    m_tubeHeight  = 180.0 * m_scale;
+    m_shiftHeight   = 20.0 * m_scale;
+    m_tubeFullHeight = m_tubeHeight + m_shiftHeight;
+    m_colorWidth  = m_vertices[2].x() - m_vertices[3].x();
     m_colorHeight = (m_vertices[2].y() - m_vertices[1].y()) / 4;
-    m_colorWidth = m_vertices[2].x() - m_vertices[3].x();
-    m_colorArea = m_colorWidth * m_colorHeight;
-    m_jetWidth = 3 * m_scale;
+    m_colorArea   = m_colorWidth * m_colorHeight;
+    m_jetWidth    = 3.0 * m_scale;
 
-    m_jetRect.setX(m_vertices[3].x() + (m_colorWidth - m_jetWidth) / 2);
-    m_jetRect.setY(0);
-    m_jetRect.setWidth(m_jetWidth);
+    m_jetRect     = QRectF(
+            m_vertices[3].x() + (m_colorWidth - m_jetWidth) / 2,
+            0,
+            m_jetWidth,
+            0);
 }
 
 QRectF TubeImages::scaleRect(QRectF rect)

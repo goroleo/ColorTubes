@@ -2,6 +2,8 @@
 #define BOARDMODEL_H
 
 #include <QVector>
+#include <iostream>
+#include "src/ctglobal.h"
 #include "tubemodel.h"
 #include "moveitem.h"
 
@@ -21,7 +23,7 @@ public:
     MoveItem         * currentMove() const;
 
     int            tubesCount() const { return m_tubes->size(); }
-    TubeModel    * getTube(int index) const;
+    TubeModel    * tubeAt(int index) const;
 
     int           movesCount() const { return m_moves->size(); }
     bool          hasMoves() const;
@@ -46,9 +48,9 @@ public:
 
     QString toString();
 
-//    void sortMoves() {
-//        std::sort(moves->begin(), moves->end(), MoveItem);
-//    }
+    void sortMoves() {
+        std::sort(m_moves->begin(), m_moves->end());
+    }
 
 private:
     const BoardModel  * m_parentBoard = nullptr;
@@ -57,8 +59,6 @@ private:
 
     QVector<TubeModel *> * m_tubes;
     QVector<MoveItem *>  * m_moves;
-
-
 };
 
 #endif // BOARDMODEL_H

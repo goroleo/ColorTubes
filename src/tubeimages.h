@@ -24,20 +24,26 @@ public:
     QPixmap   shadeGreen() {return *m_shadeGreen;}
     QPixmap   shadeBlue() {return *m_shadeBlue;}
     QPixmap   shadeRed() {return *m_shadeRed;}
+    QPixmap   shadeGray() {return *m_shadeGray;}
 
     QPixmap   cork() {return *m_cork;}
 
     qreal     scale() {return m_scale;}
 
-    qreal     width() {return m_bottle->width();}
-    qreal     height() {return m_bottle->height();}
+    qreal     tubeWidth() {return m_tubeWidth;}
+    qreal     tubeFullWidth() {return m_tubeFullWidth;}
+    qreal     shiftWidth() {return m_shiftWidth;}
+
+    qreal     tubeHeight() {return m_tubeHeight;}
+    qreal     tubeFullHeight() {return m_tubeFullHeight;}
+    qreal     shiftHeight() {return m_shiftHeight;}
 
     QPointF * vertices() {return m_vertices;}
     QPointF   vertex(quint8 index) {return m_vertices[index];}
 
     QRectF    colorRect(quint8 index);
-    qreal     colorHeight() {return m_colorHeight;}
     qreal     colorWidth()  {return m_colorWidth;}
+    qreal     colorHeight() {return m_colorHeight;}
     qreal     colorArea()   {return m_colorArea;}
     qreal     jetWidth()    {return m_jetWidth;}
     qreal     jetHeight(quint8 index)
@@ -78,8 +84,15 @@ private:
 
     QPointF      * m_vertices;   // vertices of the егиу
 
-    qreal          m_colorHeight; // width of the one color cell after scaling
+    qreal          m_tubeWidth;
+    qreal          m_tubeFullWidth;
+    qreal          m_shiftWidth;
+    qreal          m_tubeHeight;
+    qreal          m_tubeFullHeight;
+    qreal          m_shiftHeight;
+
     qreal          m_colorWidth;
+    qreal          m_colorHeight; // width of the one color cell after scaling
     qreal          m_colorArea;   // colorWidth * colorHeight
     qreal          m_jetWidth;
     QRectF         m_jetRect;

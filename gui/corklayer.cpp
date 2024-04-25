@@ -71,14 +71,14 @@ void CorkLayer::onScaleChanged()
                          QImage::Format_ARGB32);
 
     setWidth(m_drawImage.width());
-    setHeight(m_drawImage.height() + 20 * CtGlobal::images().scale());
+    setHeight(m_drawImage.height() + CtGlobal::images().shiftHeight());
 
     m_drawImage.fill(0x00ffffff);
     prepareImage();
     update();
 }
 
-void CorkLayer::paint(QPainter *painter)
+void CorkLayer::paint(QPainter * painter)
 {
     painter->drawImage(0, m_currentY, m_drawImage);
 }
@@ -99,8 +99,8 @@ void CorkLayer::nextStep()
         }
     }
 
-    m_currentY = - 20 * CtGlobal::images().scale()
-            + 40 * CtGlobal::images().scale() * exp(-0.5 * (1 - m_alpha));
+    m_currentY = - CtGlobal::images().shiftHeight()
+            + CtGlobal::images().shiftHeight() * 2 * exp(-0.5 * (1 - m_alpha));
 }
 
 void CorkLayer::prepareImage()

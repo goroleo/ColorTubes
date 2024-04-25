@@ -12,10 +12,7 @@ MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
 {
     m_boardBefore = board;
     m_parentMove = board->parentMove();
-    m_data.fields.tubeFrom = idxTubeFrom;
-    m_data.fields.tubeTo = idxTubeTo;
-    m_data.fields.count = board->colorsToMove(idxTubeFrom, idxTubeFrom);
-    m_data.fields.color = board->getTube(idxTubeFrom)->currentColor();
+    m_data.stored = board->getMove(idxTubeFrom, idxTubeTo);
     m_rank = 0;
 }
 
@@ -60,12 +57,7 @@ void MoveItem::setRank(qint8 newRank)
     m_rank = newRank;
 }
 
-quint32 MoveItem::storeMove() {
-/*    return ((m_tubeFrom & 0xff) << 24)
-           | ((m_tubeTo & 0xff) << 16)
-           | ((m_count & 0xff) << 8)
-           | ((m_color) & 0xff);
-*/
-
+quint32 MoveItem::storeMove()
+{
     return m_data.stored;
 }

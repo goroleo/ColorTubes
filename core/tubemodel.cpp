@@ -18,12 +18,12 @@ void TubeModel::clear()
 
 bool TubeModel::isEmpty() const
 {
-    return (m_count == 0);
+    return m_count == 0;
 }
 
 bool TubeModel::isClosed() const
 {
-    return (m_state == STATE_CLOSED);
+    return m_state == STATE_CLOSED;
 }
 
 bool TubeModel::checkClosed()
@@ -31,9 +31,8 @@ bool TubeModel::checkClosed()
     if (m_count != 4)
         return false;
 
-    quint8 tempColor = m_colors.items[0];
     for (quint8 i = 1; i < 4; ++i) {
-        if (m_colors.items[i] != tempColor) {
+        if (m_colors.items[i] != m_colors.items[0]) {
             return false;
         }
     }
@@ -67,7 +66,7 @@ quint8 TubeModel::currentColor() const
 
 quint8 TubeModel::color(quint8 index)
 {
-    if (index > 4)
+    if (index >= 4)
         return 0;
     return m_colors.items[index];
 }
@@ -168,12 +167,12 @@ bool TubeModel::operator == (const TubeModel & other)
     return m_colors.stored == other.m_colors.stored;
 }
 
-void TubeModel::assignColors(quint32 storedTube)
+void TubeModel::assignColors(quint32 storedColors)
 {
     clear();
-    while (storedTube > 0) {
-        putColor(storedTube & 0xff, false);
-        storedTube >>= 8;
+    while (storedColors > 0) {
+        putColor(storedColors & 0xff, false);
+        storedColors >>= 8;
     }
     updateState(); // don't forget!
 }

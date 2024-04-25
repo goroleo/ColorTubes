@@ -1,7 +1,6 @@
 #include "shadelayer.h"
 
 #include <QPixmap>
-#include <QtMath>
 #include <QtDebug>
 
 #include "src/ctglobal.h"
@@ -11,12 +10,12 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent),
       m_shadeNumber(1)
 {
-    m_drawImage = QImage(280 * CtGlobal::images().scale(),
-                         180 * CtGlobal::images().scale(),
+    m_drawImage = QImage(CtGlobal::images().tubeWidth(),
+                         CtGlobal::images().tubeHeight(),
                          QImage::Format_ARGB32);
 
-    setWidth(CtGlobal::images().width());
-    setHeight(CtGlobal::images().height());
+    setWidth(CtGlobal::images().tubeWidth());
+    setHeight(CtGlobal::images().tubeHeight());
 
     m_drawImage.fill(0x00ffffff);
 
@@ -128,7 +127,7 @@ void ShadeLayer::prepareImage()
         for (int y = 0; y < m_shadeImage.height(); ++y) {
             pix = m_shadeImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = round (qreal(pix >> 24) * m_alpha);
+                newAlpha = qRound (qreal(pix >> 24) * m_alpha);
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
@@ -148,12 +147,12 @@ void ShadeLayer::onScaleChanged()
 {
     setShade(m_shadeNumber);
 
-    m_drawImage = QImage(CtGlobal::images().width(),
-                         CtGlobal::images().height(),
+    m_drawImage = QImage(CtGlobal::images().tubeWidth(),
+                         CtGlobal::images().tubeHeight(),
                          QImage::Format_ARGB32);
 
-    setWidth(CtGlobal::images().width());
-    setHeight(CtGlobal::images().height());
+    setWidth(CtGlobal::images().tubeWidth());
+    setHeight(CtGlobal::images().tubeHeight());
 
     m_drawImage.fill(0x00ffffff);
     prepareImage();
@@ -185,9 +184,6 @@ void ShadeLayer::setShade(int newShadeNumber)
     m_shadeNumber = newShadeNumber;
     switch (m_shadeNumber)
     {
-    case 0:
-        startHide();
-        break;
     case 1:
         m_shadeImage = CtGlobal::images().shadeYellow().toImage();
         break;
@@ -196,6 +192,16 @@ void ShadeLayer::setShade(int newShadeNumber)
         break;
     case 3:
         m_shadeImage = CtGlobal::images().shadeBlue().toImage();
+        break;
+    case 4:
+        m_shadeImage = CtGlobal::images().shadeRed().toImage();
+        break;
+    case 5:
+        m_shadeImage = CtGlobal::images().shadeGray().toImage();
+        break;
+    default:
+        m_shadeNumber = 0;
+        startHide();
         break;
     }
     emit shadeChanged(m_shadeNumber);
@@ -212,14 +218,14 @@ void ShadeLayer::setShadeAfterHiding(int newShadeNumber)
     }
 }
 
-void ShadeLayer::setPulse(bool newPulse)
+void ShadeLayer::setPulse(bool value)
 {
-    if (m_pulse != newPulse) {
-        if (newPulse)
+    if (m_pulse != value) {
+        if (value)
             startPulse();
         else
             stopPulse();
-        emit pulseChanged(newPulse);
+        emit pulseChanged(value);
     }
 }
 

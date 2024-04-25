@@ -19,11 +19,11 @@ public:
     void         clickTube(TubeItem * tube);
     TubeItem   * selectedTube() { return m_selectedTube;}
     int          maxChildrenZ();
-    bool         checkSolved();
-    bool         isSolved() { return m_solved;}
     void         showAvailableMoves();
+    bool         isSolved();
 
 signals:
+    void         solved();
 
 private slots:
     void         onScaleChanged();
@@ -39,7 +39,6 @@ private:
 
     BoardModel * m_model;
     qreal        m_scale;
-    bool         m_solved = false;
 
     QVector<TubeItem *>
                * m_tubes;

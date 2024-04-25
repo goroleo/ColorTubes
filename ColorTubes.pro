@@ -24,6 +24,7 @@ SOURCES += src/ColorTubes.cpp \
     gui/bottlelayer.cpp \
     gui/colorslayer.cpp \
     gui/corklayer.cpp \
+    gui/flowerlayer.cpp \
     gui/gameboard.cpp \
     gui/shadelayer.cpp \
     gui/tubeitem.cpp \
@@ -47,7 +48,8 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
 # to disable building translations every time, comment out the
 # following CONFIG line
-CONFIG += sailfishapp_i18n
+CONFIG += \
+    sailfishapp_i18n
 
 # German translation is enabled as an example. If you aren't
 # planning to localize your app, remember to comment out the
@@ -65,6 +67,7 @@ HEADERS += \
     gui/bottlelayer.h \
     gui/colorslayer.h \
     gui/corklayer.h \
+    gui/flowerlayer.h \
     gui/gameboard.h \
     gui/shadelayer.h \
     gui/tubeitem.h \
@@ -82,3 +85,4 @@ QT += \
     svg \
     quick \
     widgets
+

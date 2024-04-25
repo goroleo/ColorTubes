@@ -8,6 +8,7 @@ class Game;
 class Io;
 class TubeImages;
 class Palette;
+class BoardModel;
 
 #define CT_PI          3.14159265358979323846              // PI
 #define CT_2PI         6.28318530717958647692              // 2*PI
@@ -31,8 +32,11 @@ namespace CtGlobal
     QString paletteFile();
     QString settingsFile();
 
-    // game modes
     int    gameMode();
+    qreal  scale();
+    BoardModel  *  board();
+    qreal  tubeWidth();
+    qreal  tubeHeight();
 
     QColor paletteColor(quint8 colorIndex);
 
@@ -57,6 +61,8 @@ namespace CtGlobal
     quint32 colorStrToRgb(bool &ok, QString value);
     QString colorRgbToStr(quint32 value);
     QString intToStr(int value);
+    QString intToHex(int value);
+    QString endOfLine();
 
 }
 

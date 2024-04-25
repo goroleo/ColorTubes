@@ -3,13 +3,15 @@
 
 #include <QtCore>
 
+class BoardModel;
+
 class JctlFormat
 {
 public:
     JctlFormat();
     ~JctlFormat();
 
-    quint32 fileVersion;
+    quint32 formatVersion;
     quint32 fileSize;
 
     quint32 level = 508;
@@ -20,7 +22,7 @@ public:
     quint16 movesDone = 0;
     QVector<quint32> * storedTubes;
     QVector<quint32> * storedMoves;
-    quint32 fileCRC;
+    quint32 crc;
 
     quint32 size();
     quint32 size(quint32 formatVersion);
@@ -29,10 +31,11 @@ public:
     quint16 crcVersion2(QByteArray &buffer, quint32 length);
 
     void storeGame();
+    void storeGame(BoardModel * model);
 
     bool read(QByteArray &buffer);
     bool write(QByteArray &buffer);
-    bool write(QByteArray &buffer, quint32 formatVersion);
+    bool write(QByteArray &buffer, quint32 version);
 
     bool checkTubes();
 

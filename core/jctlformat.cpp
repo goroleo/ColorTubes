@@ -10,7 +10,7 @@
 
 JctlFormat::JctlFormat()
 {
-    fileVersion = 2;
+    formatVersion = 2;
     storedTubes = new QVector<quint32>{};
     storedMoves = new QVector<quint32>{};
 }
@@ -25,7 +25,7 @@ JctlFormat::~JctlFormat()
 
 quint32 JctlFormat::size()
 {
-    return size(fileVersion);
+    return size(formatVersion);
 }
 
 
@@ -46,7 +46,7 @@ quint32 JctlFormat::crcVersion1()
     quint32 result;
     quint32 dw; // double word
     result = 0x6a + 0x63 + 0x74 + 0x6c + 0x1a
-        + fileVersion + fileSize + tubesCount;
+        + formatVersion + fileSize + tubesCount;
     for (int i = 0; i < tubesCount; i++) {
         dw = storedTubes->at(i);
         for (int j = 0; j < 4; j++) {
@@ -95,16 +95,16 @@ bool JctlFormat::write(QByteArray &buffer)
     return write(buffer, 2);
 }
 
-bool JctlFormat::write(QByteArray &buffer, quint32 formatVersion)
+bool JctlFormat::write(QByteArray &buffer, quint32 version)
 {
 
-    if (formatVersion != 1 && formatVersion != 2) {
+    if (version != 1 && version != 2) {
         return false;
     }
 
     QDataStream data(&buffer, QIODevice::WriteOnly);
 
-    fileVersion = formatVersion;
+    formatVersion = version;
     fileSize = size();
     quint16 zeroWord = 0;                   // 16 bit unsigned zero
 
@@ -146,11 +146,11 @@ bool JctlFormat::write(QByteArray &buffer, quint32 formatVersion)
     }
 
     if (formatVersion == 1) {
-        fileCRC = crcVersion1();
-        data << (quint16) (fileCRC & 0xffff);
+        crc = crcVersion1();
+        data << (quint16) (crc & 0xffff);
     } else { // if (ver == 2)
-        fileCRC = crcVersion2(buffer);
-        data << (quint16) (fileCRC & 0xffff);
+        crc = crcVersion2(buffer);
+        data << (quint16) (crc & 0xffff);
     }
 
     return true;
@@ -174,8 +174,8 @@ bool JctlFormat::read(QByteArray &buffer)
     }
 
     if (result) {
-        data >> fileVersion;
-        result = (fileVersion == 1 || fileVersion == 2);
+        data >> formatVersion;
+        result = (formatVersion == 1 || formatVersion == 2);
     }
 
     if (result) {
@@ -185,7 +185,7 @@ bool JctlFormat::read(QByteArray &buffer)
 
     if (result) {
 
-        if (fileVersion > 1) {
+        if (formatVersion > 1) {
             data >> level;            // read level
             data >> gameMode;         // read gameMode
             if (gameMode == 0) {
@@ -204,7 +204,7 @@ bool JctlFormat::read(QByteArray &buffer)
         }
         data >> tubesCount;           // read all tubes count
 
-        if (fileVersion > 1) {
+        if (formatVersion > 1) {
             data >> movesDone;
             data >> movesCount;
 
@@ -240,7 +240,7 @@ bool JctlFormat::read(QByteArray &buffer)
         }
     }
 
-    if (result && fileVersion > 1) {
+    if (result && formatVersion > 1) {
         storedMoves->clear();
         if (movesCount > 0)
         {
@@ -256,12 +256,12 @@ bool JctlFormat::read(QByteArray &buffer)
     }
 
     if (result) {
-        if (fileVersion == 1) {
-            data >> fileCRC;                                      // read CRC ver 1
-            result = (fileCRC == crcVersion1());
-        } else if (fileVersion == 2) {
+        if (formatVersion == 1) {
+            data >> crc;                                      // read CRC ver 1
+            result = (crc == crcVersion1());
+        } else if (formatVersion == 2) {
             data >> word;
-            fileCRC = word & 0xffff;                              // read CRC ver 2
+            crc = word & 0xffff;                              // read CRC ver 2
             result = (word == crcVersion2(buffer, fileSize - 2));
         }
     }
@@ -306,15 +306,19 @@ bool JctlFormat::checkTubes()
 }
 
 void JctlFormat::storeGame() {
+    storeGame(CtGlobal::board());
+}
+
+void JctlFormat::storeGame(BoardModel * model) {
 
     level = 0;
     gameMode = 0;
 
-    tubesCount = CtGlobal::game().boardModel()->tubesCount();
+    tubesCount = model->tubesCount();
     emptyCount = 0;
     storedTubes->clear();
-    for (quint16 i = 0; i < CtGlobal::game().boardModel()->tubesCount(); i++) {
-        storedTubes->append(CtGlobal::game().boardModel()->getTube(i)->store());
+    for (quint16 i = 0; i < model->tubesCount(); i++) {
+        storedTubes->append(model->tubeAt(i)->store());
     }
 
     movesCount = 0;

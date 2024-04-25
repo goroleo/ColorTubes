@@ -10,11 +10,7 @@ Palette* Palette::m_instance = nullptr;
 
 Palette& Palette::create()
 {
-    if (m_instance == nullptr) {
-        m_instance = new Palette();
-        m_instance->initialize();
-    }
-    return *m_instance;
+    return instance();
 }
 
 Palette& Palette::instance()
@@ -82,7 +78,7 @@ void Palette::setDefault()
     m_items[10] = 0xffff7abc; // 11
     m_items[11] = 0xffffeb04; // 12
     m_background = QColor(0xff282828);
-    m_dialogColor = QColor(0xff1c1127);
+//    m_dialogColor = QColor(0xff1c1127);
 }
 
 bool Palette::load()
@@ -108,18 +104,16 @@ bool Palette::load()
 
         // process palette's colors
         int i = 0;
-        while (result && i < count)
-        {
+        while (result && i < count) {
             key = "color" + CtGlobal::intToStr(i+1);
-            if (jPal.contains(key) && jPal[key].isString())
-            {
+            if (jPal.contains(key) && jPal[key].isString()) {
                 value = jPal[key].toString();
                 if ((value.length() == 7) && value.startsWith("#"))
-                {
                     m_items[i] = CtGlobal::colorStrToRgb(result, value);
-                } else result = false;
-
-            } else result = false;
+                else
+                    result = false;
+            } else
+                result = false;
             i++;
         }
     } // end process palette
@@ -130,24 +124,27 @@ bool Palette::load()
         QJsonObject jColors = jObj["colors"].toObject();
 
         // background color
-        if (jColors.contains("background") && jColors["background"].isString())
-        {
+        if (jColors.contains("background") && jColors["background"].isString()) {
             value = jColors["background"].toString();
             if ((value.length() == 7) && value.startsWith("#"))
-            {
                 m_background = QColor(CtGlobal::colorStrToRgb(result, value));
-            } else result = false;
-        } else result = false;
+            else
+                result = false;
+        } else
+            result = false;
 
+/*
         // dialog color
-        if (result && jColors.contains("dialog") && jColors["dialog"].isString())
-        {
+        if (result && jColors.contains("dialog") && jColors["dialog"].isString()) {
             value = jColors["dialog"].toString();
-            if ((value.length() == 7) && value.startsWith("#"))
-            {
+            if ((value.length() == 7) && value.startsWith("#")) {
                 m_dialogColor = QColor(CtGlobal::colorStrToRgb(result, value));
-            } else result = false;
-        } else result = false;
+            } else
+                result = false;
+        } else
+            result = false;
+*/
+
     }
     return result;
 }
@@ -162,8 +159,7 @@ bool Palette::save()
     jItem["count"] = CtGlobal::intToStr(CtGlobal::NUM_OF_COLORS);
 
     // adds colors
-    for (int i = 0; i < CtGlobal::NUM_OF_COLORS; i++)
-    {
+    for (int i = 0; i < CtGlobal::NUM_OF_COLORS; i++) {
         jItem["color"+CtGlobal::intToStr(i+1)] = CtGlobal::colorRgbToStr(m_items[i]);
     }
     jObj["palette"] = jItem;
@@ -172,7 +168,7 @@ bool Palette::save()
 
     // adds system colors
     jItem["background"] = CtGlobal::colorRgbToStr(m_background.rgb());
-    jItem["dialog"] = CtGlobal::colorRgbToStr(m_dialogColor.rgb());;
+//    jItem["dialog"] = CtGlobal::colorRgbToStr(m_dialogColor.rgb());;
     jObj["colors"] = jItem;
 
     // save

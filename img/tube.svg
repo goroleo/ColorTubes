@@ -26,7 +26,7 @@
  <use id="shade_gray" fill="#aaaaaa" xlink:href="#shade"/>
  <use id="shade_yellow" fill="#ffff00" xlink:href="#shade"/>
  <use id="shade_green" fill="#7fff00" xlink:href="#shade"/>
- <use id="shade_blue" fill="#00ffff" xlink:href="#shade"/>
+ <use id="shade_blue" fill="#00efef" xlink:href="#shade"/>
 
  <g id="shine" stroke="none" fill="url(#BottleShine)">
   <path d="M 22.071,36.747 C 22.047,35.531 22.029,34.301 22.165,33.099 C 22.425,30.795 23.237,28.791 25.187,26.835 C 26.265,25.752 28.019,25.751 29.1,26.828 C 30.181,27.905 29.861,29.695 29.107,30.74 C 28.507,31.572 28.088,32.68 27.832,33.733 C 27.595,34.712 27.536,35.743 27.604,36.747 C 27.604,38.273 26.364,39.513 24.837,39.513 C 23.311,39.513 22.071,38.273 22.071,36.747 Z"/>

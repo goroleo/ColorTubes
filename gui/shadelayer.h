@@ -35,7 +35,7 @@ public:
 
 public slots:
     void setShade(int newShadeNumber);
-    void setPulse(bool newPulse);
+    void setPulse(bool value);
 
 signals:
     void shadeChanged(const int newShadeNumber);

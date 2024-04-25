@@ -10,11 +10,11 @@
 GameBoard::GameBoard(QQuickItem *parent) :
     QQuickItem(parent)
 {
-    m_model = CtGlobal::game().boardModel();
+    m_model = CtGlobal::board();
     m_tubes = new QVector<TubeItem *>;
 
     for (int i=0; i < m_model->tubesCount(); ++i) {
-        TubeItem * tube = new TubeItem(this, CtGlobal::game().boardModel()->getTube(i));
+        TubeItem * tube = new TubeItem(this, CtGlobal::board()->tubeAt(i));
         m_tubes->append(tube);
     }
 
@@ -94,12 +94,12 @@ void GameBoard::placeTubes()
     int columns = m_model->tubesCount() / 2 + m_model->tubesCount() % 2 ;
 
     qreal leftMargin = scale() * spaceX;
+    qreal colSpace = scale() * spaceY;
     qreal rowWidth = width() - leftMargin * 2;
-    qreal tubeWidth = scale() * 80;
     int   rowColumns = columns;
-    qreal rowSpace = (rowWidth - rowColumns * tubeWidth) / (rowColumns + 1);
+    qreal rowSpace = (rowWidth - rowColumns * CtGlobal::tubeWidth()) / (rowColumns + 1);
 
-    qreal realHeight = scale() * (400 + 3 * spaceY);
+    qreal realHeight = colSpace * 3 + CtGlobal::tubeHeight() * 2;
     qreal topMargin = qreal (height() - realHeight) / 2;
 
     int row = 0;
@@ -109,16 +109,16 @@ void GameBoard::placeTubes()
     while (tubeNumber < m_model->tubesCount()) {
 
         if (tubeNumber == columns) {
-            row = 1;
+            row++;
             rowColumns = m_model->tubesCount() - columns;
-            rowSpace = (rowWidth - rowColumns * tubeWidth) / (rowColumns + 1);
+            rowSpace = (rowWidth - rowColumns * CtGlobal::tubeWidth()) / (rowColumns + 1);
         }
 
         col = tubeNumber - row * columns;
 
         m_tubes->at(tubeNumber)->setPosition(
-                    QPointF(leftMargin + rowSpace + col * (tubeWidth + rowSpace),
-                            topMargin + scale() * (spaceY + row * (200 + spaceY))));
+                    QPointF(leftMargin + rowSpace + col * (CtGlobal::tubeWidth() + rowSpace),
+                            topMargin + colSpace + row * (CtGlobal::tubeHeight() + colSpace)));
         tubeNumber ++;
     }
 }
@@ -133,13 +133,13 @@ void GameBoard::clickTube(TubeItem * tube)
     if (tube == nullptr) {
         if (m_selectedTube != nullptr) {
         // qDebug() << "disable selection 1";
-            m_selectedTube->showSelected(false);
+            m_selectedTube->setSelected(false);
             m_selectedTube = nullptr;
         }
     } else if (m_selectedTube == nullptr) {
         if (tube->canExtractColor()) {
          // qDebug() << "new selection";
-            tube->showSelected(true);
+            tube->setSelected(true);
             if (tube->isSelected())
                 m_selectedTube = tube;
             else
@@ -148,7 +148,7 @@ void GameBoard::clickTube(TubeItem * tube)
     } else {
         if (tube == m_selectedTube) {
          // qDebug() << "disable selection 2";
-            m_selectedTube->showSelected(false);
+            m_selectedTube->setSelected(false);
             m_selectedTube = nullptr;
         } else if (tube->canPutColor(m_selectedTube->currentColor())) {
          // qDebug() << "put color";
@@ -156,8 +156,8 @@ void GameBoard::clickTube(TubeItem * tube)
             m_selectedTube = nullptr;
         } else {
          // qDebug() << "change selection";
-            m_selectedTube->showSelected(false);
-            tube->showSelected(true);
+            m_selectedTube->setSelected(false);
+            tube->setSelected(true);
             if (tube->isSelected())
                 m_selectedTube = tube;
             else
@@ -204,9 +204,12 @@ void GameBoard::moveColor(int tubeFromIndex, int tubeToIndex)
     moveColor(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
 }
 
-bool GameBoard::checkSolved()
+bool GameBoard::isSolved()
 {
-    m_solved = m_model->isSolved();
-    return m_solved;
+    if (m_model->isSolved()) {
+//        if (maxChildrenZ() == 0)
+            emit solved();
+        return true;
+    } else
+        return false;
 }
-

@@ -6,6 +6,12 @@
 class TubeModel
 {
 public:
+
+    union ColorCells {
+        quint8 items[4];
+        quint32 stored;
+    };
+
     TubeModel();
     ~TubeModel();
 
@@ -38,7 +44,7 @@ public:
     bool operator == (const TubeModel & other);
 
     // store & restore
-    void assignColors(quint32 storedTube);
+    void assignColors(quint32 storedColors);
     void assignColors(TubeModel * other);
     quint32 store() const;
 
@@ -51,12 +57,7 @@ private:
     bool checkClosed();
     bool putColor(quint8 colorNum, bool updateState);
 
-    union TubeCells {
-        quint8 items[4];
-        quint32 stored;
-    };
-
-    TubeCells m_colors;
+    ColorCells m_colors;
     int m_state;
     int m_count;
 };

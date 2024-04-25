@@ -46,6 +46,11 @@ Game& CtGlobal::game()
     return m_game.instance();
 }
 
+BoardModel * CtGlobal::board()
+{
+    return m_game.instance().boardModel();
+}
+
 Io& CtGlobal::io()
 {
     return m_io.instance();
@@ -64,6 +69,21 @@ QColor CtGlobal::paletteColor(quint8 colorIndex)
 TubeImages& CtGlobal::images()
 {
     return m_images.instance();
+}
+
+qreal CtGlobal::tubeWidth()
+{
+    return m_images.instance().tubeWidth();
+}
+
+qreal CtGlobal::tubeHeight()
+{
+    return m_images.instance().tubeHeight();
+}
+
+qreal CtGlobal::scale()
+{
+    return m_images.instance().scale();
 }
 
 QString CtGlobal::localFile(QString fName)
@@ -101,11 +121,10 @@ quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)
 
 QString CtGlobal::colorRgbToStr(quint32 value)
 {
-    QString s;
-    s.setNum(value & 0xffffff, 16);
+    QString s = intToHex(value & 0xffffff);
     while (s.length() < 6)
-        s = "0" + s;
-    s = "#" + s;
+        s.prepend("0");
+    s.prepend("#");
     return s;
 }
 
@@ -114,4 +133,26 @@ QString CtGlobal::intToStr(int value)
     QString s;
     s.setNum(value, 10);
     return s;
+}
+
+QString CtGlobal::intToHex(int value)
+{
+    QString s;
+    s.setNum(value, 16);
+    return s;
+}
+
+QString CtGlobal::endOfLine()
+{
+    const QChar newline('\n');
+    const QChar cr('\r');
+
+    #ifdef __linux__
+        const QString eol = QString(newline);
+    #elif _WIN32
+        const QString eol = QString(cr) + QString(newline);
+    #else
+        const QString eol = QString(cr);
+    #endif
+    return eol;
 }
