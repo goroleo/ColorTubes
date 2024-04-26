@@ -136,7 +136,7 @@ Page {
         Text {
             id: levelNumber
 
-            text: qsTrId("level") + " " + "145"
+            text: qsTr("Level") + " " + "145"
 
             width: parent.width
             anchors.top: topMenu.bottom
@@ -191,7 +191,7 @@ Page {
 
         Text {
             id: congratsText
-            text: qsTrId("victory")
+            text: qsTr("Victory!")
 
             x: badge.width * 0.25
             y: congratsPanel.height / 2 - badge.iHeight * 0.25
