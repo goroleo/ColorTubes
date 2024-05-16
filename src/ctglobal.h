@@ -10,11 +10,42 @@ class TubeImages;
 class Palette;
 class BoardModel;
 
+// ------------- radians & degrees
 #define CT_PI          3.14159265358979323846              // PI
 #define CT_2PI         6.28318530717958647692              // 2*PI
 #define CT_PI2         1.57079632679489661923              // PI/2
 #define CT_DEG2RAD     0.01745329251994329576922222222222  // PI/180
 #define CT_RAD2DEG     57.295779513082320876846364344191   // 180/PI
+
+// ------------- number of game colors
+#define NUM_OF_COLORS       12               // don't forget to change palette!
+
+// ------------- game modes
+#define END_GAME            0
+#define FILL_MODE           100
+#define PLAY_MODE           200
+#define ASSIST_MODE         300
+#define BUSY_MODE           400
+
+// ------------- tubes animation settings
+#define TUBE_TIMER_TICKS    10
+#define TUBE_STEPS_UP       3
+#define TUBE_STEPS_DOWN     5
+#define TUBE_STEPS_FLY      10
+#define TUBE_STEPS_POUR_OUT 22
+#define TUBE_STEPS_FLYBACK  15
+#define CORK_ALPHA_INC      0.12
+#define CORK_ALPHA_DEC     -0.18
+#define SHADE_ALPHA_INC     0.065;
+#define SHADE_ALPHA_DEC    -0.1;
+
+// ------------- tubes stages
+#define TUBE_STAGE_REGULAR  0
+#define TUBE_STAGE_SELECT   1
+#define TUBE_STAGE_FLY_OUT  2
+#define TUBE_STAGE_POUR_OUT 3
+#define TUBE_STAGE_FLY_BACK 4
+#define TUBE_STAGE_POUR_IN  10
 
 namespace CtGlobal
 {
@@ -40,30 +71,15 @@ namespace CtGlobal
 
     QColor paletteColor(quint8 colorIndex);
 
-    static const int END_GAME    = 0;
-    static const int FILL_MODE   = 100;
-    static const int PLAY_MODE   = 200;
-    static const int ASSIST_MODE = 300;
-    static const int BUSY_MODE   = 400;
-
-    // number of game colors
-    static const int NUM_OF_COLORS = 12;
-
-    static const qreal TILT_ANGLE[5] = {
-        118.6105 * CT_DEG2RAD,      // all cells are flowed
-        85.2159  * CT_DEG2RAD,      // start of flowing forth color cell
-        76.2664  * CT_DEG2RAD,      // start of flowing third color cell
-        65.6270  * CT_DEG2RAD,      // start of flowing second color cell
-        25.9394  * CT_DEG2RAD       // start of flowing top color cell
-    };
-
     // services
     quint32 colorStrToRgb(bool &ok, QString value);
     QString colorRgbToStr(quint32 value);
     QString intToStr(int value);
     QString intToHex(int value);
     QString endOfLine();
-
+    template <typename T> int sgn(T val) {
+        return (T(0) < val) - (val < T(0));
+    }
 }
 
 #endif // CTGLOBAL_H

@@ -39,14 +39,10 @@ private:
     void prepareImage();
 
     QImage m_drawImage;
-    bool m_visible = false;
-    qreal m_alpha = 0.0;
-    qreal m_alphaIncrement;
-    qreal m_currentY = 0;
-
-    const float ALPHA_INC_UP = 0.08;
-    const float ALPHA_INC_DOWN = -0.12;
-    const int   TIMER_TICKS = 5;
+    bool   m_visible = false;
+    qreal  m_alpha = 0.0;
+    qreal  m_alphaIncrement;
+    qreal  m_currentY = 0;
 };
 
 #endif // COLORSLAYER_H

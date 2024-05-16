@@ -21,6 +21,7 @@ Game::~Game()
     delete m_board;
 
     m_instance = nullptr;
+    qDebug() << "Game destroyed";
 }
 
 Game& Game::create()
@@ -33,6 +34,7 @@ Game& Game::instance()
     if (m_instance == nullptr) {
         m_instance = new Game();
         m_instance->initialize();
+        qDebug() << "Game created";
     }
     return *m_instance;
 }
@@ -43,10 +45,8 @@ void Game::initialize()
     m_jctl = new JctlFormat();
 
     m_board = new BoardModel();
-    qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
-    qmlRegisterType <FlowerLayer> ("FlowerLayer", 1, 0, "FlowerLayer");
 
-    load(QLatin1String(":/jctl/difficult8.jctl"));
+    load(QLatin1String(":/jctl/example1.jctl"));
 }
 
 void Game::load(QString fileName)

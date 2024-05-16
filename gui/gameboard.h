@@ -43,9 +43,6 @@ private:
     QVector<TubeItem *>
                * m_tubes;
 
-    int          rows;
-    int          cols;
-
     qreal        spaceX = 5.0;
     qreal        spaceY = 100.0;
 

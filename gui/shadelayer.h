@@ -60,10 +60,6 @@ private:
     QImage      m_shadeImage;
     QImage      m_drawImage;
 
-    const float ALPHA_INC_UP = 0.05;
-    const float ALPHA_INC_DOWN = -0.08;
-    const int   TIMER_TICKS = 8;
-    const int   TIMER_PULSE_TICKS = 30;
 };
 
 #endif // SHADELAYER_H

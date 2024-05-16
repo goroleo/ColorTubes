@@ -92,21 +92,18 @@ private:
     void          currentFrame();           // calculates current frame of animation
 
     QTimer      * m_timer;
+
+    int           steps;
     QPointF       m_startPoint;
     QPointF       m_endPoint;
     QPointF       m_moveIncrement;
-
     qreal         m_startAngle;
     qreal         m_endAngle;
     qreal         m_angleIncrement;
 
-    static const int TIMER_TICKS    = 10;
-    static const int STEPS_UP       = 3;
-    static const int STEPS_DOWN     = 5;
-    static const int STEPS_FLY      = 10;
-    static const int STEPS_POUR_OUT = 24;
-    static const int STEPS_FLYBACK  = 15;
-    int           steps;
+    // only for pouring out
+    uint          m_endAngleNum;
+
 
 //  animation stages
     void          nextStage();              // calls the next animation' stage after this one has finished
@@ -114,16 +111,10 @@ private:
     void          regularTube();
     void          moveUp();                  // show this tube as selected
     void          moveDown();                // deselect this tube
-    void          flyTo(TubeItem * tubeTo);  // fly to pour colors out into specified tube (tubeTo)
-    void          pourOut();                 //
+    void          flyTo(TubeItem * tubeTo);  // fly to the specified tube to pour colors into it
+    void          pourOut();                 // pour colors out
     void          flyBack();                 // fly back to the original position
 
-    static const int STAGE_REGULAR  = 0;
-    static const int STAGE_SELECT   = 1;
-    static const int STAGE_FLY_OUT  = 2;
-    static const int STAGE_POUR_OUT = 3;
-    static const int STAGE_FLY_BACK = 4;
-    static const int STAGE_POUR_IN  = 10;
     int           currentStageId = 0;
     int           nextStageId = 0;
 
@@ -133,7 +124,6 @@ private:
     void          connectTube(TubeItem * tubeFrom); // connects tubeFrom to this tube to pour colors out
     void          removeConnectedTube(TubeItem * tubeFrom);
     void          addPouringArea();
-//  qreal         getPouringArea();         // the real area of poured colors. may be used in the future
 
     quint8        m_fillingColor;           // color number
     quint8        m_pouringCells = 0;       // number of pouring color cells

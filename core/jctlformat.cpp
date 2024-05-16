@@ -189,14 +189,14 @@ bool JctlFormat::read(QByteArray &buffer)
             data >> level;            // read level
             data >> gameMode;         // read gameMode
             if (gameMode == 0) {
-                gameMode = CtGlobal::PLAY_MODE;
+                gameMode = PLAY_MODE;
             }
         } else {
             level = 0;
-            gameMode = CtGlobal::PLAY_MODE;
+            gameMode = PLAY_MODE;
         }
 
-        if (gameMode == CtGlobal::FILL_MODE) {
+        if (gameMode == FILL_MODE) {
             data >> emptyCount;       // read empty tubes count
         } else {
             data >> word;             // empty tubes count is null
@@ -208,7 +208,7 @@ bool JctlFormat::read(QByteArray &buffer)
             data >> movesDone;
             data >> movesCount;
 
-            if (movesDone == 0 && gameMode != CtGlobal::ASSIST_MODE) {
+            if (movesDone == 0 && gameMode != ASSIST_MODE) {
                 movesDone = movesCount;
             }
             if (movesDone > movesCount) {
@@ -234,7 +234,7 @@ bool JctlFormat::read(QByteArray &buffer)
 
             // check tubes for used colors
             // In FILL_MODE not all tubes can be filled completely
-            if (gameMode != CtGlobal::FILL_MODE) {
+            if (gameMode != FILL_MODE) {
                 result = checkTubes();
             }
         }

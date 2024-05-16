@@ -15,8 +15,10 @@ public:
     ~FlowerLayer();
 
 public slots:
-    void startRotate();
-    void stopRotate();
+    void connectToSvg();
+    void disconnectFromSvg();
+    void onOpacityChanged();
+    void onApplicationStateChanged();
 
 private:
     QSvgRenderer * m_source;
@@ -24,7 +26,7 @@ private:
     QPainter  * m_painter = nullptr;
 
     qreal m_edgeSize;
-    bool rotated = false;
+    bool svgConnected = false;
     void prepareImage();
     void repaintFrame();
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;

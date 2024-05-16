@@ -13,6 +13,7 @@ Io * Io::m_instance = nullptr;
 
 Io::~Io()
 {
+    qDebug() << "IO destroyed";
     m_instance = nullptr;
 }
 
@@ -26,6 +27,7 @@ Io & Io::instance()
     if (m_instance == nullptr) {
         m_instance = new Io();
         m_instance->initialize();
+        qDebug() << "IO created";
     }
     return * m_instance;
 }
@@ -41,12 +43,13 @@ void Io::initialize()
     m_sep = qdir.separator();
 
     QString dirName = SailfishApp::pathToSharedDir().toString();
-//    qdir.remove(dirName);
-    qdir.mkpath(dirName);
+    if (!qdir.exists(dirName)) {
+        qDebug() << "Creating path" << dirName;
+        qdir.mkpath(dirName);
+    }
     qdir.setPath(dirName);
-
-    qDebug() << dirName;
     m_dir = qdir.path();
+    qDebug() << "Application path:" << m_dir;
 }
 
 bool Io::loadJson(QString fName, QJsonObject &jsonObj)

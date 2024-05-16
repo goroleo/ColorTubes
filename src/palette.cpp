@@ -2,6 +2,7 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDebug>
 
 #include "ctglobal.h"
 #include "io.h"
@@ -18,14 +19,15 @@ Palette& Palette::instance()
     if (m_instance == nullptr) {
         m_instance = new Palette();
         m_instance->initialize();
+        qDebug() << "Palette created";
     }
     return *m_instance;
 }
 
 void Palette::initialize()
 {
-    m_items = new quint32[CtGlobal::NUM_OF_COLORS];
-    for (int i = 0; i < CtGlobal::NUM_OF_COLORS; i++) {
+    m_items = new quint32[NUM_OF_COLORS];
+    for (int i = 0; i < NUM_OF_COLORS; i++) {
         m_items[i] = 0;
     }
     if (!load()) {
@@ -36,6 +38,7 @@ void Palette::initialize()
 
 Palette::~Palette()
 {
+    qDebug() << "Palette destroyed";
     save();
     delete[] m_items;
     m_instance = nullptr;
@@ -43,14 +46,14 @@ Palette::~Palette()
 
 int Palette::size()
 {
-    return CtGlobal::NUM_OF_COLORS;
+    return NUM_OF_COLORS;
 }
 
 QColor Palette::getColor(int index)
 {
     if (index == 0) {
         return m_background;
-    } else if ((index > 0) && (index <= CtGlobal::NUM_OF_COLORS)) {
+    } else if ((index > 0) && (index <= NUM_OF_COLORS)) {
         return QColor(m_items[index - 1]);
     } else
         return nullptr;
@@ -58,7 +61,7 @@ QColor Palette::getColor(int index)
 
 void Palette::setColor(int index, quint32 rgb)
 {
-    if ((index > 0) && (index <= CtGlobal::NUM_OF_COLORS)) {
+    if ((index > 0) && (index <= NUM_OF_COLORS)) {
         m_items[index - 1] = rgb;
     }
 }
@@ -100,7 +103,7 @@ bool Palette::load()
         // check count
         if (jPal.contains("count") && jPal["count"].isString())
             count = jPal["count"].toString().toInt(&result, 10);
-        result = result && count == CtGlobal::NUM_OF_COLORS;
+        result = result && count == NUM_OF_COLORS;
 
         // process palette's colors
         int i = 0;
@@ -156,10 +159,10 @@ bool Palette::save()
     QJsonObject jObj;
 
     // adds count
-    jItem["count"] = CtGlobal::intToStr(CtGlobal::NUM_OF_COLORS);
+    jItem["count"] = CtGlobal::intToStr(NUM_OF_COLORS);
 
     // adds colors
-    for (int i = 0; i < CtGlobal::NUM_OF_COLORS; i++) {
+    for (int i = 0; i < NUM_OF_COLORS; i++) {
         jItem["color"+CtGlobal::intToStr(i+1)] = CtGlobal::colorRgbToStr(m_items[i]);
     }
     jObj["palette"] = jItem;

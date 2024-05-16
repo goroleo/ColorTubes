@@ -48,11 +48,10 @@ public:
     qreal     jetWidth()    {return m_jetWidth;}
     qreal     jetHeight(quint8 index)
                  {return m_vertices[3].y() - m_colorHeight * index;}
-
     QRectF    jetRect()    {return m_jetRect;}
-
-
     QRectF    scaleRect (QRectF rect);
+
+    qreal      tiltAngle(uint index);
 
 public slots:
     void      setScale(qreal value);
@@ -96,6 +95,14 @@ private:
     qreal          m_colorArea;   // colorWidth * colorHeight
     qreal          m_jetWidth;
     QRectF         m_jetRect;
+
+    qreal        * m_tiltAngles;
+    bool           anglesCalculated = false;
+    void           calculateAngles();
+    qreal          lineLength(qreal x1, qreal y1, qreal x2, qreal y2);
+    qreal          lineAngle(qreal x1, qreal y1, qreal x2, qreal y2);
+    qreal          triangleArea(qreal line, qreal angle1, qreal angle2);
+
 };
 
 #endif // TUBEIMAGES_H

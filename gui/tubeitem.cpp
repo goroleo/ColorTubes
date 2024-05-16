@@ -76,23 +76,23 @@ bool TubeItem::isEmpty()
 bool TubeItem::isActive()
 {
     return !m_model->isClosed()
-            && currentStageId <= STAGE_SELECT;
+            && currentStageId <= TUBE_STAGE_SELECT;
 }
 
 bool TubeItem::isPouredIn()
 {
-    return currentStageId == STAGE_POUR_IN;
+    return currentStageId == TUBE_STAGE_POUR_IN;
 }
 
 bool TubeItem::isFlyed()
 {
-    return (currentStageId != STAGE_POUR_IN)
-            && (currentStageId > STAGE_SELECT);
+    return (currentStageId != TUBE_STAGE_POUR_IN)
+            && (currentStageId > TUBE_STAGE_SELECT);
 }
 
 bool TubeItem::isSelected()
 {
-    return currentStageId == STAGE_SELECT;
+    return currentStageId == TUBE_STAGE_SELECT;
 }
 
 int TubeItem::shade()
@@ -124,12 +124,14 @@ void TubeItem::setSelected(bool value)
 
 void TubeItem::showAvailable(bool value)
 {
-    if (value) {
-        if (m_shade->shade() != 2)
-            m_shade->setShadeAfterHiding(2);
-    } else
-        if (m_shade->shade() != 0)
-            m_shade->startHide();
+    if (!m_model->isClosed()) {
+        if (value) {
+            if (m_shade->shade() != 2)
+                m_shade->setShadeAfterHiding(2);
+        } else
+            if (m_shade->shade() != 0)
+                m_shade->startHide();
+    }
 }
 
 void TubeItem::showClosed(bool value)
@@ -157,10 +159,10 @@ quint8 TubeItem::colorAt(quint8 index)
 
 bool TubeItem::canPutColor(quint8 colorNum)
 {
-    return (currentStageId == STAGE_REGULAR
+    return (currentStageId == TUBE_STAGE_REGULAR
                 && m_model->canPutColor(colorNum))
 
-            || (currentStageId == STAGE_POUR_IN
+            || (currentStageId == TUBE_STAGE_POUR_IN
                 && m_fillingColor == colorNum
                 && m_pouringCells < m_model->rest());
 }
@@ -243,7 +245,6 @@ void TubeItem::setAngle(qreal newAngle)
 */
     if (qFuzzyCompare(m_currentAngle, newAngle))
         return;
-
     m_currentAngle = newAngle;
     emit angleChanged(newAngle);
 }
@@ -255,25 +256,37 @@ void TubeItem::startAnimation() {
     m_moveIncrement.setX((m_endPoint.x() - m_startPoint.x()) / steps);
     m_moveIncrement.setY((m_endPoint.y() - m_startPoint.y()) / steps);
     m_angleIncrement = (m_endAngle - m_startAngle) / steps;
-    m_timer->start(TIMER_TICKS);
+    m_timer->start(TUBE_TIMER_TICKS);
 }
 
 void TubeItem::currentFrame()
 {
     if (steps > 0) {
-        if (!qFuzzyIsNull(m_angleIncrement))
-            setAngle(m_currentAngle + m_angleIncrement);
-        setCurrentPosition(m_currentPosition + m_moveIncrement);
 
-        if (currentStageId == STAGE_POUR_OUT && m_recipient) {
-            m_recipient->addPouringArea();
+        if (currentStageId != TUBE_STAGE_POUR_OUT) {
+            if (!qFuzzyIsNull(m_angleIncrement))
+                setAngle(m_currentAngle + m_angleIncrement);
+        } else {
+            setAngle(CtGlobal::images().tiltAngle(m_endAngleNum + steps)
+                     * CtGlobal::sgn(m_currentAngle));
+            if (m_recipient)
+                m_recipient->addPouringArea();
         }
+
+        setCurrentPosition(m_currentPosition + m_moveIncrement);
         steps --;
+
     } else {
         steps = 0;
         m_timer->stop();
-        if (!qFuzzyIsNull(m_angleIncrement))
-            setAngle(m_endAngle);
+
+        if (currentStageId != TUBE_STAGE_POUR_OUT) {
+            if (!qFuzzyIsNull(m_angleIncrement))
+                setAngle(m_endAngle);
+        } else {
+            setAngle(CtGlobal::images().tiltAngle(m_endAngleNum)
+                     * CtGlobal::sgn(m_currentAngle));
+        }
         setCurrentPosition(m_endPoint);
         nextStage();
     }
@@ -284,15 +297,15 @@ void TubeItem::nextStage()
     currentStageId = nextStageId;
 
     switch (currentStageId) {
-    case STAGE_REGULAR:
+    case TUBE_STAGE_REGULAR:
         regularTube();
         return;
 
-    case STAGE_POUR_OUT:
+    case TUBE_STAGE_POUR_OUT:
         pourOut();
         return;
 
-    case STAGE_FLY_BACK:
+    case TUBE_STAGE_FLY_BACK:
         flyBack();
         return;
     }
@@ -300,7 +313,7 @@ void TubeItem::nextStage()
 
 void TubeItem::regularTube()
 {
-    currentStageId = STAGE_REGULAR;
+    currentStageId = TUBE_STAGE_REGULAR;
 
     QQuickItem::setPosition(m_regularPosition);
 
@@ -326,39 +339,39 @@ void TubeItem::regularTube()
 
 void TubeItem::moveUp()
 {
-    if (currentStageId != STAGE_REGULAR)
+    if (currentStageId != TUBE_STAGE_REGULAR)
         return;
-    currentStageId = STAGE_SELECT;
+    currentStageId = TUBE_STAGE_SELECT;
 
     m_startPoint = m_regularPosition;
     m_endPoint = QPointF(m_regularPosition.x(),
                          m_regularPosition.y() - CtGlobal::images().shiftHeight());
-    m_startAngle = 0;
-    m_endAngle = 0;
-    steps = STEPS_UP;
+    m_startAngle = 0.0;
+    m_endAngle = 0.0;
+    steps = TUBE_STEPS_UP;
 
-    nextStageId = STAGE_SELECT;
+    nextStageId = TUBE_STAGE_SELECT;
     startAnimation();
 }
 
 void TubeItem::moveDown()
 {
-    if (currentStageId != STAGE_SELECT)
+    if (currentStageId != TUBE_STAGE_SELECT)
         return;
 
     m_startPoint = m_currentPosition;
     m_endPoint = m_regularPosition;
     m_startAngle = m_currentAngle;
-    m_endAngle = 0;
-    steps = STEPS_DOWN;
+    m_endAngle = 0.0;
+    steps = TUBE_STEPS_DOWN;
 
-    nextStageId = STAGE_REGULAR;
+    nextStageId = TUBE_STAGE_REGULAR;
     startAnimation();
 }
 
 void TubeItem::flyTo(TubeItem * tubeTo)
 {
-    if (currentStageId != STAGE_SELECT
+    if (currentStageId != TUBE_STAGE_SELECT
             || !tubeTo)
         return;
 
@@ -374,19 +387,19 @@ void TubeItem::flyTo(TubeItem * tubeTo)
         m_recipient->connectTube(this);
 
     m_startAngle = m_currentAngle;
-    m_endAngle = ((tubeTo->m_currentPosition.x() * 2 + CtGlobal::tubeWidth()) >= m_board->width())
-            ? CtGlobal::TILT_ANGLE[m_model->count()]
-            : -CtGlobal::TILT_ANGLE[m_model->count()];
+    m_endAngle = CtGlobal::images().tiltAngle(m_model->count() * TUBE_STEPS_POUR_OUT);
+    if ((tubeTo->m_currentPosition.x() * 2 + CtGlobal::tubeWidth()) < m_board->width())
+        m_endAngle *= -1;
 
     m_startPoint = m_currentPosition;
     m_endPoint = QPointF((m_endAngle > 0)
                          ? tubeTo->m_currentPosition.x() - CtGlobal::images().vertex(5).x()
                          : tubeTo->m_currentPosition.x() + CtGlobal::images().vertex(5).x(),
                          tubeTo->m_currentPosition.y() - CtGlobal::images().shiftHeight() * 2);
-    steps = STEPS_FLY;
+    steps = TUBE_STEPS_FLY;
     setZ(m_board->maxChildrenZ() + 1);
 
-    nextStageId = STAGE_POUR_OUT;
+    nextStageId = TUBE_STAGE_POUR_OUT;
     startAnimation();
 }
 
@@ -399,13 +412,13 @@ void TubeItem::pourOut()
     m_endPoint = m_currentPosition;
 
     m_startAngle = m_currentAngle;
-    m_endAngle = (m_currentAngle > 0)
-            ? CtGlobal::TILT_ANGLE[m_model->count() - m_pouringCells]
-            : - CtGlobal::TILT_ANGLE[m_model->count() - m_pouringCells];
+    m_endAngleNum = (m_model->count() - m_pouringCells) * TUBE_STEPS_POUR_OUT;
+    m_endAngle = CtGlobal::images().tiltAngle(m_endAngleNum)
+            * CtGlobal::sgn(m_currentAngle);
 
-    steps = STEPS_POUR_OUT * m_pouringCells;
+    steps = TUBE_STEPS_POUR_OUT * m_pouringCells;
 
-    nextStageId = STAGE_FLY_BACK;
+    nextStageId = TUBE_STAGE_FLY_BACK;
     startAnimation();
 }
 
@@ -417,10 +430,10 @@ void TubeItem::flyBack()
     m_startPoint = m_currentPosition;
     m_endPoint = m_regularPosition;
     m_startAngle = m_currentAngle;
-    m_endAngle = 0;
-    steps = STEPS_FLYBACK;
+    m_endAngle = 0.0;
+    steps = TUBE_STEPS_FLYBACK;
 
-    nextStageId = STAGE_REGULAR;
+    nextStageId = TUBE_STAGE_REGULAR;
     startAnimation();
 }
 
@@ -430,10 +443,10 @@ void TubeItem::connectTube(TubeItem * tubeFrom)
         return;
     m_connectedTubes ++;
     m_pouringCells += tubeFrom->m_pouringCells;
-    if (currentStageId != STAGE_POUR_IN) {
+    if (currentStageId != TUBE_STAGE_POUR_IN) {
         m_fillingColor = tubeFrom->currentColor();
         m_colors->resetPourArea();
-        currentStageId = STAGE_POUR_IN;
+        currentStageId = TUBE_STAGE_POUR_IN;
     }
 }
 
@@ -467,7 +480,8 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
 
 void TubeItem::addPouringArea()
 {
-    m_colors->addPourArea(CtGlobal::images().colorArea() / STEPS_POUR_OUT, m_fillingColor);
+    m_colors->addPourArea(CtGlobal::images().colorArea() / TUBE_STEPS_POUR_OUT, m_fillingColor);
 }
+
 
 

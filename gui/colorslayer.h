@@ -7,7 +7,6 @@
 #include <QImage>
 #include <QPainter>
 
-// class TubeModel;
 class TubeItem;
 
 class ColorsLayer : public QQuickPaintedItem
@@ -24,15 +23,13 @@ public:
     void  resetPourArea() {m_pourArea = 0;}
     void  addPourArea(qreal areaIncrement, quint8 colorIndex);
     void  addPourArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex);
-//    qreal getPouringArea() {return m_pouringArea;}
-
 
 private slots:
     void  onScaleChanged();
     void  onAngleChanged();
 
 private:
-    TubeItem  * m_tube;                     // parent tube for this layer
+    TubeItem  * m_parentTube;                     // parent tube for this layer
     void paint(QPainter * painter) override;
 
     qreal       scale();
@@ -76,15 +73,15 @@ private:
 
     PointF    * tubeVertices;                      // coordinates after rotation
     LineF     * bottleLines;                       // bottle edge lines
-    qreal       getIntersectionX(quint8 vertex);   // the intersection of the horizontal line from bottle vertices
+    qreal       intersectByX(quint8 vertex);       // the intersection of the horizontal line from bottle vertices
 
-    SliceF    * tubeSlices;                         // tube is sliced by horizontal lines passing through its vertices
+    SliceF    * tubeSlices;                        // tube is sliced by horizontal lines passing through its vertices
     qint8       m_slicesCount;
     qint8       m_sliceIndex;
     void        addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
     void        clearSlices();
 
-    SliceF    * colorSegments;                       // color segments coordinates
+    SliceF    * colorSegments;                     // color segments coordinates
     qint8       m_segmentsCount;
     qint8       m_colorIndex;
     qreal       m_segmentArea;

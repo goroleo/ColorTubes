@@ -1,9 +1,9 @@
 import QtQuick 2.6
-
 import Sailfish.Silica 1.0
-
 import GameBoard 1.0
 import FlowerLayer 1.0
+import "../items/"
+
 
 Page {
     id: page
@@ -32,103 +32,49 @@ Page {
             anchors.leftMargin: Theme.horizontalPageMargin
             anchors.top: parent.top
             anchors.topMargin: Theme.paddingLarge
-
             spacing: (width - (Theme.iconSizeMedium * 4)) / 3
 
-            Icon {
+            IconButtonItem {
                 id: btnNewGame
                 source: "qrc:/img/icon-star.svg"
-                height: Theme.iconSizeMedium
-                width: Theme.iconSizeMedium
-                opacity: enabled? 1.0 : Theme.opacityLow
-                color: Theme.lightPrimaryColor
-                highlightColor: Theme.highlightColor
-
-                MouseArea {
-                    width: parent.width
-                    height: parent.height
-
-                    onPressedChanged: {
-                        btnNewGame.highlighted = pressed;
-                    }
-                    onClicked: {
-                        console.log("[NewGame] button pressed")
-                    }
+                onClicked: {
+                    console.log("[NewGame] button pressed")
                 }
             }
 
-            Icon {
+            IconButtonItem {
                 id: btnUndoMove
                 source: "qrc:/img/icon-undo.svg"
                 enabled: false
-
-                height: Theme.iconSizeMedium
-                width: Theme.iconSizeMedium
-                opacity: enabled? 1.0 : Theme.opacityLow
-                color: Theme.lightPrimaryColor
-                highlightColor: Theme.highlightColor
-
-                MouseArea {
-                    width: parent.width
-                    height: parent.height
-
-                    onPressedChanged: {
-                        btnUndoMove.highlighted = pressed;
-                    }
-
-                    onClicked: {
-                        console.log("[UndoMove] button clicked")
-                    }
+                onClicked: {
+                    console.log("[UndoMove] button clicked")
+                    messagePanel.messageText
+                            = qsTr("Undo one move")
+                    messagePanel.buttonText
+                            = qsTr("Ok")
+                    messagePanel.enabled = true
                 }
             }
 
-            Icon {
+            IconButtonItem {
                 id: btnSolve
                 source: "qrc:/img/icon-dice.svg"
-
-                height: Theme.iconSizeMedium
-                width: Theme.iconSizeMedium
-                opacity: enabled? 1.0 : Theme.opacityLow
-                color: Theme.lightPrimaryColor
-                highlightColor: Theme.highlightColor
-
-                MouseArea {
-                    width: parent.width
-                    height: parent.height
-
-                    onPressedChanged: {
-                        btnSolve.highlighted = pressed;
-                    }
-
-                    onClicked: {
-                        console.log("[Solve] button clicked")
-                    }
+                onClicked: {
+                    console.log("[Solve] button clicked")
+                    messagePanel.messageText
+                            = qsTr("I will try to find a solution to this game, but it can take some time.\nDo you want to get started?")
+                    messagePanel.buttonText
+                            = qsTr("Start")
+                    messagePanel.enabled = true
                 }
             }
 
-            Icon {
+            IconButtonItem {
                 id: btnSettings
                 source: "qrc:/img/icon-gear.svg"
-
-                height: Theme.iconSizeMedium
-                width: Theme.iconSizeMedium
-                opacity: enabled? 1.0 : Theme.opacityLow
-
-                color: Theme.lightPrimaryColor
-                highlightColor: Theme.highlightColor
-
-                MouseArea {
-                    width: parent.width
-                    height: parent.height
-
-                    onPressedChanged: {
-                        btnSettings.highlighted = pressed;
-                    }
-
-                    onClicked: {
-                        console.log("[Settings] button clicked")
-                        btnUndoMove.enabled = !btnUndoMove.enabled
-                    }
+                onClicked: {
+                    console.log("[Settings] button clicked")
+                    btnUndoMove.enabled = !btnUndoMove.enabled
                 }
             }
         }
@@ -160,63 +106,22 @@ Page {
             Behavior on opacity { FadeAnimator {} }
             onSolved: {
                 congratsPanel.enabled = true
-                flower.startRotate()
             }
         }
     }
 
-    Rectangle {
+    CongratsPanel {
         id: congratsPanel
-
-        width: parent.width
-        height: parent.height
-        color: "#448888ff"
-        enabled: true
-        opacity: enabled ? 1.0 : 0.0
-        Behavior on opacity { FadeAnimator {} }
-
-        FlowerLayer {
-            id: flower
-            anchors.fill: parent
-            opacity: 0.5
-        }
-
-        Image {
-            id: badge
-            source: "qrc:/img/badge.svg"
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectFit
-            property real iHeight: badge.sourceSize.height * badge.width / badge.sourceSize.width
-        }
-
-        Text {
-            id: congratsText
-            text: qsTr("Victory!")
-
-            x: badge.width * 0.25
-            y: congratsPanel.height / 2 - badge.iHeight * 0.25
-            width: badge.width * 0.5
-            height: badge.iHeight * 0.5
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-
-            font.capitalization: Font.AllUppercase
-            font.weight: Font.DemiBold
-            font.pixelSize: badge.iHeight * 0.3
-
-            color: "#fffa60"
-            clip: true
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                flower.stopRotate()
-                congratsPanel.enabled = false
-            }
-        }
     }
 
-
+    MessagePanel {
+        id: messagePanel
+        onAccepted: {
+            console.log("Accepted")
+        }
+        onRejected: {
+            console.log("Rejected")
+        }
+    }
 
 }

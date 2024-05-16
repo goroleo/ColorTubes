@@ -10,7 +10,7 @@
 ColorsLayer::ColorsLayer(TubeItem * parent) :
     QQuickPaintedItem((QQuickItem *) parent)
 {
-    m_tube = parent;
+    m_parentTube = parent;
 
 // coordinates
     tubeVertices = new PointF[6];
@@ -33,7 +33,7 @@ ColorsLayer::ColorsLayer(TubeItem * parent) :
     QObject::connect(parent, &TubeItem::angleChanged,
             this, &ColorsLayer::onAngleChanged);
 
-    if (m_tube->model())
+    if (m_parentTube->model())
         refresh();
 }
 
@@ -86,25 +86,25 @@ void ColorsLayer::onScaleChanged()
 
 void ColorsLayer::onAngleChanged()
 {
-    qreal angle = m_tube->angle();
+    qreal angle = m_parentTube->angle();
 
     if (qFuzzyIsNull(angle)) {
-        m_tube->setVerticalShift(0);
+        m_parentTube->setVerticalShift(0);
         drawColors();
         update();
         return;
     }
 
 // ---- set rotation point
-    quint8 rVertexNumber; // rotation vertex number
+    quint8 rotationVertex; // rotation vertex number
     if (angle > 0)
-        rVertexNumber = 0;
+        rotationVertex = 0;
     else
-        rVertexNumber = 5;
+        rotationVertex = 5;
 
     tubeVertices[0].v = 0;
-    tubeVertices[0].x = CtGlobal::images().vertex(rVertexNumber).x();
-    tubeVertices[0].y = CtGlobal::images().vertex(rVertexNumber).y();
+    tubeVertices[0].x = CtGlobal::images().vertex(rotationVertex).x();
+    tubeVertices[0].y = CtGlobal::images().vertex(rotationVertex).y();
 
 // --- calculate new coordinates of other vertices after rotation
     qreal cos = qCos(angle);
@@ -112,8 +112,8 @@ void ColorsLayer::onAngleChanged()
 
     for (quint8 i = 0; i < 6; i++)
     {
-        if (i != rVertexNumber) {
-            quint8 number = abs(rVertexNumber - i);
+        if (i != rotationVertex) {
+            quint8 number = abs(rotationVertex - i);
 
             qreal dx = CtGlobal::images().vertex(i).x() - tubeVertices[0].x;
             qreal dy = CtGlobal::images().vertex(i).y() - tubeVertices[0].y;
@@ -124,7 +124,7 @@ void ColorsLayer::onAngleChanged()
         }
     }
 
-// --- calculate edge lines before sorting points
+// --- calculate edge lines before sort vertices
     for (qint8 i = 0; i < 5; i++)
     {
         bottleLines[i].x1 = tubeVertices[i].x;
@@ -150,12 +150,12 @@ void ColorsLayer::onAngleChanged()
         tubeVertices[j] = temp;
     }
 
-    //
-    m_tube->setVerticalShift(tubeVertices[5].y);
+    // Parent tube has to be visible. This is to avoid negative vertical coordinates.
+    m_parentTube->setVerticalShift(tubeVertices[5].y);
 
 // --- calculate slices
     clearSlices();
-    if (tubeVertices[0].v != 0)             // rotation point must be not the lowest point
+    if (tubeVertices[0].v != 0)              // rotation point must be not the lowest point
     {
         quint8 currentVertex;
 
@@ -179,7 +179,7 @@ void ColorsLayer::onAngleChanged()
             currentVertex++;
             addSlice(tubeVertices[currentVertex].v,
                      tubeVertices[currentVertex].x,
-                     getIntersectionX(currentVertex),
+                     intersectByX(currentVertex),
                      tubeVertices[currentVertex].y);
         } while (tubeVertices[currentVertex].v != 0);
     }
@@ -190,22 +190,22 @@ void ColorsLayer::onAngleChanged()
 
 void ColorsLayer::drawColors()
 {
-    if (!m_tube->model())
+    if (!m_parentTube->model())
         return;
 
     m_drawImage->fill(0);
 
-    if (qFuzzyIsNull(m_tube->angle())) {
+    if (qFuzzyIsNull(m_parentTube->angle())) {
 
-        for (quint8 i = 0; i < m_tube->model()->count(); ++i)
+        for (quint8 i = 0; i < m_parentTube->model()->count(); ++i)
         {
             m_colorRect = CtGlobal::images().colorRect(i);
             m_colorRect.translate(0, CtGlobal::images().shiftHeight());
-            m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_tube->colorAt(i)));
+            m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_parentTube->colorAt(i)));
         }
 
         m_bottomLine.y = CtGlobal::images().vertex(3).y()
-                - CtGlobal::images().colorHeight() * m_tube->model()->count()
+                - CtGlobal::images().colorHeight() * m_parentTube->model()->count()
                 + CtGlobal::images().shiftHeight();
         m_bottomLine.x1 = CtGlobal::images().vertex(3).x();
 
@@ -216,7 +216,7 @@ void ColorsLayer::drawColors()
         m_fillArea = CtGlobal::images().colorArea();
 
         while (m_sliceIndex < m_slicesCount - 1
-               && m_colorIndex < m_tube->model()->count())
+               && m_colorIndex < m_parentTube->model()->count())
         {
             nextSegment();
             if (qFuzzyIsNull(m_fillArea))
@@ -259,6 +259,7 @@ void ColorsLayer::nextSegment()
             drawColorCell();
             clearColorSegments();
             m_colorIndex ++;
+
         }
 
     } else {
@@ -325,8 +326,8 @@ void ColorsLayer::drawColorCell()
     path.lineTo(colorSegments[0].x1, colorSegments[0].y);
 
     path.translate(CtGlobal::images().shiftWidth(),
-                   CtGlobal::images().shiftHeight() - m_tube->m_verticalShift);
-    m_painter->setBrush(QBrush(CtGlobal::paletteColor(m_tube->colorAt(m_colorIndex))));
+                   CtGlobal::images().shiftHeight() - m_parentTube->m_verticalShift);
+    m_painter->setBrush(QBrush(CtGlobal::paletteColor(m_parentTube->colorAt(m_colorIndex))));
     m_painter->drawPath(path);
 }
 
@@ -361,7 +362,7 @@ void ColorsLayer::addColorSegment(SliceF line)
     m_segmentsCount++;
 }
 
-qreal ColorsLayer::getIntersectionX(quint8 vertex)
+qreal ColorsLayer::intersectByX(quint8 vertex)
 {
     qint8 line = 0;
     while (line < 5)

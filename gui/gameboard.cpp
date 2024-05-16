@@ -181,8 +181,7 @@ void GameBoard::showAvailableMoves()
                 && tube->canPutColor(m_selectedTube->currentColor()))
             tube->showAvailable(true);
         else {
-            if (!tube->isClosed())
-                tube->showAvailable(false);
+            tube->showAvailable(false);
         }
         i++;
     }
@@ -207,7 +206,6 @@ void GameBoard::moveColor(int tubeFromIndex, int tubeToIndex)
 bool GameBoard::isSolved()
 {
     if (m_model->isSolved()) {
-//        if (maxChildrenZ() == 0)
             emit solved();
         return true;
     } else

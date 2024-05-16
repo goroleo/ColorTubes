@@ -8,7 +8,7 @@
 #include "tubeimages.h"
 #include "game.h"
 
-int game_mode = CtGlobal::END_GAME;
+int game_mode = END_GAME;
 bool created = false;
 
 extern Game m_game;

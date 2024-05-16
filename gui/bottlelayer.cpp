@@ -12,7 +12,7 @@
 BottleLayer::BottleLayer(TubeItem * parent) :
       QQuickPaintedItem((QQuickItem *) parent)
 {
-    parentTube = parent;
+    m_parentTube = parent;
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
@@ -30,28 +30,28 @@ BottleLayer::~BottleLayer()
 void BottleLayer::paint(QPainter *painter)
 {
 
-    if (qFuzzyIsNull(parentTube->angle())) {
+    if (qFuzzyIsNull(m_parentTube->angle())) {
 
-        painter->drawPixmap(0, (startY + CtGlobal::images().shiftHeight()), m_drawPixMap);
+        painter->drawPixmap(0, (m_startY + CtGlobal::images().shiftHeight()), m_drawPixMap);
 
     } else {
 
-        qreal x = (parentTube->angle() > 0)
+        qreal x = (m_parentTube->angle() > 0)
                   ? CtGlobal::images().vertex(0).x()
                   : CtGlobal::images().vertex(5).x();
         x += CtGlobal::images().shiftWidth();
 
         qreal y = CtGlobal::images().vertex(0).y()
                 + CtGlobal::images().shiftHeight()
-                - parentTube->m_verticalShift;
+                - m_parentTube->m_verticalShift;
 
         painter->translate(x, y);
-        painter->rotate(parentTube->angle() * CT_RAD2DEG);
+        painter->rotate(m_parentTube->angle() * CT_RAD2DEG);
         painter->translate(-x, -y);
 
         painter->drawPixmap(
                     CtGlobal::images().shiftWidth(),
-                    startY + CtGlobal::images().shiftHeight() - parentTube->m_verticalShift,
+                    m_startY + CtGlobal::images().shiftHeight() - m_parentTube->m_verticalShift,
                     m_drawPixMap);
     }
 }
@@ -95,21 +95,21 @@ void BottleLayer::setSource(quint8 newSourceId)
     case CT_BOTTLE_WHOLE:
         m_source_id = newSourceId;
         m_drawPixMap = CtGlobal::images().bottle();
-        startY = 0.0;
+        m_startY = 0.0;
         break;
     case CT_BOTTLE_FRONT:
         m_source_id = newSourceId;
         m_drawPixMap = CtGlobal::images().bottleFront();
-        startY = CtGlobal::images().vertex(0).y();
+        m_startY = CtGlobal::images().vertex(0).y();
         break;
     case CT_BOTTLE_BACK:
         m_source_id = newSourceId;
         m_drawPixMap = CtGlobal::images().bottleBack();
-        startY = 0.0;
+        m_startY = 0.0;
         break;
     default:
         m_source_id = CT_BOTTLE_NONE;
-        startY = 0.0;
+        m_startY = 0.0;
     }
 
     if (m_source_id != CT_BOTTLE_NONE) {

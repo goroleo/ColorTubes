@@ -36,6 +36,9 @@ SOURCES += src/ColorTubes.cpp \
 
 DISTFILES += qml/ColorTubes.qml \
     qml/cover/CoverPage.qml \
+    qml/items/CongratsPanel.qml \
+    qml/items/IconButtonItem.qml \
+    qml/items/MessagePanel.qml \
     qml/pages/MainPage.qml \
     rpm/ColorTubes.changes.in \
     rpm/ColorTubes.changes.run.in \

@@ -35,9 +35,9 @@ private slots:
     void     onAngleChanged();
 
 private:
-    TubeItem * parentTube;
+    TubeItem * m_parentTube;
 
-    qreal    startY = 0;
+    qreal    m_startY = 0;
     quint8   m_source_id = CT_BOTTLE_NONE;
     QPixmap  m_drawPixMap;
 };
