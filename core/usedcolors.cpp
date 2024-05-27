@@ -8,7 +8,7 @@
 
 UsedColors::UsedColors()
 {
-    m_items = new quint8[NUM_OF_COLORS];
+    m_items = new quint8[CT_NUM_OF_COLORS];
     clearAllUsed();
 }
 
@@ -19,36 +19,36 @@ UsedColors::~UsedColors()
 
 int UsedColors::size()
 {
-    return NUM_OF_COLORS;
+    return CT_NUM_OF_COLORS;
 }
 
 void UsedColors::incUsed(quint8 colorNum)
 {
-    if (colorNum > 0 && colorNum <= NUM_OF_COLORS)
+    if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         m_items[colorNum - 1] += 1;
 }
 
 void UsedColors::incUsed(quint8 colorNum, quint8 count)
 {
-    if (colorNum > 0 && colorNum <= NUM_OF_COLORS)
+    if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         m_items[colorNum - 1] += count;
 }
 
 void UsedColors::decUsed(quint8 colorNum)
 {
-    if (colorNum > 0 && colorNum <= NUM_OF_COLORS)
+    if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         m_items[colorNum - 1] -= 1;
 }
 
 void UsedColors::setUsed(quint8 colorNum, quint8 count)
 {
-    if (colorNum > 0 && colorNum <= NUM_OF_COLORS)
+    if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         m_items[colorNum - 1] = count;
 }
 
 quint8 UsedColors::getUsed(quint8 colorNum)
 {
-    if (colorNum > 0 && colorNum <= NUM_OF_COLORS)
+    if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         return m_items[colorNum - 1];
     else
         return 0;
@@ -56,13 +56,13 @@ quint8 UsedColors::getUsed(quint8 colorNum)
 
 void UsedColors::clearUsed(quint8 colorNum)
 {
-    if (colorNum > 0 && colorNum <= NUM_OF_COLORS)
+    if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         m_items[colorNum - 1] = 0;
 }
 
 void UsedColors::clearAllUsed()
 {
-    for (int i = 0; i < NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
         m_items[i] = 0;
     }
 }
@@ -70,7 +70,7 @@ void UsedColors::clearAllUsed()
 quint8 UsedColors::numberOfUsedColors()
 {
     int c = 0;
-    for (int i = 0; i < NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
         if (m_items[i] > 0)
             c++;
     }
@@ -80,7 +80,7 @@ quint8 UsedColors::numberOfUsedColors()
 quint8 UsedColors::numberOfFilledColors()
 {
     int c = 0;
-    for (int i = 0; i < NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
         if (m_items[i] == 4)
             c++;
     }
@@ -90,7 +90,7 @@ quint8 UsedColors::numberOfFilledColors()
 quint8 UsedColors::numberOfUnusedColors()
 {
     int c = 0;
-    for (int i = 0; i < NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
         if (m_items[i] == 0)
             c++;
     }
@@ -100,7 +100,7 @@ quint8 UsedColors::numberOfUnusedColors()
 quint8 UsedColors::numberOfUsedCells()
 {
     int c = 0;
-    for (int i = 0; i < NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
         c += m_items[i];
     }
     return c;
@@ -109,7 +109,7 @@ quint8 UsedColors::numberOfUsedCells()
 quint8 UsedColors::numberOfAvailableCells()
 {
     int c = 0;
-    for (int i = 0; i < NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
         c += (4 - m_items[i]);
     }
     return c;

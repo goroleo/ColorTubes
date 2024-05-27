@@ -1,4 +1,5 @@
 #include "tubemodel.h"
+#include "src/ctglobal.h"
 
 TubeModel::TubeModel()
 {
@@ -21,12 +22,12 @@ bool TubeModel::isEmpty() const
     return m_count == 0;
 }
 
-bool TubeModel::isClosed() const
+bool TubeModel::isDone() const
 {
-    return m_state == STATE_CLOSED;
+    return m_state == CT_STATE_DONE;
 }
 
-bool TubeModel::checkClosed()
+bool TubeModel::checkDone()
 {
     if (m_count != 4)
         return false;
@@ -43,30 +44,30 @@ void TubeModel::updateState()
 {
     switch (m_count) {
     case 0:
-        m_state = STATE_EMPTY;             // STATE_EMPTY
+        m_state = CT_STATE_EMPTY;
         return;
     case 4:
-        if (checkClosed()) {
-            m_state = STATE_CLOSED;         // STATE_CLOSED
+        if (checkDone()) {
+            m_state = CT_STATE_DONE;
         } else {
-            m_state = STATE_FILLED;         // STATE_FILLED
+            m_state = CT_STATE_FILLED;
         }
         return;
     default:
-        m_state = STATE_REGULAR;             // STATE_REGULAR
+        m_state = CT_STATE_REGULAR;
     }
 }
 
 quint8 TubeModel::currentColor() const
 {
-    if (m_count == 0 || m_state == STATE_CLOSED)
+    if (m_count == 0 || m_state == CT_STATE_DONE)
         return 0;
     return m_colors.items[m_count - 1];
 }
 
 quint8 TubeModel::color(quint8 index)
 {
-    if (index >= 4)
+    if (index >= m_count)
         return 0;
     return m_colors.items[index];
 }
@@ -113,11 +114,11 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
     // update tube's state
     if (updateState) {
         if (m_count < 4) {
-            m_state = STATE_REGULAR;                // STATE_REGULAR
-        } else if (checkClosed()) {
-            m_state = STATE_CLOSED;                 // STATE_CLOSED
+            m_state = CT_STATE_REGULAR;
+        } else if (checkDone()) {
+            m_state = CT_STATE_DONE;
         } else {
-            m_state = STATE_FILLED;                 // STATE_FILLED
+            m_state = CT_STATE_FILLED;
         }
     }
     return true;
@@ -125,7 +126,7 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
 
 bool TubeModel::canExtractColor() const
 {
-    return (m_state == STATE_FILLED || m_state == STATE_REGULAR);
+    return (m_state == CT_STATE_FILLED || m_state == CT_STATE_REGULAR);
 }
 
 quint8 TubeModel::extractColor()
@@ -139,9 +140,9 @@ quint8 TubeModel::extractColor()
 
     // update tube's state
     if (m_count == 0) {
-        m_state = STATE_EMPTY;                       // STATE_EMPTY;
+        m_state = CT_STATE_EMPTY;
     } else {
-        m_state = STATE_REGULAR;                     // STATE_REGULAR;
+        m_state = CT_STATE_REGULAR;
     }
     return result;
 }
@@ -179,7 +180,7 @@ void TubeModel::assignColors(quint32 storedColors)
 
 void TubeModel::assignColors(TubeModel * other)
 {
-    if (other != nullptr) {
+    if (other) {
         m_colors.stored = other->store();
         m_state = other->state();
         m_count = other->count();

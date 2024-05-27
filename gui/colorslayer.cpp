@@ -10,7 +10,7 @@
 ColorsLayer::ColorsLayer(TubeItem * parent) :
     QQuickPaintedItem((QQuickItem *) parent)
 {
-    m_parentTube = parent;
+    m_tube = parent;
 
 // coordinates
     tubeVertices = new PointF[6];
@@ -33,14 +33,16 @@ ColorsLayer::ColorsLayer(TubeItem * parent) :
     QObject::connect(parent, &TubeItem::angleChanged,
             this, &ColorsLayer::onAngleChanged);
 
-    if (m_parentTube->model())
+    if (m_tube->model())
         refresh();
 }
 
 ColorsLayer::~ColorsLayer()
 {
-    delete m_painter;
-    delete m_drawImage;
+    if (m_drawImage) {
+        delete m_painter;
+        delete m_drawImage;
+    }
     delete [] tubeVertices;
     delete [] bottleLines;
     delete [] tubeSlices;
@@ -86,10 +88,10 @@ void ColorsLayer::onScaleChanged()
 
 void ColorsLayer::onAngleChanged()
 {
-    qreal angle = m_parentTube->angle();
+    qreal angle = m_tube->angle();
 
     if (qFuzzyIsNull(angle)) {
-        m_parentTube->setVerticalShift(0);
+        m_tube->setVerticalShift(0);
         drawColors();
         update();
         return;
@@ -150,8 +152,8 @@ void ColorsLayer::onAngleChanged()
         tubeVertices[j] = temp;
     }
 
-    // Parent tube has to be visible. This is to avoid negative vertical coordinates.
-    m_parentTube->setVerticalShift(tubeVertices[5].y);
+    // Parent tube has to be visible. This is to avoid negative vertical coordinates after rotation.
+    m_tube->setVerticalShift(tubeVertices[5].y);
 
 // --- calculate slices
     clearSlices();
@@ -160,15 +162,12 @@ void ColorsLayer::onAngleChanged()
         quint8 currentVertex;
 
         // lowest point(s)
-        if ( qFuzzyCompare(qAbs(angle), (qreal) CT_PI2) )
-        {
+        if ( qFuzzyCompare(qAbs(angle), CT_PI2) ) {
             // when angle = +-90 degrees, we have two lowest points
             addSlice(tubeVertices[1].v, tubeVertices[0].x,
                      tubeVertices[1].x, tubeVertices[1].y);
             currentVertex = 1;
-        }
-        else
-        {
+        } else {
             addSlice(tubeVertices[0].v, tubeVertices[0].x,
                      tubeVertices[0].x, tubeVertices[0].y);
             currentVertex = 0;
@@ -190,22 +189,22 @@ void ColorsLayer::onAngleChanged()
 
 void ColorsLayer::drawColors()
 {
-    if (!m_parentTube->model())
+    if (!m_tube->model())
         return;
 
     m_drawImage->fill(0);
 
-    if (qFuzzyIsNull(m_parentTube->angle())) {
+    if (qFuzzyIsNull(m_tube->angle())) {
 
-        for (quint8 i = 0; i < m_parentTube->model()->count(); ++i)
+        for (quint8 i = 0; i < m_tube->model()->count(); ++i)
         {
             m_colorRect = CtGlobal::images().colorRect(i);
             m_colorRect.translate(0, CtGlobal::images().shiftHeight());
-            m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_parentTube->colorAt(i)));
+            m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_tube->colorAt(i)));
         }
 
         m_bottomLine.y = CtGlobal::images().vertex(3).y()
-                - CtGlobal::images().colorHeight() * m_parentTube->model()->count()
+                - CtGlobal::images().colorHeight() * m_tube->model()->count()
                 + CtGlobal::images().shiftHeight();
         m_bottomLine.x1 = CtGlobal::images().vertex(3).x();
 
@@ -216,7 +215,7 @@ void ColorsLayer::drawColors()
         m_fillArea = CtGlobal::images().colorArea();
 
         while (m_sliceIndex < m_slicesCount - 1
-               && m_colorIndex < m_parentTube->model()->count())
+               && m_colorIndex < m_tube->model()->count())
         {
             nextSegment();
             if (qFuzzyIsNull(m_fillArea))
@@ -326,8 +325,8 @@ void ColorsLayer::drawColorCell()
     path.lineTo(colorSegments[0].x1, colorSegments[0].y);
 
     path.translate(CtGlobal::images().shiftWidth(),
-                   CtGlobal::images().shiftHeight() - m_parentTube->m_verticalShift);
-    m_painter->setBrush(QBrush(CtGlobal::paletteColor(m_parentTube->colorAt(m_colorIndex))));
+                   CtGlobal::images().shiftHeight() - m_tube->m_verticalShift);
+    m_painter->setBrush(QBrush(CtGlobal::paletteColor(m_tube->colorAt(m_colorIndex))));
     m_painter->drawPath(path);
 }
 

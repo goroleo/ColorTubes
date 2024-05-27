@@ -12,7 +12,7 @@
 BottleLayer::BottleLayer(TubeItem * parent) :
       QQuickPaintedItem((QQuickItem *) parent)
 {
-    m_parentTube = parent;
+    m_tube = parent;
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
@@ -30,28 +30,28 @@ BottleLayer::~BottleLayer()
 void BottleLayer::paint(QPainter *painter)
 {
 
-    if (qFuzzyIsNull(m_parentTube->angle())) {
+    if (qFuzzyIsNull(m_tube->angle())) {
 
         painter->drawPixmap(0, (m_startY + CtGlobal::images().shiftHeight()), m_drawPixMap);
 
     } else {
 
-        qreal x = (m_parentTube->angle() > 0)
+        qreal x = (m_tube->angle() > 0)
                   ? CtGlobal::images().vertex(0).x()
                   : CtGlobal::images().vertex(5).x();
         x += CtGlobal::images().shiftWidth();
 
         qreal y = CtGlobal::images().vertex(0).y()
                 + CtGlobal::images().shiftHeight()
-                - m_parentTube->m_verticalShift;
+                - m_tube->m_verticalShift;
 
         painter->translate(x, y);
-        painter->rotate(m_parentTube->angle() * CT_RAD2DEG);
+        painter->rotate(m_tube->angle() * CT_RAD2DEG);
         painter->translate(-x, -y);
 
         painter->drawPixmap(
                     CtGlobal::images().shiftWidth(),
-                    m_startY + CtGlobal::images().shiftHeight() - m_parentTube->m_verticalShift,
+                    m_startY + CtGlobal::images().shiftHeight() - m_tube->m_verticalShift,
                     m_drawPixMap);
     }
 }

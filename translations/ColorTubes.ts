@@ -18,24 +18,32 @@
 <context>
     <name>MainPage</name>
     <message>
-        <source>Undo one move</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>I will try to find a solution to this game, but it can take some time.
 Do you want to get started?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start</source>
+        <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Level</source>
+        <source>Do you want to start this level again?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application settings will be here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I see</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unavailable now</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

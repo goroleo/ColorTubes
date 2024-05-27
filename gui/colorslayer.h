@@ -12,6 +12,7 @@ class TubeItem;
 class ColorsLayer : public QQuickPaintedItem
 {
     Q_OBJECT
+    friend class TubeItem;
 
 public:
     explicit ColorsLayer(TubeItem *parent = 0);
@@ -19,36 +20,30 @@ public:
 
     void  refresh();
 
-// pouring routines must be available from TubeItem class
-    void  resetPourArea() {m_pourArea = 0;}
-    void  addPourArea(qreal areaIncrement, quint8 colorIndex);
-    void  addPourArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex);
-
 private slots:
     void  onScaleChanged();
     void  onAngleChanged();
 
 private:
-    TubeItem  * m_parentTube;                     // parent tube for this layer
+    TubeItem  * m_tube;                     // parent tube for this layer
     void paint(QPainter * painter) override;
 
     qreal       scale();
 
-//  draw colors
+    //  draw colors
     QImage    * m_drawImage;
     QPainter  * m_painter;
     void        drawColors();
 
-//  fill colors from another tube
+    //  fill colors from another tube
     qreal       m_fillArea;                  // currently filled area
     QRectF      m_colorRect;                 // rect of the color
     qreal       m_pourArea;
+    void        resetPourArea() {m_pourArea = 0;}
+    void        addPourArea(qreal areaIncrement, quint8 colorIndex);
+    void        addPourArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex);
 
-//  drop colors to another tube
-    void        nextSegment();
-    void        drawColorCell();
-
-//  rotation coordinates & routines
+    //  rotation coordinates & routines
     struct PointF {
         qint8 v;    // vertex/point number
         qreal x;    // X coorinate
@@ -71,6 +66,9 @@ private:
         qreal b;    // koeff b
     };
 
+    void        nextSegment();
+    void        drawColorCell();
+
     PointF    * tubeVertices;                      // coordinates after rotation
     LineF     * bottleLines;                       // bottle edge lines
     qreal       intersectByX(quint8 vertex);       // the intersection of the horizontal line from bottle vertices
@@ -90,6 +88,7 @@ private:
 
     SliceF      m_bottomLine;
     SliceF      m_topLine;
+
 };
 
 #endif // COLORSLAYER_H

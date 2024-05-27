@@ -15,8 +15,6 @@ public:
     ~FlowerLayer();
 
 public slots:
-    void connectToSvg();
-    void disconnectFromSvg();
     void onOpacityChanged();
     void onApplicationStateChanged();
 
@@ -27,6 +25,8 @@ private:
 
     qreal m_edgeSize;
     bool svgConnected = false;
+    void connectToSvg();
+    void disconnectFromSvg();
     void prepareImage();
     void repaintFrame();
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;

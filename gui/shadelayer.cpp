@@ -40,17 +40,17 @@ void ShadeLayer::startShow()
 {
     m_visible = true;
     m_pulse = false;
-    m_alphaIncrement = SHADE_ALPHA_INC;
-    shadingTimer->start(TUBE_TIMER_TICKS);
+    m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+    shadingTimer->start(CT_TIMER_TICKS);
 }
 
 void ShadeLayer::startHide()
 {
     m_visible = false;
     m_pulse = false;
-    m_alphaIncrement = SHADE_ALPHA_DEC;
+    m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
     m_shadeAfterHiding = 0;
-    shadingTimer->start(TUBE_TIMER_TICKS);
+    shadingTimer->start(CT_TIMER_TICKS);
 }
 
 void ShadeLayer::hideImmediately()
@@ -71,8 +71,8 @@ void ShadeLayer::startPulse()
 {
     m_pulse = true;
     m_visible = true;
-    m_alphaIncrement = SHADE_ALPHA_INC;
-    shadingTimer->start(TUBE_TIMER_TICKS * 3);
+    m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+    shadingTimer->start(CT_TIMER_TICKS * 3);
     emit pulseChanged(m_pulse);
 }
 
@@ -80,8 +80,8 @@ void ShadeLayer::stopPulse()
 {
     m_pulse = false;
     m_visible = false;
-    m_alphaIncrement = SHADE_ALPHA_DEC;
-    shadingTimer->start(TUBE_TIMER_TICKS);
+    m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
+    shadingTimer->start(CT_TIMER_TICKS);
     emit pulseChanged(m_pulse);
 }
 
@@ -94,7 +94,7 @@ void ShadeLayer::nextAlpha()
             m_alpha = 1.0;
             if (m_pulse) {
                 m_visible = false;
-                m_alphaIncrement = SHADE_ALPHA_DEC;
+                m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
             } else {
                 shadingTimer->stop();
             }
@@ -104,7 +104,7 @@ void ShadeLayer::nextAlpha()
             m_alpha = 0.0;
             if (m_pulse) {
                 m_visible = true;
-                m_alphaIncrement = SHADE_ALPHA_INC;
+                m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
             } else {
                 shadingTimer->stop();
 

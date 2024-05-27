@@ -8,6 +8,7 @@ import "../items/"
 Page {
     id: page
     allowedOrientations: Orientation.Portrait
+    property int questionNumber
 
     Image {
         id: backgroundImage
@@ -37,34 +38,39 @@ Page {
             IconButtonItem {
                 id: btnNewGame
                 source: "qrc:/img/icon-star.svg"
+                enabled: board.hasMoves
                 onClicked: {
                     console.log("[NewGame] button pressed")
+                    questionNumber = 1
+                    messagePanel.messageText
+                            = qsTr("Do you want to start this level again?")
+                    messagePanel.buttonText
+                            = qsTr("Yes")
+                    messagePanel.enabled = true
                 }
             }
 
             IconButtonItem {
                 id: btnUndoMove
                 source: "qrc:/img/icon-undo.svg"
-                enabled: false
+                enabled: board.hasMoves
                 onClicked: {
-                    console.log("[UndoMove] button clicked")
-                    messagePanel.messageText
-                            = qsTr("Undo one move")
-                    messagePanel.buttonText
-                            = qsTr("Ok")
-                    messagePanel.enabled = true
+                    questionNumber = 2
+                    board.undoMove()
                 }
             }
 
             IconButtonItem {
                 id: btnSolve
                 source: "qrc:/img/icon-dice.svg"
+                enabled: true
                 onClicked: {
+                    questionNumber = 3
                     console.log("[Solve] button clicked")
                     messagePanel.messageText
                             = qsTr("I will try to find a solution to this game, but it can take some time.\nDo you want to get started?")
                     messagePanel.buttonText
-                            = qsTr("Start")
+                            = qsTr("Unavailable now")
                     messagePanel.enabled = true
                 }
             }
@@ -73,8 +79,13 @@ Page {
                 id: btnSettings
                 source: "qrc:/img/icon-gear.svg"
                 onClicked: {
+                    questionNumber = 4
+                    messagePanel.messageText
+                            = qsTr("Application settings will be here")
+                    messagePanel.buttonText
+                            = qsTr("I see")
+                    messagePanel.enabled = true
                     console.log("[Settings] button clicked")
-                    btnUndoMove.enabled = !btnUndoMove.enabled
                 }
             }
         }
@@ -117,7 +128,14 @@ Page {
     MessagePanel {
         id: messagePanel
         onAccepted: {
-            console.log("Accepted")
+            console.log("Accepted.", "question=", questionNumber)
+            switch (questionNumber) {
+            case 1: board.startAgain(); return;
+            case 2: board.undoMove(); return;
+            case 3:
+            case 4:
+            }
+
         }
         onRejected: {
             console.log("Rejected")

@@ -1,9 +1,10 @@
 #include "boardmodel.h"
+#include "src/ctglobal.h"
 
 BoardModel::BoardModel()
 {
-    m_moves = new QVector<MoveItem *>;
-    m_tubes = new QVector<TubeModel *>;
+    m_moves = new GameMoves;
+    m_tubes = new GameTubes;
 }
 
 BoardModel::BoardModel(BoardModel * parentBoard)
@@ -51,12 +52,7 @@ void BoardModel::clearMoves()
     m_moves->clear();
 }
 
-bool BoardModel::hasMoves() const
-{
-    return !m_moves->empty();
-}
-
-MoveItem * BoardModel::currentMove() const
+MoveItem * BoardModel::currentMove()
 {
     if (!m_moves->empty())
         return (m_moves->last());
@@ -65,8 +61,10 @@ MoveItem * BoardModel::currentMove() const
 
 void BoardModel::deleteCurrentMove()
 {
-    if (!m_moves->empty())
+    if (!m_moves->empty()) {
+        delete m_moves->last();
         m_moves->remove(m_moves->size() - 1);
+    }
 }
 
 bool BoardModel::operator == (const BoardModel & other) const
@@ -86,9 +84,6 @@ bool BoardModel::operator == (const BoardModel & other) const
     int j1, j2;
     quint32 temp1, temp2;
 
-//    std::sort(stored1[0], stored1[tubesCount()-1]);
-//    std::sort(stored2[0], stored2[tubesCount()-1]);
-
     // sort stored1 & 2
     for (int i = 1; i < tubesCount(); ++i) {
         temp1 = stored1[i];
@@ -105,17 +100,6 @@ bool BoardModel::operator == (const BoardModel & other) const
         stored1[j1] = temp1;
         stored2[j2] = temp2;
     }
-/*
-    for (int i = 1; i < tubesCount(); ++i) {
-        temp2 = stored2[i];
-        j2 = i;
-        while ( (j2 > 0) && (stored2[j2-1] < temp2) ) {
-            stored2[j2] = stored2[j2-1];
-            j2--;
-        }
-        stored2[j2] = temp2;
-    }
-*/
 
     for (int i = 0; i < tubesCount(); ++i) {
         if (stored1[i] != stored2[i])
@@ -193,8 +177,8 @@ bool BoardModel::isSolved()
     quint8 index = 0;
 
     while (result && index < m_tubes->size()) {
-        if (m_tubes->at(index)->state() == TubeModel::STATE_FILLED
-                || m_tubes->at(index)->state() == TubeModel::STATE_REGULAR)
+        if (m_tubes->at(index)->state() == CT_STATE_FILLED
+                || m_tubes->at(index)->state() == CT_STATE_REGULAR)
             result = false;
         index ++;
     }
@@ -230,4 +214,40 @@ quint32 BoardModel::getMove(int tubeFromIndex, int tubeToIndex)
     move.fields.count = colorsToMove(tubeFromIndex, tubeToIndex);
     move.fields.color = m_tubes->at(tubeFromIndex)->currentColor();
     return move.stored;
+}
+
+quint32 BoardModel::addNewMove(int tubeFromIndex, int tubeToIndex)
+{
+    MoveItem * move = new MoveItem(this, tubeFromIndex, tubeToIndex);
+    m_moves->append(move);
+    return move->stored();
+}
+
+quint32 BoardModel::undoMove()
+{
+    MoveItem * current = currentMove();
+    if (current) {
+        quint32 result = current->stored();
+        for (int i=0; i < current->count(); ++i) {
+            m_tubes->at(current->tubeTo())->extractColor();
+            m_tubes->at(current->tubeFrom())->putColor(current->color());
+        }
+        deleteCurrentMove();
+        return result;
+    }
+    return 0;
+}
+
+
+void BoardModel::startAgain()
+{
+    MoveItem * current;
+    while (currentMove()) {
+        current = currentMove();
+        for (int i=0; i < current->count(); ++i) {
+            m_tubes->at(current->tubeTo())->extractColor();
+            m_tubes->at(current->tubeFrom())->putColor(current->color());
+        }
+        deleteCurrentMove();
+    }
 }

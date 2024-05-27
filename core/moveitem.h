@@ -22,30 +22,26 @@ public:
         quint32 stored;
     };
 
-    MoveItem();
+//    MoveItem();
     MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo);
     ~MoveItem();
 
     bool         doMove();
     bool         undoMove();
-    quint32      storeMove();
+    quint32      stored();
+    MoveFields   data();
 
     bool operator < (const MoveItem & other) const {
         return m_rank < other.m_rank;
     }
 
-    void         setParentMove(MoveItem * move);
-    void         setBoardBefore(BoardModel * board);
-    void         setTubeFrom(quint8 idxTubeFrom);
-    void         setTubeTo(quint8 idxTubeTo);
-    void         setRank(qint8 newRank);
-    void         addRank(qint8 newRank);
-
-    const MoveItem   * parentMove()  { return m_parentMove; }
-    const BoardModel * boardBefore() { return m_boardBefore; }
+    MoveItem   * parentMove()  { return m_parentMove; }
+    BoardModel * boardBefore() { return m_boardBefore; }
     BoardModel * boardAfter()  { return m_boardAfter; }
     quint8       tubeFrom()    { return m_data.fields.tubeFrom; }
     quint8       tubeTo()      { return m_data.fields.tubeTo; }
+    quint8       color()       { return m_data.fields.color; }
+    quint8       count()       { return m_data.fields.count; }
     qint8        rank()        { return m_rank;}
 
 private:
@@ -53,9 +49,11 @@ private:
     MoveData     m_data;
     qint8        m_rank;
 
-    const MoveItem   * m_parentMove = nullptr;
-    const BoardModel * m_boardBefore = nullptr;
+    MoveItem   * m_parentMove = nullptr;
+    BoardModel * m_boardBefore = nullptr;
     BoardModel * m_boardAfter = nullptr;
 };
+
+class GameMoves: public QVector<MoveItem*>{};
 
 #endif // MOVEITEM_H

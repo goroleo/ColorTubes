@@ -3,7 +3,6 @@
 
 #include <QVector>
 #include <iostream>
-#include "src/ctglobal.h"
 #include "tubemodel.h"
 #include "moveitem.h"
 
@@ -17,32 +16,35 @@ public:
     BoardModel(MoveItem * parentMove);
     ~BoardModel();
 
-    const BoardModel * rootBoard()   const {return m_rootBoard;}
-    const BoardModel * parentBoard() const {return m_parentBoard;}
-    const MoveItem   * parentMove()  const {return m_parentMove;}
-    MoveItem         * currentMove() const;
-
-    int            tubesCount() const { return m_tubes->size(); }
-    TubeModel    * tubeAt(int index) const;
-
-    int           movesCount() const { return m_moves->size(); }
-    bool          hasMoves() const;
-    void          deleteCurrentMove();
-
-    int           calculateMoves();
-
-    TubeModel *   addNewTube();
-    TubeModel *   addNewTube(TubeModel * tube);
-    TubeModel *   addNewTube(quint32 storedTube);
+    BoardModel  * rootBoard()   {return m_rootBoard;}
+    BoardModel  * parentBoard() {return m_parentBoard;}
+    MoveItem    * parentMove()  {return m_parentMove;}
+    MoveItem    * currentMove();
 
     void          clear();
     void          clearTubes();
     void          clearMoves();
+
+    int           tubesCount() const { return m_tubes->size(); }
+    TubeModel   * tubeAt(int index) const;
+
+    TubeModel   * addNewTube();
+    TubeModel   * addNewTube(TubeModel * tube);
+    TubeModel   * addNewTube(quint32 storedTube);
+
     bool          isSolved();
 
+    int           movesCount() { return m_moves->size(); }
     bool          canDoMove(int tubeFromIndex, int tubeToIndex);
     quint8        colorsToMove(int tubeFromIndex, int tubeToIndex);
     quint32       getMove(int tubeFromIndex, int tubeToIndex);
+    quint32       addNewMove(int tubeFromIndex, int tubeToIndex);
+    bool          hasMoves() { return !m_moves->empty(); }
+    void          deleteCurrentMove();
+    quint32       undoMove();
+    void          startAgain();
+
+    int           calculateMoves();
 
     bool operator == (const BoardModel &other) const;
 
@@ -53,12 +55,12 @@ public:
     }
 
 private:
-    const BoardModel  * m_parentBoard = nullptr;
-    const BoardModel  * m_rootBoard = nullptr;
-    const MoveItem    * m_parentMove = nullptr;
+    BoardModel  * m_parentBoard = nullptr;
+    BoardModel  * m_rootBoard = nullptr;
+    MoveItem    * m_parentMove = nullptr;
 
-    QVector<TubeModel *> * m_tubes;
-    QVector<MoveItem *>  * m_moves;
+    GameTubes   * m_tubes;
+    GameMoves   * m_moves;
 };
 
 #endif // BOARDMODEL_H

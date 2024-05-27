@@ -22,7 +22,7 @@ public:
     quint8 state() const {return m_state;}
 
     // state routines
-    bool isClosed() const;
+    bool isDone() const;
     bool isEmpty() const;
     void updateState();
 
@@ -48,18 +48,16 @@ public:
     void assignColors(TubeModel * other);
     quint32 store() const;
 
-    static const quint8 STATE_EMPTY   = 0;
-    static const quint8 STATE_REGULAR = 1;
-    static const quint8 STATE_FILLED  = 2;
-    static const quint8 STATE_CLOSED  = 3;
 
 private:
-    bool checkClosed();
+    bool checkDone();
     bool putColor(quint8 colorNum, bool updateState);
 
     ColorCells m_colors;
-    int m_state;
-    int m_count;
+    quint8 m_state;
+    quint8 m_count;
 };
+
+class GameTubes: public QVector<TubeModel*>{};
 
 #endif // TUBEMODEL_H

@@ -49,18 +49,18 @@ void CorkLayer::setVisible(bool newVisible)
 void CorkLayer::startShow()
 {
     m_visible = true;
-    m_alphaIncrement = CORK_ALPHA_INC;
+    m_alphaIncrement = 1.0 / qreal(CT_CORK_STEPS_INC);
     if (!internalTimer->isActive()) {
-        internalTimer->start(TUBE_TIMER_TICKS);
+        internalTimer->start(CT_TIMER_TICKS);
     }
 }
 
 void CorkLayer::startHide()
 {
     m_visible = false;
-    m_alphaIncrement = CORK_ALPHA_DEC;
+    m_alphaIncrement = -1.0 / qreal(CT_CORK_STEPS_DEC);
     if (!internalTimer->isActive()) {
-        internalTimer->start(TUBE_TIMER_TICKS);
+        internalTimer->start(CT_TIMER_TICKS);
     }
 }
 

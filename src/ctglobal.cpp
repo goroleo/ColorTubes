@@ -8,7 +8,7 @@
 #include "tubeimages.h"
 #include "game.h"
 
-int game_mode = END_GAME;
+int game_mode = CT_END_GAME;
 bool created = false;
 
 extern Game m_game;
@@ -86,17 +86,17 @@ qreal CtGlobal::scale()
     return m_images.instance().scale();
 }
 
-QString CtGlobal::localFile(QString fName)
+QString CtGlobal::localFileName(QString fName)
 {
     return m_io.instance().localFileName(fName);
 }
 
-QString CtGlobal::paletteFile()
+QString CtGlobal::paletteFileName()
 {
     return m_io.instance().paletteFileName();
 }
 
-QString CtGlobal::settingsFile()
+QString CtGlobal::settingsFileName()
 {
     return m_io.instance().settingsFileName();
 }
@@ -130,16 +130,12 @@ QString CtGlobal::colorRgbToStr(quint32 value)
 
 QString CtGlobal::intToStr(int value)
 {
-    QString s;
-    s.setNum(value, 10);
-    return s;
+    return QString().setNum(value, 10);
 }
 
 QString CtGlobal::intToHex(int value)
 {
-    QString s;
-    s.setNum(value, 16);
-    return s;
+    return QString().setNum(value, 16);
 }
 
 QString CtGlobal::endOfLine()

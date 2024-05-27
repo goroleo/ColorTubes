@@ -1,26 +1,39 @@
 #include "jctlformat.h"
 #include "usedcolors.h"
-#include <QFile>
 #include <QDataStream>
 
 #include "src/ctglobal.h"
 #include "src/game.h"
 #include "boardmodel.h"
 #include "tubemodel.h"
+#include "moveitem.h"
 
 JctlFormat::JctlFormat()
 {
     formatVersion = 2;
+    gameMode = CT_PLAY_MODE;
     storedTubes = new QVector<quint32>{};
     storedMoves = new QVector<quint32>{};
 }
 
 JctlFormat::~JctlFormat()
 {
-    storedTubes->clear();
-    storedMoves->clear();
+    clear();
     delete storedTubes;
     delete storedMoves;
+}
+
+void JctlFormat::clear()
+{
+    level = 0;
+    gameMode = 0;
+    tubesCount = 0;
+    emptyCount = 0;
+    movesCount = 0;
+    movesDone = 0;
+    storedTubes->clear();
+    storedMoves->clear();
+    crc = 0;
 }
 
 quint32 JctlFormat::size()
@@ -29,15 +42,15 @@ quint32 JctlFormat::size()
 }
 
 
-quint32 JctlFormat::size(quint32 formatVersion)
+quint32 JctlFormat::size(quint32 version)
 {
-    switch (formatVersion) {
+    switch (version) {
     case 1:
         return (6 + tubesCount) * 4;
     case 2:
         return (8 + tubesCount + movesCount) * 4 + 2;
     default:
-        return -1;
+        return 0;
     }
 }
 
@@ -77,25 +90,20 @@ quint16 JctlFormat::crcVersion2(QByteArray &buffer, quint32 length)
         for (int b = 0; b < 8; b++) {    // for every bit...
             doXOR = ((crc & 1) != 0);    //   doXOR = (last bit of the crc) != 0
             crc >>= 1;                   //   crc = crc >> 1
-            if (doXOR) {                 //   if doXOR than
+            if (doXOR)                   //   if doXOR than
                 crc ^= 0xa001;           //     crc = crc XOR polynomial 0xA001
-            }
         }
         pos++;                           // next buffer position
     }
-
-    // Now you can get LOW and HIGH bytes of the CRC.
-    //   Low byte:    crcLo = crc & 0xff;
-    //   High byte:   crcHi = (crc >> 8) & 0xff;
     return crc;
 }
 
-bool JctlFormat::write(QByteArray &buffer)
+bool JctlFormat::writeTo(QByteArray &buffer)
 {
-    return write(buffer, 2);
+    return writeTo(buffer, 2);
 }
 
-bool JctlFormat::write(QByteArray &buffer, quint32 version)
+bool JctlFormat::writeTo(QByteArray &buffer, quint32 version)
 {
 
     if (version != 1 && version != 2) {
@@ -108,8 +116,8 @@ bool JctlFormat::write(QByteArray &buffer, quint32 version)
     fileSize = size();
     quint16 zeroWord = 0;                   // 16 bit unsigned zero
 
-    data << FILE_ID;
-    data << FILE_EOF;
+    data << JCTL_FILE_ID;
+    data << JCTL_FILE_EOF;
     data << formatVersion;
     data << fileSize;
 
@@ -118,7 +126,7 @@ bool JctlFormat::write(QByteArray &buffer, quint32 version)
         data << gameMode;
     }
 
-    if (formatVersion == 2 && gameMode == 200) {
+    if (formatVersion == 2 && gameMode == CT_FILL_MODE) {
         data << emptyCount;
     } else {
         data << zeroWord;
@@ -156,7 +164,7 @@ bool JctlFormat::write(QByteArray &buffer, quint32 version)
     return true;
 }
 
-bool JctlFormat::read(QByteArray &buffer)
+bool JctlFormat::readFrom(QByteArray &buffer)
 {
     bool result = true;
 
@@ -166,11 +174,11 @@ bool JctlFormat::read(QByteArray &buffer)
     QDataStream data(&buffer, QIODevice::ReadOnly);
 
     data >> dWord;
-    result = (dWord == FILE_ID);
+    result = (dWord == JCTL_FILE_ID);
 
     if (result) {
         data >> dWord;
-        result = (dWord == FILE_EOF);
+        result = (dWord == JCTL_FILE_EOF);
     }
 
     if (result) {
@@ -186,17 +194,17 @@ bool JctlFormat::read(QByteArray &buffer)
     if (result) {
 
         if (formatVersion > 1) {
-            data >> level;            // read level
-            data >> gameMode;         // read gameMode
+            data >> level;
+            data >> gameMode;
             if (gameMode == 0) {
-                gameMode = PLAY_MODE;
+                gameMode = CT_PLAY_MODE;
             }
         } else {
             level = 0;
-            gameMode = PLAY_MODE;
+            gameMode = CT_PLAY_MODE;
         }
 
-        if (gameMode == FILL_MODE) {
+        if (gameMode == CT_FILL_MODE) {
             data >> emptyCount;       // read empty tubes count
         } else {
             data >> word;             // empty tubes count is null
@@ -208,7 +216,7 @@ bool JctlFormat::read(QByteArray &buffer)
             data >> movesDone;
             data >> movesCount;
 
-            if (movesDone == 0 && gameMode != ASSIST_MODE) {
+            if (movesDone == 0 && gameMode != CT_ASSIST_MODE) {
                 movesDone = movesCount;
             }
             if (movesDone > movesCount) {
@@ -234,7 +242,7 @@ bool JctlFormat::read(QByteArray &buffer)
 
             // check tubes for used colors
             // In FILL_MODE not all tubes can be filled completely
-            if (gameMode != FILL_MODE) {
+            if (gameMode != CT_FILL_MODE) {
                 result = checkTubes();
             }
         }
@@ -250,20 +258,25 @@ bool JctlFormat::read(QByteArray &buffer)
                 result = result
                          && ((dWord >> 24) & 0xff) < tubesCount   // check tubeFrom
                          && ((dWord >> 16) & 0xff) < tubesCount   // check tubeTo
-                         && ((dWord >> 8) & 0xff) > 0;            // checks count
+                         && ((dWord >> 8) & 0xff) > 0             // count
+                         && (dWord & 0xff) > 0;                   // color number
             }
         }
     }
 
     if (result) {
         if (formatVersion == 1) {
-            data >> crc;                                      // read CRC ver 1
+            data >> crc;                                      // CRC ver 1
             result = (crc == crcVersion1());
         } else if (formatVersion == 2) {
             data >> word;
-            crc = word & 0xffff;                              // read CRC ver 2
+            crc = word & 0xffff;                              // CRC ver 2
             result = (word == crcVersion2(buffer, fileSize - 2));
         }
+    }
+
+    if (!result) {
+        clear();
     }
 
     return result;
@@ -274,7 +287,7 @@ bool JctlFormat::checkTubes()
     if (tubesCount == 0 || tubesCount != storedTubes->size())
         return false;
 
-    quint32 stored;                                               // one of stored tubes
+    quint32 stored; // one of stored tubes
     quint8 color;
 
     CtGlobal::game().usedColors()->clearAllUsed();
@@ -282,8 +295,7 @@ bool JctlFormat::checkTubes()
     // fill used colors array
     for (quint16 i = 0; i < tubesCount; i++) {
         stored = storedTubes->at(i);
-        while (stored > 0)
-        {
+        while (stored > 0) {
             color = stored & 0xff;
             if (color > 0)
                 CtGlobal::game().usedColors()->incUsed(color);
@@ -294,12 +306,12 @@ bool JctlFormat::checkTubes()
     // check used colors array
     color = 0;
     do {
+        color ++;
         if (CtGlobal::game().usedColors()->getUsed(color) != 0
             && CtGlobal::game().usedColors()->getUsed(color) != 4)
         {
             return false;
         }
-        color ++;
     } while (color < CtGlobal::game().usedColors()->size());
 
     return true;
@@ -325,3 +337,37 @@ void JctlFormat::storeGame(BoardModel * model) {
     movesDone = 0;
     storedMoves->clear();
 }
+
+void JctlFormat::storeMoves()
+{
+    storeGame(CtGlobal::board());
+}
+
+void JctlFormat::storeMoves(GameMoves * moves)
+{
+
+}
+
+void JctlFormat::restoreGame()
+{
+    restoreGame(CtGlobal::board());
+}
+
+void JctlFormat::restoreGame(BoardModel * boardModel)
+{
+    boardModel->clear();
+    for (quint16 i = 0; i < tubesCount; i++) {
+        boardModel->addNewTube(storedTubes->at(i));
+    }
+}
+
+void JctlFormat::restoreMoves()
+{
+
+}
+
+void JctlFormat::restoreMoves(GameMoves * moves)
+{
+
+}
+

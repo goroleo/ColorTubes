@@ -32,6 +32,7 @@ public:
 
     qreal     tubeWidth() {return m_tubeWidth;}
     qreal     tubeFullWidth() {return m_tubeFullWidth;}
+    qreal     tubeRotationWidth() {return m_tubeRotationWidth;}
     qreal     shiftWidth() {return m_shiftWidth;}
 
     qreal     tubeHeight() {return m_tubeHeight;}
@@ -51,7 +52,7 @@ public:
     QRectF    jetRect()    {return m_jetRect;}
     QRectF    scaleRect (QRectF rect);
 
-    qreal      tiltAngle(uint index);
+    qreal     tiltAngle(uint index);
 
 public slots:
     void      setScale(qreal value);
@@ -60,49 +61,49 @@ signals:
     void      scaleChanged(qreal newScale);
 
 private:
-    explicit TubeImages(QObject *parent = nullptr);
+    explicit  TubeImages(QObject *parent = nullptr);
 
-    void initialize();
-    static TubeImages * m_instance;
+    void      initialize();
+    static    TubeImages * m_instance;
 
-    void scalePoints();
-    void renderImages();
+    void      scalePoints();
+    void      renderImages();
 
-    qreal m_scale = 1.0;
+    qreal     m_scale = 1.0;
     QSvgRenderer * m_source;
 
-    QPixmap      * m_bottle;
-    QPixmap      * m_bottleBack;
-    QPixmap      * m_bottleFront;
-    QPixmap      * m_shadeYellow;
-    QPixmap      * m_shadeGreen;
-    QPixmap      * m_shadeBlue;
-    QPixmap      * m_shadeRed;
-    QPixmap      * m_shadeGray;
-    QPixmap      * m_cork;
+    QPixmap   * m_bottle;
+    QPixmap   * m_bottleBack;
+    QPixmap   * m_bottleFront;
+    QPixmap   * m_shadeYellow;
+    QPixmap   * m_shadeGreen;
+    QPixmap   * m_shadeBlue;
+    QPixmap   * m_shadeRed;
+    QPixmap   * m_shadeGray;
+    QPixmap   * m_cork;
 
-    QPointF      * m_vertices;   // vertices of the егиу
+    QPointF   * m_vertices;   // vertices of the tube
 
-    qreal          m_tubeWidth;
-    qreal          m_tubeFullWidth;
-    qreal          m_shiftWidth;
-    qreal          m_tubeHeight;
-    qreal          m_tubeFullHeight;
-    qreal          m_shiftHeight;
+    qreal       m_tubeWidth;
+    qreal       m_tubeFullWidth;
+    qreal       m_tubeRotationWidth;
+    qreal       m_shiftWidth;
+    qreal       m_tubeHeight;
+    qreal       m_tubeFullHeight;
+    qreal       m_shiftHeight;
 
-    qreal          m_colorWidth;
-    qreal          m_colorHeight; // width of the one color cell after scaling
-    qreal          m_colorArea;   // colorWidth * colorHeight
-    qreal          m_jetWidth;
-    QRectF         m_jetRect;
+    qreal       m_colorWidth;
+    qreal       m_colorHeight; // width of the one color cell after scaling
+    qreal       m_colorArea;   // colorWidth * colorHeight
+    qreal       m_jetWidth;
+    QRectF      m_jetRect;
 
-    qreal        * m_tiltAngles;
-    bool           anglesCalculated = false;
-    void           calculateAngles();
-    qreal          lineLength(qreal x1, qreal y1, qreal x2, qreal y2);
-    qreal          lineAngle(qreal x1, qreal y1, qreal x2, qreal y2);
-    qreal          triangleArea(qreal line, qreal angle1, qreal angle2);
-
+    qreal     * m_tiltAngles;
+    bool        anglesCalculated = false;
+    void        calculateTiltAngles();
+    qreal       lineLength(QPointF p1, QPointF p2);
+    qreal       lineAngle(QPointF p1, QPointF p2);
+    qreal       triangleArea(qreal lineLength, qreal angle1, qreal angle2);
 };
 
 #endif // TUBEIMAGES_H

@@ -7,7 +7,6 @@ class CorkLayer;
 class BottleLayer;
 class ColorsLayer;
 class ShadeLayer;
-class FlowLayer;
 class TubeModel;
 class GameBoard;
 
@@ -19,6 +18,7 @@ class TubeItem : public QQuickItem
 
     friend class ColorsLayer;  // the inner layer, it calculates vertical shift when rotate
     friend class BottleLayer;  // the inner layer, it uses vertical shift when rotate
+    friend class GameBoard;
 
 public:
     explicit TubeItem(QQuickItem * parent = 0, TubeModel * tm = 0);
@@ -26,21 +26,24 @@ public:
 
     TubeModel   * model() { return m_model; }
 
+    int           tubeIndex();
+
     void          setPosition(const QPointF newPoint);
     QPointF       position() {return m_regularPosition;}
 
-    int           tubeIndex();
-    bool          isClosed();
+    bool          isDone();
+    bool          isClosed() {return m_closed;}
     bool          isEmpty();
     bool          isActive();
     bool          isFlyed();
     bool          isPouredIn();
     bool          isSelected();
 
+    void          refresh();
     int           shade();
     void          setSelected(bool value);
     void          showAvailable(bool value);
-    void          showClosed(bool value);
+    void          setClosed(bool value);
 
     quint8        currentColor();
     quint8        colorAt(quint8 index);
@@ -87,6 +90,9 @@ private:
     void          setAngle(qreal newAngle);
     qreal         m_currentAngle    = 0.0;
 
+    bool          m_closed;
+
+
 //  animation frames
     void          startAnimation();         // ... with predefined (pre-calculated) parameters
     void          currentFrame();           // calculates current frame of animation
@@ -100,20 +106,16 @@ private:
     qreal         m_startAngle;
     qreal         m_endAngle;
     qreal         m_angleIncrement;
-
-    // only for pouring out
-    uint          m_endAngleNum;
-
+    uint          m_endAngleNumber;         // used for pouring out rotation only
 
 //  animation stages
     void          nextStage();              // calls the next animation' stage after this one has finished
-
-    void          regularTube();
-    void          moveUp();                  // show this tube as selected
-    void          moveDown();                // deselect this tube
-    void          flyTo(TubeItem * tubeTo);  // fly to the specified tube to pour colors into it
-    void          pourOut();                 // pour colors out
-    void          flyBack();                 // fly back to the original position
+    void          regularTube();            // tube at its regular position
+    void          moveUp();                 // show tube as selected
+    void          moveDown();               // deselect this tube
+    void          flyTo(TubeItem * tubeTo); // fly to the specified tube to pour colors into it
+    void          pourOut();                // pour colors out
+    void          flyBack();                // fly back to the original position
 
     int           currentStageId = 0;
     int           nextStageId = 0;
@@ -129,8 +131,8 @@ private:
     quint8        m_pouringCells = 0;       // number of pouring color cells
     quint8        m_connectedTubes = 0;     // number of tubes which will be pour colors into this tube
     quint8        m_pouredTubes = 0;        // number of tubes which are pours colors into this tube
-    qreal         m_pouringArea = 0;        //
-
 };
+
+class TubeItems: public QVector<TubeItem*>{};
 
 #endif // TUBEITEM_H

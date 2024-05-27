@@ -5,13 +5,11 @@
 #include "src/game.h"
 #include "core/boardmodel.h"
 
-#include "tubeitem.h"
-
 GameBoard::GameBoard(QQuickItem *parent) :
     QQuickItem(parent)
 {
     m_model = CtGlobal::board();
-    m_tubes = new QVector<TubeItem *>;
+    m_tubes = new TubeItems();
 
     for (int i=0; i < m_model->tubesCount(); ++i) {
         TubeItem * tube = new TubeItem(this, CtGlobal::board()->tubeAt(i));
@@ -187,27 +185,55 @@ void GameBoard::showAvailableMoves()
     }
 }
 
-void GameBoard::moveColor(TubeItem * tubeFrom, TubeItem * tubeTo)
+void GameBoard::addNewMove(TubeItem * tubeFrom, TubeItem * tubeTo)
 {
-    if (tubeFrom == nullptr || tubeTo == nullptr)
-        return;
-    tubeFrom->moveColorTo(tubeTo);
+    m_model->addNewMove(tubeFrom->tubeIndex(), tubeTo->tubeIndex());
+    emit movesChanged();
 }
 
-void GameBoard::moveColor(int tubeFromIndex, int tubeToIndex)
+void GameBoard::undoMove()
 {
-    if (tubeFromIndex < 0 || tubeFromIndex >= m_model->tubesCount()
-            || tubeToIndex < 0 || tubeToIndex >= m_model->tubesCount())
-        return;
+    if (m_model->hasMoves()) {
 
-    moveColor(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
+        if (maxChildrenZ() == 0) {
+
+            if (m_selectedTube)
+                clickTube(m_selectedTube);
+
+            MoveItem::MoveData data;
+            data.stored = m_model->undoMove();
+            if (data.stored > 0) {
+                m_tubes->at(data.fields.tubeFrom)->refresh();
+                m_tubes->at(data.fields.tubeTo)->refresh();
+                emit movesChanged();
+            }
+        }
+    }
 }
 
 bool GameBoard::isSolved()
 {
-    if (m_model->isSolved()) {
-            emit solved();
-        return true;
-    } else
-        return false;
+    return m_model->isSolved();
+}
+
+bool GameBoard::hasMoves()
+{
+    return m_model->hasMoves();
+}
+
+void GameBoard::startAgain()
+{
+    if (m_model->hasMoves()) {
+
+        if (maxChildrenZ() == 0) {
+
+            if (m_selectedTube)
+                clickTube(m_selectedTube);
+            m_model->startAgain();
+            for (int i=0; i<tubesCount(); ++i) {
+                m_tubes->at(i)->refresh();
+            }
+            emit movesChanged();
+        }
+    }
 }
