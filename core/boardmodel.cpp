@@ -84,7 +84,7 @@ bool BoardModel::operator == (const BoardModel & other) const
     int j1, j2;
     quint32 temp1, temp2;
 
-    // sort stored1 & 2
+    // sort stored1 & stored2
     for (int i = 1; i < tubesCount(); ++i) {
         temp1 = stored1[i];
         temp2 = stored2[i];
@@ -101,9 +101,12 @@ bool BoardModel::operator == (const BoardModel & other) const
         stored2[j2] = temp2;
     }
 
-    for (int i = 0; i < tubesCount(); ++i) {
-        if (stored1[i] != stored2[i])
+    // compare sorted
+    j1 = 0;
+    while (result && j1 < tubesCount()) {
+        if (stored1[j1] != stored2[j1])
             result = false;
+        j1++;
     }
 
     delete [] stored1;
@@ -126,10 +129,10 @@ TubeModel * BoardModel::addNewTube()
     return tube;
 }
 
-TubeModel * BoardModel::addNewTube(TubeModel * cloneTube)
+TubeModel * BoardModel::addNewTube(TubeModel * tubeToClone)
 {
     TubeModel * tube = new TubeModel();
-    tube->assignColors(cloneTube);
+    tube->assignColors(tubeToClone);
     m_tubes->append(tube);
     return tube;
 }
@@ -191,14 +194,29 @@ bool BoardModel::canDoMove(int tubeFromIndex, int tubeToIndex)
          || tubeToIndex < 0 || tubeToIndex >= m_tubes->size())
         return false;
 
-    return m_tubes->at(tubeToIndex)->canPutColor(m_tubes->at(tubeFromIndex)->currentColor());
+    return canDoMove(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
+}
+
+bool BoardModel::canDoMove(TubeModel * tubeFrom, TubeModel * tubeTo)
+{
+    if (tubeFrom && tubeTo)
+        return tubeTo->canPutColor(tubeFrom->currentColor());
+    return false;
 }
 
 quint8 BoardModel::colorsToMove(int tubeFromIndex, int tubeToIndex)
 {
-    if (canDoMove(tubeFromIndex, tubeToIndex))
-        return qMin(m_tubes->at(tubeFromIndex)->sameColorCount(),
-                    m_tubes->at(tubeToIndex)->rest());
+    if ( tubeFromIndex < 0 || tubeFromIndex >= m_tubes->size()
+         || tubeToIndex < 0 || tubeToIndex >= m_tubes->size())
+        return false;
+    return colorsToMove(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
+}
+
+quint8 BoardModel::colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo)
+{
+    if (canDoMove(tubeFrom, tubeTo))
+        return qMin(tubeFrom->sameColorCount(),
+                    tubeTo->rest());
     else
         return 0;
 }
@@ -228,7 +246,7 @@ quint32 BoardModel::undoMove()
     MoveItem * current = currentMove();
     if (current) {
         quint32 result = current->stored();
-        for (int i=0; i < current->count(); ++i) {
+        for (int i = 0; i < current->count(); ++i) {
             m_tubes->at(current->tubeTo())->extractColor();
             m_tubes->at(current->tubeFrom())->putColor(current->color());
         }
@@ -237,7 +255,6 @@ quint32 BoardModel::undoMove()
     }
     return 0;
 }
-
 
 void BoardModel::startAgain()
 {

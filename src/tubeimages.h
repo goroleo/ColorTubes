@@ -101,9 +101,12 @@ private:
     qreal     * m_tiltAngles;
     bool        anglesCalculated = false;
     void        calculateTiltAngles();
-    qreal       lineLength(QPointF p1, QPointF p2);
-    qreal       lineAngle(QPointF p1, QPointF p2);
-    qreal       triangleArea(qreal lineLength, qreal angle1, qreal angle2);
+    bool        loadTiltAngles();
+    bool        saveTiltAngles();
+
+//    qreal       lineLength(QPointF p1, QPointF p2);
+//    qreal       lineAngle(QPointF p1, QPointF p2);
+//    qreal       triangleArea(qreal lineLength, qreal angle1, qreal angle2);
 };
 
 #endif // TUBEIMAGES_H

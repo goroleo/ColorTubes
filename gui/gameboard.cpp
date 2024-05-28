@@ -1,6 +1,7 @@
 #include "gameboard.h"
 
 #include "src/ctglobal.h"
+#include "tubeitem.h"
 #include "src/tubeimages.h"
 #include "src/game.h"
 #include "core/boardmodel.h"
@@ -162,8 +163,12 @@ void GameBoard::clickTube(TubeItem * tube)
                 m_selectedTube = nullptr;
         }
     }
-
     showAvailableMoves();
+}
+
+GameMoves * GameBoard::moves()
+{
+    return m_model->moves();
 }
 
 void GameBoard::showAvailableMoves()
@@ -198,7 +203,7 @@ void GameBoard::undoMove()
         if (maxChildrenZ() == 0) {
 
             if (m_selectedTube)
-                clickTube(m_selectedTube);
+                clickTube(nullptr);
 
             MoveItem::MoveData data;
             data.stored = m_model->undoMove();
@@ -228,9 +233,10 @@ void GameBoard::startAgain()
         if (maxChildrenZ() == 0) {
 
             if (m_selectedTube)
-                clickTube(m_selectedTube);
+                clickTube(nullptr);
+
             m_model->startAgain();
-            for (int i=0; i<tubesCount(); ++i) {
+            for (int i = 0; i < tubesCount(); ++i) {
                 m_tubes->at(i)->refresh();
             }
             emit movesChanged();

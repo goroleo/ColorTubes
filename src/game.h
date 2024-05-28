@@ -22,7 +22,6 @@ public:
     ~Game();
 
     BoardModel * boardModel() {return m_board; }
-    GameMoves  * gameMoves() {return m_moves; }
     UsedColors * usedColors() {return m_usedColors; }
     JctlFormat * jctl() {return m_jctl; }
 
@@ -44,7 +43,6 @@ private:
     UsedColors * m_usedColors;
     JctlFormat * m_jctl;
     BoardModel * m_board;
-    GameMoves  * m_moves;
     int gameMode;
     static Game* m_instance;
 };

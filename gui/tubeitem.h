@@ -13,7 +13,7 @@ class GameBoard;
 class TubeItem : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal angle READ angle NOTIFY angleChanged)
+//    Q_PROPERTY(qreal angle READ angle NOTIFY angleChanged)
     Q_PROPERTY(int shade READ shade WRITE setShade NOTIFY shadeChanged)
 
     friend class ColorsLayer;  // the inner layer, it calculates vertical shift when rotate

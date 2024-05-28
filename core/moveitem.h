@@ -22,14 +22,13 @@ public:
         quint32 stored;
     };
 
-//    MoveItem();
     MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo);
     ~MoveItem();
 
     bool         doMove();
     bool         undoMove();
     quint32      stored();
-    MoveFields   data();
+//    MoveFields   data();
 
     bool operator < (const MoveItem & other) const {
         return m_rank < other.m_rank;

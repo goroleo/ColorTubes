@@ -26,7 +26,7 @@ private slots:
 
 private:
     TubeItem  * m_tube;                     // parent tube for this layer
-    void paint(QPainter * painter) override;
+    void        paint(QPainter * painter) override;
 
     qreal       scale();
 
@@ -58,10 +58,10 @@ private:
     };
     
     struct LineF {  // line is y = k * x + b
-        qreal x1;
-        qreal y1;
-        qreal x2;
-        qreal y2;
+        qreal x1;   // point1.x
+        qreal y1;   // point1.y
+        qreal x2;   // point2.x
+        qreal y2;   // point2.y
         qreal k;    // koeff k
         qreal b;    // koeff b
     };

@@ -28,7 +28,7 @@ static const quint8  CT_TIMER_TICKS      = 10;           // ticks interval in mi
 static const quint8  CT_TUBE_STEPS_UP    = 3;            // steps to move tube up
 static const quint8  CT_TUBE_STEPS_DOWN  = 5;            // steps to move tube down
 static const quint8  CT_TUBE_STEPS_FLY   = 10;           // steps to fly/move tube to another tube
-static const quint8  CT_TUBE_STEPS_POUR  = 23;           // steps to pour out one color cell
+static const quint8  CT_TUBE_STEPS_POUR  = 22;           // steps to pour out one color cell
 static const quint8  CT_TUBE_STEPS_BACK  = 15;           // steps to fly/move tube back to its place
 static const quint8  CT_SHADE_STEPS_INC  = 15;           // steps to opacity increment when shade layer appears
 static const quint8  CT_SHADE_STEPS_DEC  = 10;           // steps to opacity decrement when shade layer disappears
@@ -73,7 +73,7 @@ namespace CtGlobal
 
     int    gameMode();
     qreal  scale();
-    BoardModel  *  board();
+    BoardModel * board();
     qreal  tubeWidth();
     qreal  tubeHeight();
 

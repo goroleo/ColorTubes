@@ -247,7 +247,9 @@ qreal TubeItem::angle() const
 void TubeItem::setAngle(qreal newAngle)
 {
 /*
-    checking for external angle changes, doesn't need inside the app
+    // Angle must be in the range from 0 to +-180 degrees,
+    // but going out of range can only happen if the angle is set manually.
+    // So checking this is not required inside the app.
 
     newAngle = fmod(newAngle, CT_2PI);
     if (qAbs(newAngle) > CT_PI) {
@@ -256,6 +258,7 @@ void TubeItem::setAngle(qreal newAngle)
                 : newAngle - CT_2PI;
     }
 */
+
     if (qFuzzyCompare(m_currentAngle, newAngle))
         return;
     m_currentAngle = newAngle;
@@ -340,8 +343,8 @@ void TubeItem::regularTube()
         setClosed(true);
         qDebug() << "Closed tube" << tubeIndex();
         if (m_board->isSolved()) {
-            emit m_board->solved();
             qDebug() << "!!! SOLVED !!!";
+            emit m_board->solved();
         }
     }
 }

@@ -1,9 +1,10 @@
 #include "jctlformat.h"
-#include "usedcolors.h"
+
 #include <QDataStream>
 
 #include "src/ctglobal.h"
 #include "src/game.h"
+#include "usedcolors.h"
 #include "boardmodel.h"
 #include "tubemodel.h"
 #include "moveitem.h"
@@ -340,7 +341,7 @@ void JctlFormat::storeGame(BoardModel * model) {
 
 void JctlFormat::storeMoves()
 {
-    storeGame(CtGlobal::board());
+    // storeGame(CtGlobal::board().);
 }
 
 void JctlFormat::storeMoves(GameMoves * moves)

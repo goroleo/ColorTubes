@@ -2,9 +2,11 @@
 #define GAMEBOARD_H
 
 #include <QQuickItem>
-#include "tubeitem.h"
 
 class BoardModel;
+class GameMoves;
+class TubeItem;
+class TubeItems;
 
 class GameBoard : public QQuickItem
 {
@@ -19,6 +21,7 @@ public:
     int          indexOf(TubeItem * tube);
     TubeItem   * selectedTube() { return m_selectedTube; }
 
+    GameMoves  * moves();
     void         addNewMove(TubeItem * tubeFrom, TubeItem * tubeTo);
     bool         hasMoves();
     void         showAvailableMoves();
@@ -52,7 +55,6 @@ private:
 
     qreal        spaceX = 5.0;
     qreal        spaceY = 100.0;
-
 };
 
 #endif // GAMEBOARD_H

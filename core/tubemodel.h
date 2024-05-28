@@ -7,11 +7,6 @@ class TubeModel
 {
 public:
 
-    union ColorCells {
-        quint8 items[4];
-        quint32 stored;
-    };
-
     TubeModel();
     ~TubeModel();
 
@@ -52,6 +47,11 @@ public:
 private:
     bool checkDone();
     bool putColor(quint8 colorNum, bool updateState);
+
+    union ColorCells {
+        quint8 items[4];
+        quint32 stored;
+    };
 
     ColorCells m_colors;
     quint8 m_state;

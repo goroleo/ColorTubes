@@ -21,7 +21,6 @@ Game::~Game()
     delete m_usedColors;
     delete m_jctl;
     delete m_board;
-    delete m_moves;
 
     m_instance = nullptr;
     qDebug() << "Game destroyed";
@@ -47,9 +46,8 @@ void Game::initialize()
     m_usedColors = new UsedColors; // UsedColors must be before JctlFormat
     m_jctl = new JctlFormat();
     m_board = new BoardModel();
-    m_moves = new GameMoves();
 
-    load(QLatin1String(":/jctl/example4.jctl"));
+    load(QLatin1String(":/jctl/example1.jctl"));
 }
 
 void Game::load(QString fileName)

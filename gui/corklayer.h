@@ -17,21 +17,20 @@ public:
 
     bool isVisible();
 
-    void paint(QPainter *painter) override;
-
 public slots:
     void setVisible(bool newVisible);
     void startShow();
     void startHide();
 
 signals:
-    void scaleChanged(const qreal newScale);
     bool visibleChanged(const bool newVisible);
 
 private slots:
     void onScaleChanged();
 
 private:
+
+    void paint(QPainter *painter) override;
 
     QTimer *internalTimer;
 

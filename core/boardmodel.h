@@ -7,6 +7,7 @@
 #include "moveitem.h"
 
 class MoveItem;
+class TubeModel;
 
 class BoardModel
 {
@@ -29,7 +30,7 @@ public:
     TubeModel   * tubeAt(int index) const;
 
     TubeModel   * addNewTube();
-    TubeModel   * addNewTube(TubeModel * tube);
+    TubeModel   * addNewTube(TubeModel * tubeToClone);
     TubeModel   * addNewTube(quint32 storedTube);
 
     bool          isSolved();
@@ -37,12 +38,15 @@ public:
     int           movesCount() { return m_moves->size(); }
     bool          canDoMove(int tubeFromIndex, int tubeToIndex);
     quint8        colorsToMove(int tubeFromIndex, int tubeToIndex);
+    bool          canDoMove(TubeModel * tubeFrom, TubeModel * tubeTo);
+    quint8        colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo);
     quint32       getMove(int tubeFromIndex, int tubeToIndex);
     quint32       addNewMove(int tubeFromIndex, int tubeToIndex);
     bool          hasMoves() { return !m_moves->empty(); }
     void          deleteCurrentMove();
     quint32       undoMove();
     void          startAgain();
+    GameMoves   * moves() {return m_moves;}
 
     int           calculateMoves();
 

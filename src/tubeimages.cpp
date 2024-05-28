@@ -4,8 +4,10 @@
 #include <QtMath>
 #include <QPainter>
 #include <QDebug>
+#include <QJsonObject>
 
 #include "ctglobal.h"
+#include "io.h"
 
 TubeImages* TubeImages::m_instance = nullptr;
 
@@ -82,7 +84,9 @@ void TubeImages::setScale(qreal value)
         emit scaleChanged(m_scale);
     }
     if (!anglesCalculated)
-        calculateTiltAngles();
+        if (!loadTiltAngles()) {
+            calculateTiltAngles();
+        }
 }
 
 void TubeImages::scalePoints()
@@ -267,18 +271,18 @@ qreal TubeImages::tiltAngle(uint index)
     return 0.0;
 }
 
-qreal TubeImages::lineLength(QPointF p1, QPointF p2)
+qreal lineLength(QPointF p1, QPointF p2)
 {
     return sqrt((p2.x() - p1.x()) * (p2.x() - p1.x())
                 + (p2.y() - p1.y()) * (p2.y() - p1.y()));
 }
 
-qreal TubeImages::lineAngle(QPointF p1, QPointF p2)
+qreal lineAngle(QPointF p1, QPointF p2)
 {
     return atan2(p2.y() - p1.y(), p2.x() - p1.x());
 }
 
-qreal TubeImages::triangleArea(qreal lineLength, qreal angle1, qreal angle2)
+qreal triangleArea(qreal lineLength, qreal angle1, qreal angle2)
 {
     // triangle area by one side and two angles adjacent to it (ASA, angle-side-angle)
     return lineLength * lineLength * qSin(angle1) * qSin(angle2) / qSin(angle1 + angle2) / 2.0;
@@ -380,15 +384,89 @@ void TubeImages::calculateTiltAngles()
         } while (!qFuzzyCompare(currentArea, expectedArea));
 
         m_tiltAngles[(CT_TUBE_STEPS_POUR << 2) - i] = currentAngle;
-//        qDebug() << "Tilt angle" << (CT_TUBE_STEPS_POUR << 2) - i << "is" << currentAngle * CT_RAD2DEG << "degrees with area" << currentArea;
         i++;
 
     } while (!qFuzzyIsNull(expectedArea));
 
     m_tiltAngles[1] = (m_tiltAngles[0] + m_tiltAngles[2]) / 2;
-//    qDebug() << "Correct tilt angle" << 1 << m_tiltAngles[1] * CT_RAD2DEG;
 
     anglesCalculated = true;
+    qDebug() << i << "tilt angles were calculated";
+
+    saveTiltAngles();
 
 }
 
+bool TubeImages::loadTiltAngles()
+{
+    QJsonObject jObj, jAngles;
+
+    if (!CtGlobal::io().loadJson(CtGlobal::io().anglesFileName(), jObj))
+        return false;
+
+    int steps = 0;
+    QString key;
+    QString value;
+
+    bool result = jObj.contains("tiltAngles") && jObj["tiltAngles"].isObject();
+
+    if (result) {
+        jAngles = jObj["tiltAngles"].toObject();
+
+        if (jAngles.contains("pourStepsPerColor") && jAngles["pourStepsPerColor"].isString())
+            steps = jAngles["pourStepsPerColor"].toString().toInt(&result, 10);
+        result = result && steps == CT_TUBE_STEPS_POUR;
+    }
+
+    if (result) {
+        int count = steps * 4 + 1;
+
+        int i = 0;
+        while (result && i < count) {
+
+            key = "angle" + CtGlobal::intToStr(i);
+            if (jAngles.contains(key) && jAngles[key].isString()) {
+
+                value = jAngles[key].toString();
+                m_tiltAngles[i] = value.toDouble(&result) * CT_DEG2RAD;
+                if (!result)
+                    qDebug() << key << "cannot read";
+            }
+            i++;
+        }
+    }
+
+    if (result) {
+        anglesCalculated = true;
+        qDebug() << CT_TUBE_STEPS_POUR * 4 + 1 << "tilt angles were restored";
+    }
+
+    return result;
+}
+
+bool TubeImages::saveTiltAngles()
+{
+    // creates json
+    QJsonObject jItem;
+    QJsonObject jObj;
+    QString value;
+
+    // add count
+    jItem["pourStepsPerColor"] = CtGlobal::intToStr(CT_TUBE_STEPS_POUR);
+
+    // add angles
+    for (int i = 0; i < CT_TUBE_STEPS_POUR * 4 + 1; i++) {
+        value = QString().number(m_tiltAngles[i] * CT_RAD2DEG, 'g', 16);
+        jItem["angle"+CtGlobal::intToStr(i)] = value;
+    }
+
+    jObj["tiltAngles"] = jItem;
+
+    // save
+    if (CtGlobal::io().saveJson(CtGlobal::io().anglesFileName(), jObj)) {
+        qDebug() << (CT_TUBE_STEPS_POUR << 2) + 1 << "tilt angles were saved";
+        return true;
+    }
+
+    return false;
+}
