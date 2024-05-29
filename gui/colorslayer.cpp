@@ -2,8 +2,8 @@
 
 #include "src/ctglobal.h"
 #include "src/game.h"
-#include "src/tubeimages.h"
-#include "src/palette.h"
+#include "src/ctimages.h"
+#include "src/ctpalette.h"
 #include "core/tubemodel.h"
 #include "gui/tubeitem.h"
 

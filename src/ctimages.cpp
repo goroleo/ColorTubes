@@ -1,4 +1,4 @@
-#include "tubeimages.h"
+#include "ctimages.h"
 
 #include <QImage>
 #include <QtMath>
@@ -7,9 +7,9 @@
 #include <QJsonObject>
 
 #include "ctglobal.h"
-#include "io.h"
+#include "ctio.h"
 
-TubeImages* TubeImages::m_instance = nullptr;
+CtImages* CtImages::m_instance = nullptr;
 
 /*
 
@@ -17,12 +17,12 @@ TubeImages* TubeImages::m_instance = nullptr;
 
  */
 
-TubeImages::TubeImages(QObject *parent) :
+CtImages::CtImages(QObject *parent) :
     QObject(parent)
 {
 }
 
-TubeImages::~TubeImages()
+CtImages::~CtImages()
 {
     delete m_source;
     delete m_bottle;
@@ -39,22 +39,22 @@ TubeImages::~TubeImages()
     qDebug() << "Images destroyed";
 }
 
-TubeImages& TubeImages::create()
+CtImages& CtImages::create()
 {
     return instance();
 }
 
-TubeImages& TubeImages::instance()
+CtImages& CtImages::instance()
 {
     if (m_instance == nullptr) {
-        m_instance = new TubeImages();
+        m_instance = new CtImages();
         m_instance->initialize();
         qDebug() << "Images created";
     }
     return * m_instance;
 }
 
-void TubeImages::initialize()
+void CtImages::initialize()
 {
     m_tiltAngles = new qreal[(CT_TUBE_STEPS_POUR << 2) + 1];
     anglesCalculated = false;
@@ -75,7 +75,7 @@ void TubeImages::initialize()
     renderImages();
 }
 
-void TubeImages::setScale(qreal value)
+void CtImages::setScale(qreal value)
 {
     if (!qFuzzyCompare(m_scale, value)) {
         m_scale = value;
@@ -89,7 +89,7 @@ void TubeImages::setScale(qreal value)
         }
 }
 
-void TubeImages::scalePoints()
+void CtImages::scalePoints()
 {
     m_vertices[0] = QPointF(60.0, 15.5) * m_scale;
     m_vertices[1] = QPointF(66.0, 26.0) * m_scale;
@@ -97,31 +97,32 @@ void TubeImages::scalePoints()
     m_vertices[3] = QPointF(14.0, 166.0) * m_scale;
     m_vertices[4] = QPointF(14.0, 26.0) * m_scale;
     m_vertices[5] = QPointF(20.0, 15.5) * m_scale;
+
     m_tubeWidth   = 80.0 * m_scale;
     m_shiftWidth  = 100.0 * m_scale;
     m_tubeRotationWidth  = m_tubeWidth + m_shiftWidth;
     m_tubeFullWidth  = m_tubeWidth + m_shiftWidth * 2;
+
     m_tubeHeight  = 180.0 * m_scale;
     m_shiftHeight = 20.0 * m_scale;
     m_tubeFullHeight = m_tubeHeight + m_shiftHeight;
+
     m_colorWidth  = m_vertices[2].x() - m_vertices[3].x();
     m_colorHeight = (m_vertices[2].y() - m_vertices[1].y()) / 4;
     m_colorArea   = m_colorWidth * m_colorHeight;
-    m_jetWidth    = 3.0 * m_scale;
 
+    m_jetWidth    = 3.0 * m_scale;
     m_jetRect     = QRectF(
-            m_vertices[3].x() + (m_colorWidth - m_jetWidth) / 2,
-            0,
-            m_jetWidth,
-            0);
+                m_vertices[3].x() + (m_colorWidth - m_jetWidth) / 2,
+                0, m_jetWidth, 0);
 }
 
-QRectF TubeImages::scaleRect(QRectF rect)
+QRectF CtImages::scaleRect(QRectF rect)
 {
     return QRectF(rect.topLeft() * m_scale, rect.size() * m_scale);
 }
 
-QRectF TubeImages::colorRect(quint8 index)
+QRectF CtImages::colorRect(quint8 index)
 {
     return QRectF(m_vertices[3].x(),
             m_vertices[3].y() - m_colorHeight * (index+1),
@@ -129,7 +130,7 @@ QRectF TubeImages::colorRect(quint8 index)
             m_colorHeight);
 }
 
-void TubeImages::renderImages()
+void CtImages::renderImages()
 {
     QRectF elementRect; // rect of the every element in SVG
     QPointF startPoint; // top left point of the elementRect
@@ -264,7 +265,7 @@ void TubeImages::renderImages()
     m_cork->convertFromImage(corkImage);
 }
 
-qreal TubeImages::tiltAngle(uint index)
+qreal CtImages::tiltAngle(uint index)
 {
     if (index <= 4 * CT_TUBE_STEPS_POUR)
         return m_tiltAngles[index];
@@ -288,7 +289,7 @@ qreal triangleArea(qreal lineLength, qreal angle1, qreal angle2)
     return lineLength * lineLength * qSin(angle1) * qSin(angle2) / qSin(angle1 + angle2) / 2.0;
 }
 
-void TubeImages::calculateTiltAngles()
+void CtImages::calculateTiltAngles()
 {
     qreal l01 = lineLength(m_vertices[0], m_vertices[1]);
     qreal l02 = lineLength(m_vertices[0], m_vertices[2]);
@@ -397,7 +398,7 @@ void TubeImages::calculateTiltAngles()
 
 }
 
-bool TubeImages::loadTiltAngles()
+bool CtImages::loadTiltAngles()
 {
     QJsonObject jObj, jAngles;
 
@@ -444,7 +445,7 @@ bool TubeImages::loadTiltAngles()
     return result;
 }
 
-bool TubeImages::saveTiltAngles()
+bool CtImages::saveTiltAngles()
 {
     // creates json
     QJsonObject jItem;

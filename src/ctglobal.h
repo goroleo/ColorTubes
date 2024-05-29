@@ -50,9 +50,9 @@ static const quint8  CT_STATE_FILLED     = 2;            // all 4 color cells ar
 static const quint8  CT_STATE_DONE       = 3;            // all 4 color cells are filled with the same color
 
 class Game;
-class Io;
-class TubeImages;
-class Palette;
+class CtIo;
+class CtImages;
+class CtPalette;
 class BoardModel;
 
 namespace CtGlobal
@@ -62,9 +62,9 @@ namespace CtGlobal
 
     // set of global singletons
     Game & game();
-    Io & io();
-    TubeImages & images();
-    Palette & palette();
+    CtIo & io();
+    CtImages & images();
+    CtPalette & palette();
 
     // files
     QString localFileName(QString fName);

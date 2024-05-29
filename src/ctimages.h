@@ -1,19 +1,19 @@
-#ifndef TUBEIMAGES_H
-#define TUBEIMAGES_H
+#ifndef CTIMAGES_H
+#define CTIMAGES_H
 
 #include <QtGlobal>
 #include <QtSvg/QSvgRenderer>
 #include <QPixmap>
 
 // Qt is not supported SVG transparency masks. So we have to render them manually.
-class TubeImages : public QObject
+class CtImages : public QObject
 {
     Q_OBJECT
 public:
-    static TubeImages & create();
-    static TubeImages & instance();
+    static CtImages & create();
+    static CtImages & instance();
 
-    ~TubeImages();
+    ~CtImages();
 
     // images
     QPixmap   bottle() {return *m_bottle;}
@@ -61,10 +61,10 @@ signals:
     void      scaleChanged(qreal newScale);
 
 private:
-    explicit  TubeImages(QObject *parent = nullptr);
+    explicit  CtImages(QObject *parent = nullptr);
 
     void      initialize();
-    static    TubeImages * m_instance;
+    static    CtImages * m_instance;
 
     void      scalePoints();
     void      renderImages();
@@ -109,4 +109,4 @@ private:
 //    qreal       triangleArea(qreal lineLength, qreal angle1, qreal angle2);
 };
 
-#endif // TUBEIMAGES_H
+#endif // CTIMAGES_H

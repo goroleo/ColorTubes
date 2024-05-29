@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef CTIO_H
+#define CTIO_H
 
 #include <QJsonObject>
 
@@ -7,12 +7,12 @@
  * \brief The Input-Output Singleton class
  */
 
-class Io
+class CtIo
 {
 public:
-    static Io & create();
-    static Io & instance();
-    ~Io();
+    static CtIo & create();
+    static CtIo & instance();
+    ~CtIo();
 
     QString localDir() {return m_dir;}
     QString localFileName(QString fName) {return m_dir + m_sep + fName;}
@@ -31,12 +31,12 @@ public:
 
     bool created();
 private:
-    Io() {};
+    CtIo() {};
     void initialize();
 
-    static Io * m_instance;
+    static CtIo * m_instance;
     QString m_dir;
     QString m_sep;
 };
 
-#endif // IO_H
+#endif // CTIO_H

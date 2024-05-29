@@ -4,7 +4,7 @@
 #include <QtDebug>
 
 #include "src/ctglobal.h"
-#include "src/tubeimages.h"
+#include "src/ctimages.h"
 
 ShadeLayer::ShadeLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent),

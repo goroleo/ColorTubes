@@ -3,18 +3,18 @@
 #include <QString>
 #include <QDebug>
 
-#include "io.h"
-#include "palette.h"
-#include "tubeimages.h"
+#include "ctio.h"
+#include "ctpalette.h"
+#include "ctimages.h"
 #include "game.h"
 
 int game_mode = CT_END_GAME;
 bool created = false;
 
 extern Game m_game;
-extern Io m_io;
-extern TubeImages m_images;
-extern Palette m_palette;
+extern CtIo m_io;
+extern CtImages m_images;
+extern CtPalette m_palette;
 
 void CtGlobal::create()
 {
@@ -31,9 +31,9 @@ void CtGlobal::destroy()
 {
     created = false;
     m_game.instance().~Game();
-    m_images.instance().~TubeImages();
-    m_palette.instance().~Palette();
-    m_io.instance().~Io();
+    m_images.instance().~CtImages();
+    m_palette.instance().~CtPalette();
+    m_io.instance().~CtIo();
 }
 
 int CtGlobal::gameMode()
@@ -51,12 +51,12 @@ BoardModel * CtGlobal::board()
     return m_game.instance().boardModel();
 }
 
-Io& CtGlobal::io()
+CtIo& CtGlobal::io()
 {
     return m_io.instance();
 }
 
-Palette& CtGlobal::palette()
+CtPalette& CtGlobal::palette()
 {
     return m_palette.instance();
 }
@@ -66,7 +66,7 @@ QColor CtGlobal::paletteColor(quint8 colorIndex)
     return m_palette.instance().getColor(colorIndex);
 }
 
-TubeImages& CtGlobal::images()
+CtImages& CtGlobal::images()
 {
     return m_images.instance();
 }

@@ -1,7 +1,7 @@
 #include "game.h"
 
 #include "src/ctglobal.h"
-#include "src/io.h"
+#include "src/ctio.h"
 
 #include "core/jctlformat.h"
 #include "core/boardmodel.h"

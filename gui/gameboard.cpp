@@ -2,7 +2,7 @@
 
 #include "src/ctglobal.h"
 #include "tubeitem.h"
-#include "src/tubeimages.h"
+#include "src/ctimages.h"
 #include "src/game.h"
 #include "core/boardmodel.h"
 

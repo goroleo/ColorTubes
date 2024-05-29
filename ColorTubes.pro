@@ -29,10 +29,10 @@ SOURCES += src/ColorTubes.cpp \
     gui/shadelayer.cpp \
     gui/tubeitem.cpp \
     src/ctglobal.cpp \
-    src/io.cpp \
-    src/game.cpp \
-    src/palette.cpp  \
-    src/tubeimages.cpp
+    src/ctimages.cpp \
+    src/ctio.cpp \
+    src/ctpalette.cpp \
+    src/game.cpp
 
 DISTFILES += qml/ColorTubes.qml \
     qml/cover/CoverPage.qml \
@@ -75,10 +75,10 @@ HEADERS += \
     gui/shadelayer.h \
     gui/tubeitem.h \
     src/ctglobal.h \
-    src/io.h \
-    src/game.h \
-    src/palette.h \
-    src/tubeimages.h
+    src/ctimages.h \
+    src/ctio.h \
+    src/ctpalette.h \
+    src/game.h
 
 RESOURCES += \
     ColorTubes.qrc

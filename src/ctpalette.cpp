@@ -1,30 +1,30 @@
-#include "palette.h"
+#include "ctpalette.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDebug>
 
 #include "ctglobal.h"
-#include "io.h"
+#include "ctio.h"
 
-Palette* Palette::m_instance = nullptr;
+CtPalette* CtPalette::m_instance = nullptr;
 
-Palette& Palette::create()
+CtPalette& CtPalette::create()
 {
     return instance();
 }
 
-Palette& Palette::instance()
+CtPalette& CtPalette::instance()
 {
     if (m_instance == nullptr) {
-        m_instance = new Palette();
+        m_instance = new CtPalette();
         m_instance->initialize();
         qDebug() << "Palette created";
     }
     return *m_instance;
 }
 
-void Palette::initialize()
+void CtPalette::initialize()
 {
     m_items = new quint32[CT_NUM_OF_COLORS];
     for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
@@ -36,7 +36,7 @@ void Palette::initialize()
     }
 }
 
-Palette::~Palette()
+CtPalette::~CtPalette()
 {
     qDebug() << "Palette destroyed";
     save();
@@ -44,29 +44,29 @@ Palette::~Palette()
     m_instance = nullptr;
 }
 
-int Palette::size()
+int CtPalette::size()
 {
     return CT_NUM_OF_COLORS;
 }
 
-QColor Palette::getColor(int index)
+QColor CtPalette::getColor(int index)
 {
     if (index == 0) {
-        return m_background;
+        return QColor((quint32) 0);
     } else if ((index > 0) && (index <= CT_NUM_OF_COLORS)) {
         return QColor(m_items[index - 1]);
     } else
         return nullptr;
 }
 
-void Palette::setColor(int index, quint32 rgb)
+void CtPalette::setColor(int index, quint32 rgb)
 {
     if ((index > 0) && (index <= CT_NUM_OF_COLORS)) {
         m_items[index - 1] = rgb;
     }
 }
 
-void Palette::setDefault()
+void CtPalette::setDefault()
 {
     m_items[0] = 0xff38ff4d; // 1
     m_items[1] = 0xff1dd3f4; // 2
@@ -80,11 +80,11 @@ void Palette::setDefault()
     m_items[9] = 0xffe60f04; // 10
     m_items[10] = 0xffff7abc; // 11
     m_items[11] = 0xffffeb04; // 12
-    m_background = QColor(0xff282828);
+//    m_background = QColor(0xff282828);
 //    m_dialogColor = QColor(0xff1c1127);
 }
 
-bool Palette::load()
+bool CtPalette::load()
 {
     QJsonObject jObj;
 
@@ -121,7 +121,8 @@ bool Palette::load()
         }
     } // end process palette
 
-    // process system colors
+/*
+ *     // process system colors
     result = result && jObj.contains("colors") && jObj["colors"].isObject();
     if (result) {
         QJsonObject jColors = jObj["colors"].toObject();
@@ -136,7 +137,7 @@ bool Palette::load()
         } else
             result = false;
 
-/*
+
         // dialog color
         if (result && jColors.contains("dialog") && jColors["dialog"].isString()) {
             value = jColors["dialog"].toString();
@@ -146,13 +147,14 @@ bool Palette::load()
                 result = false;
         } else
             result = false;
-*/
+
 
     }
+*/
     return result;
 }
 
-bool Palette::save()
+bool CtPalette::save()
 {
     // creates json
     QJsonObject jItem;
@@ -167,12 +169,12 @@ bool Palette::save()
     }
     jObj["palette"] = jItem;
 
-    jItem = QJsonObject();
+//    jItem = QJsonObject();
 
     // adds system colors
-    jItem["background"] = CtGlobal::colorRgbToStr(m_background.rgb());
+//    jItem["background"] = CtGlobal::colorRgbToStr(m_background.rgb());
 //    jItem["dialog"] = CtGlobal::colorRgbToStr(m_dialogColor.rgb());;
-    jObj["colors"] = jItem;
+//    jObj["colors"] = jItem;
 
     // save
     return CtGlobal::io().saveJson(CtGlobal::paletteFileName(), jObj);

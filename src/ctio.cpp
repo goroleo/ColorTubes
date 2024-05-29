@@ -1,4 +1,4 @@
-#include "io.h"
+#include "ctio.h"
 #include "sailfishapp.h"
 
 #include <QIODevice>
@@ -9,35 +9,35 @@
 
 #include <QDebug>
 
-Io * Io::m_instance = nullptr;
+CtIo * CtIo::m_instance = nullptr;
 
-Io::~Io()
+CtIo::~CtIo()
 {
     qDebug() << "IO destroyed";
     m_instance = nullptr;
 }
 
-Io & Io::create()
+CtIo & CtIo::create()
 {
     return instance();
 }
 
-Io & Io::instance()
+CtIo & CtIo::instance()
 {
     if (m_instance == nullptr) {
-        m_instance = new Io();
+        m_instance = new CtIo();
         m_instance->initialize();
         qDebug() << "IO created";
     }
     return * m_instance;
 }
 
-bool Io::created()
+bool CtIo::created()
 {
     return m_instance != nullptr;
 }
 
-void Io::initialize()
+void CtIo::initialize()
 {
     QDir qdir;
     m_sep = qdir.separator();
@@ -52,7 +52,7 @@ void Io::initialize()
     qDebug() << "Application path:" << m_dir;
 }
 
-bool Io::loadJson(QString fName, QJsonObject &jsonObj)
+bool CtIo::loadJson(QString fName, QJsonObject &jsonObj)
 {
     QFile loadFile(fName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
@@ -67,7 +67,7 @@ bool Io::loadJson(QString fName, QJsonObject &jsonObj)
     return true;
 }
 
-bool Io::saveJson(QString fName, QJsonObject &jsonObj)
+bool CtIo::saveJson(QString fName, QJsonObject &jsonObj)
 {
     QFile saveFile(fName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
@@ -79,7 +79,7 @@ bool Io::saveJson(QString fName, QJsonObject &jsonObj)
     return true;
 }
 
-bool Io::loadGame(QString fName, QByteArray &buffer)
+bool CtIo::loadGame(QString fName, QByteArray &buffer)
 {
     QFile loadFile(fName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
@@ -91,7 +91,7 @@ bool Io::loadGame(QString fName, QByteArray &buffer)
     return true;
 }
 
-bool Io::saveGame(QString fName, QByteArray &buffer)
+bool CtIo::saveGame(QString fName, QByteArray &buffer)
 {
     QFile saveFile(fName);
     if (!saveFile.open(QIODevice::WriteOnly)) {

@@ -1,7 +1,7 @@
 #include "tubeitem.h"
 
 #include "src/ctglobal.h"
-#include "src/tubeimages.h"
+#include "src/ctimages.h"
 
 #include "core/tubemodel.h"
 #include "bottlelayer.h"

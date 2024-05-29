@@ -6,7 +6,7 @@
 #include <QtMath>
 
 #include "src/ctglobal.h"
-#include "src/tubeimages.h"
+#include "src/ctimages.h"
 #include "tubeitem.h"
 
 BottleLayer::BottleLayer(TubeItem * parent) :
