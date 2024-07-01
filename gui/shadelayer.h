@@ -1,4 +1,4 @@
-#ifndef SHADELAYER_H
+﻿#ifndef SHADELAYER_H
 #define SHADELAYER_H
 
 #include <QObject>
@@ -10,43 +10,36 @@
 class ShadeLayer : public QQuickPaintedItem
 {
     Q_OBJECT
-    Q_PROPERTY(int shade READ shade WRITE setShade NOTIFY shadeChanged)
-    Q_PROPERTY(bool visible READ isVisible )
-    Q_PROPERTY(bool pulse READ pulse WRITE setPulse NOTIFY pulseChanged)
 
 public:
     explicit ShadeLayer(QQuickItem *parent = 0);
     ~ShadeLayer();
 
-    void paint(QPainter *painter) override;
+    bool        isVisible();
+    int         shade();
+    bool        pulse();
 
-    qreal scale();
-    int shade();
-    bool isVisible();
-    bool pulse();
+    void        startShow();
+    void        startHide();
+    void        hideImmediately();
+    void        startPulse();
+    void        stopPulse();
 
-    void startShow();
-    void startHide();
-    void hideImmediately();
-    void startPulse();
-    void stopPulse();
+    void        setShade(int newShadeNumber);
+    void        setShadeAfterHide(int newShadeNumber);
 
-    void setShadeAfterHiding(int newShadeNumber);
-
-public slots:
-    void setShade(int newShadeNumber);
-    void setPulse(bool value);
+    void        setPulse(bool value);
 
 signals:
-    void shadeChanged(const int newShadeNumber);
-    void pulseChanged(const bool newPulse);
+    void        pulseChanged(const bool newPulse);
 
 private slots:
-    void onScaleChanged();
+    void        onScaleChanged();
 
 private:
-    void nextAlpha();
-    void prepareImage();
+    void        nextFrame();
+    void        paintFrame();
+    void        paint(QPainter * painter) override;
 
     quint8      m_shadeNumber = 0;
     quint8      m_shadeAfterHiding = 0;
@@ -55,11 +48,10 @@ private:
 
     qreal       m_alpha = 0;
     qreal       m_alphaIncrement;
-    QTimer      *shadingTimer;
+    QTimer    * m_timer;
 
     QImage      m_shadeImage;
     QImage      m_drawImage;
-
 };
 
 #endif // SHADELAYER_H

@@ -1,4 +1,4 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import Sailfish.Silica 1.0
 import GameBoard 1.0
 import FlowerLayer 1.0
@@ -42,10 +42,8 @@ Page {
                 onClicked: {
                     console.log("[NewGame] button pressed")
                     questionNumber = 1
-                    messagePanel.messageText
-                            = qsTr("Do you want to start this level again?")
-                    messagePanel.buttonText
-                            = qsTr("Yes")
+                    messagePanel.messageText = qsTr("#wantToStartAgain")
+                    messagePanel.buttonText = qsTr("Yes")
                     messagePanel.enabled = true
                 }
             }
@@ -67,10 +65,8 @@ Page {
                 onClicked: {
                     questionNumber = 3
                     console.log("[Solve] button clicked")
-                    messagePanel.messageText
-                            = qsTr("I will try to find a solution to this game, but it can take some time.\nDo you want to get started?")
-                    messagePanel.buttonText
-                            = qsTr("Unavailable now")
+                    messagePanel.messageText = qsTr("#wantToSolve")
+                    messagePanel.buttonText = qsTr("#unavailable")
                     messagePanel.enabled = true
                 }
             }
@@ -80,10 +76,8 @@ Page {
                 source: "qrc:/img/icon-gear.svg"
                 onClicked: {
                     questionNumber = 4
-                    messagePanel.messageText
-                            = qsTr("Application settings will be here")
-                    messagePanel.buttonText
-                            = qsTr("I see")
+                    messagePanel.messageText = qsTr("#settings")
+                    messagePanel.buttonText = qsTr("I see")
                     messagePanel.enabled = true
                     console.log("[Settings] button clicked")
                 }
@@ -93,7 +87,7 @@ Page {
         Text {
             id: levelNumber
 
-            text: qsTr("Level") + " " + "145"
+            text: qsTr("#level") + " " + board.level
 
             width: parent.width
             anchors.top: topMenu.bottom
@@ -114,7 +108,12 @@ Page {
             width: parent.width
             enabled: true
             opacity: enabled ? 1.0 : 0.0
-            Behavior on opacity { FadeAnimator {} }
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutBack
+                }
+            }
             onSolved: {
                 congratsPanel.enabled = true
             }
@@ -123,19 +122,21 @@ Page {
 
     CongratsPanel {
         id: congratsPanel
+        onClicked: {
+            board.randomFill()
+        }
     }
 
     MessagePanel {
         id: messagePanel
         onAccepted: {
-            console.log("Accepted.", "question=", questionNumber)
+            console.log("Question", questionNumber, "accepted.")
             switch (questionNumber) {
             case 1: board.startAgain(); return;
             case 2: board.undoMove(); return;
             case 3:
             case 4:
             }
-
         }
         onRejected: {
             console.log("Rejected")

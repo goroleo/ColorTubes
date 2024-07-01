@@ -1,10 +1,13 @@
-#include "boardmodel.h"
+﻿#include "boardmodel.h"
 #include "src/ctglobal.h"
+#include "src/game.h"
+#include "core/usedcolors.h"
+#include "core/jctlformat.h"
 
 BoardModel::BoardModel()
 {
-    m_moves = new GameMoves;
-    m_tubes = new GameTubes;
+    m_moves = new MoveItems;
+    m_tubes = new TubeModels;
 }
 
 BoardModel::BoardModel(BoardModel * parentBoard)
@@ -54,9 +57,7 @@ void BoardModel::clearMoves()
 
 MoveItem * BoardModel::currentMove()
 {
-    if (!m_moves->empty())
-        return (m_moves->last());
-    return nullptr;
+    return (m_moves->current());
 }
 
 void BoardModel::deleteCurrentMove()
@@ -243,12 +244,12 @@ quint32 BoardModel::addNewMove(int tubeFromIndex, int tubeToIndex)
 
 quint32 BoardModel::undoMove()
 {
-    MoveItem * current = currentMove();
-    if (current) {
-        quint32 result = current->stored();
-        for (int i = 0; i < current->count(); ++i) {
-            m_tubes->at(current->tubeTo())->extractColor();
-            m_tubes->at(current->tubeFrom())->putColor(current->color());
+    MoveItem * move = currentMove();
+    if (move) {
+        quint32 result = move->stored();
+        for (int i = 0; i < move->count(); ++i) {
+            m_tubes->at(move->tubeTo())->extractColor();
+            m_tubes->at(move->tubeFrom())->putColor(move->color());
         }
         deleteCurrentMove();
         return result;
@@ -258,13 +259,50 @@ quint32 BoardModel::undoMove()
 
 void BoardModel::startAgain()
 {
-    MoveItem * current;
+    MoveItem * move;
     while (currentMove()) {
-        current = currentMove();
-        for (int i=0; i < current->count(); ++i) {
-            m_tubes->at(current->tubeTo())->extractColor();
-            m_tubes->at(current->tubeFrom())->putColor(current->color());
+        move = currentMove();
+        for (int i=0; i < move->count(); ++i) {
+            m_tubes->at(move->tubeTo())->extractColor();
+            m_tubes->at(move->tubeFrom())->putColor(move->color());
         }
         deleteCurrentMove();
     }
+}
+
+void BoardModel::randomFill(int fillTubes, int emptyTubes)
+{
+    do {
+        clear();
+        CtGlobal::game().usedColors()->clearAllUsed();
+
+        m_rootBoard = this;
+        for (int i = 0; i < fillTubes + emptyTubes; ++i)
+            addNewTube();
+
+        for (int i = 0; i < fillTubes; ++i) {
+            for (int c = m_tubes->at(i)->count(); c < 4; ++c) {
+                quint8 clr = CtGlobal::game().usedColors()->getRandomColor();
+                m_tubes->at(i)->putColor(clr);
+                CtGlobal::game().usedColors()->incUsed(clr);
+                if (CtGlobal::game().usedColors()->numberOfUsedColors() >= fillTubes) {
+                    CtGlobal::game().usedColors()->disableUnusedColors();
+                }
+            }
+        }
+   } while (!checkBoard());
+}
+
+bool BoardModel::checkBoard()
+{
+    if (m_tubes->isEmpty())
+        return false;
+    int i = 0;
+    while (i < m_tubes->size()) {
+        if (m_tubes->at(i)->isDone())
+            return false;
+        i++;
+    }
+    CtGlobal::game().jctl()->storeGame(this);
+    return CtGlobal::game().jctl()->checkTubes();
 }

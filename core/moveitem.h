@@ -53,6 +53,10 @@ private:
     BoardModel * m_boardAfter = nullptr;
 };
 
-class GameMoves: public QVector<MoveItem*>{};
+class MoveItems: public QVector<MoveItem*>{
+public:
+    void sortByRank();
+    MoveItem * current();
+};
 
 #endif // MOVEITEM_H

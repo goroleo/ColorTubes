@@ -1,4 +1,4 @@
-#include "bottlelayer.h"
+﻿#include "bottlelayer.h"
 
 #include <QPixmap>
 #include <QPainter>
@@ -51,7 +51,7 @@ void BottleLayer::paint(QPainter *painter)
 
         painter->drawPixmap(
                     CtGlobal::images().shiftWidth(),
-                    m_startY + CtGlobal::images().shiftHeight() - m_tube->m_verticalShift,
+                    CtGlobal::images().shiftHeight() + m_startY - m_tube->m_verticalShift,
                     m_drawPixMap);
     }
 }

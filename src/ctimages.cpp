@@ -1,4 +1,4 @@
-#include "ctimages.h"
+﻿#include "ctimages.h"
 
 #include <QImage>
 #include <QtMath>
@@ -57,7 +57,7 @@ CtImages& CtImages::instance()
 void CtImages::initialize()
 {
     m_tiltAngles = new qreal[(CT_TUBE_STEPS_POUR << 2) + 1];
-    anglesCalculated = false;
+    anglesExist = false;
 
     m_source = new QSvgRenderer(QLatin1String(":/img/tube.svg"));
     m_bottle = new QPixmap;
@@ -83,7 +83,7 @@ void CtImages::setScale(qreal value)
         renderImages();
         emit scaleChanged(m_scale);
     }
-    if (!anglesCalculated)
+    if (!anglesExist)
         if (!loadTiltAngles()) {
             calculateTiltAngles();
         }
@@ -91,6 +91,19 @@ void CtImages::setScale(qreal value)
 
 void CtImages::scalePoints()
 {
+/*
+           5 +  neck  + 0
+            /          \
+           /            \
+        4 +              + 1
+          |              |
+          |     tube     |
+          |              |
+        3 + ------------ + 2
+
+        (see /img/tube.svg)
+*/
+
     m_vertices[0] = QPointF(60.0, 15.5) * m_scale;
     m_vertices[1] = QPointF(66.0, 26.0) * m_scale;
     m_vertices[2] = QPointF(66.0, 166.0) * m_scale;
@@ -139,7 +152,6 @@ void CtImages::renderImages()
                  m_source->defaultSize().rheight() * m_scale,
                  QImage::Format_ARGB32);
     QPainter painter(&image);
-
     image.fill(0x00ffffff);
 
 //----------------- shine
@@ -272,84 +284,90 @@ qreal CtImages::tiltAngle(uint index)
     return 0.0;
 }
 
-qreal lineLength(QPointF p1, QPointF p2)
-{
-    return sqrt((p2.x() - p1.x()) * (p2.x() - p1.x())
-                + (p2.y() - p1.y()) * (p2.y() - p1.y()));
-}
-
-qreal lineAngle(QPointF p1, QPointF p2)
-{
-    return atan2(p2.y() - p1.y(), p2.x() - p1.x());
-}
-
-qreal triangleArea(qreal lineLength, qreal angle1, qreal angle2)
-{
-    // triangle area by one side and two angles adjacent to it (ASA, angle-side-angle)
-    return lineLength * lineLength * qSin(angle1) * qSin(angle2) / qSin(angle1 + angle2) / 2.0;
-}
-
 void CtImages::calculateTiltAngles()
 {
+/*
+    The tube rotates clockwise around point 0 and pours out its colors at this point.
+    The area filled with colors depends on the rotation/tilt angle.
+    Each of 4 colors is poured out evenly in <CT_TUBE_STEPS_POUR> steps. (see CtGlobal)
+    This routine calculates each tilt angle for each step.
+
+    Based on 4 triangles inside the tube: 504, 403, 302, 201.
+
+           5 +  neck  + 0
+            /          \
+           /            \
+        4 +              + 1
+          |              |
+          |     tube     |
+          |              |
+        3 + ------------ + 2
+*/
+
+//  l01 - line between point 0 and point 1;
+//  l02 - line between point 0 and point 2, etc.
     qreal l01 = lineLength(m_vertices[0], m_vertices[1]);
     qreal l02 = lineLength(m_vertices[0], m_vertices[2]);
     qreal l03 = lineLength(m_vertices[0], m_vertices[3]);
     qreal l04 = lineLength(m_vertices[0], m_vertices[4]);
 
-    qreal a201 = CT_PI - lineAngle(m_vertices[0], m_vertices[1]);
-    qreal a302 = CT_PI - lineAngle(m_vertices[0], m_vertices[2]);
-    qreal a403 = CT_PI - lineAngle(m_vertices[0], m_vertices[3]);
-    qreal a504 = CT_PI - lineAngle(m_vertices[0], m_vertices[4]);
+//  a501 - angle at point 0 between line l50 (l05) and line l01, etc.
+    qreal a501 = - lineAngle(m_vertices[1], m_vertices[0]);
+    qreal a502 = - lineAngle(m_vertices[2], m_vertices[0]);
+    qreal a503 = - lineAngle(m_vertices[3], m_vertices[0]);
+    qreal a504 = - lineAngle(m_vertices[4], m_vertices[0]);
 
-    qreal a012 = CT_3PI2 - a201;
-    qreal a023 = CT_PI - a302;
-    qreal a034 = CT_PI2 - a403;
-    qreal a045 = CT_PI - a504 - a201;
+//  a012 - angle at point 1 between line l01 and line l12, etc.
+    qreal a012 = CT_3PI2 - a501;
+    qreal a023 = CT_PI - a502;
+    qreal a034 = CT_PI2 - a503;
+    qreal a045 = CT_PI - a504 - a501;
 
     struct Triangle {
         qreal side;     // side length
-        qreal angle0;   // side angle from the origin
+        qreal angleZ;   // Zero Angle - side angle from the origin
         qreal angle1;   // first angle adjacent to side
         qreal angle2;   // second angle adjacent to side
         qreal area;     // triangle area
     };
-
     Triangle triangles[4];
 
+//  Triangle 504
     triangles[0].side = l04;
-    triangles[0].angle0 = 0;
+    triangles[0].angleZ = 0;
     triangles[0].angle1 = a504;
     triangles[0].angle2 = a045;
     triangles[0].area = triangleArea(triangles[0].side, triangles[0].angle1, triangles[0].angle2);
 
+//  Triangle 403
     triangles[1].side = l03;
-    triangles[1].angle0 = a504;
-    triangles[1].angle1 = a403 - a504;
+    triangles[1].angleZ = a504;
+    triangles[1].angle1 = a503 - a504;
     triangles[1].angle2 = a034;
     triangles[1].area = triangleArea(triangles[1].side, triangles[1].angle1, triangles[1].angle2);
 
+//  Triangle 302
     triangles[2].side = l02;
-    triangles[2].angle0 = a403;
-    triangles[2].angle1 = a302 - a403;
+    triangles[2].angleZ = a503;
+    triangles[2].angle1 = a502 - a503;
     triangles[2].angle2 = a023;
     triangles[2].area = triangleArea(triangles[2].side, triangles[2].angle1, triangles[2].angle2);
 
+//  Triangle 201
     triangles[3].side = l01;
-    triangles[3].angle0 = a302;
-    triangles[3].angle1 = a201 - a302;
+    triangles[3].angleZ = a502;
+    triangles[3].angle1 = a501 - a502;
     triangles[3].angle2 = a012;
     triangles[3].area = triangleArea(triangles[3].side, triangles[3].angle1, triangles[3].angle2);
 
-    qreal expectedArea;
-
-    int i = 0;
-    qreal currentAngle = 0;
-    qreal trianglesArea;
-    qreal currentArea;
-
+    qreal currentAngle = 0.0;
     qreal angleIncrement;
 
-    do {
+    qreal expectedArea;    // colors area at each step
+    qreal baseArea;        // area of triangles which are laid below the current angle completely
+    qreal calculatedArea;  // colors area at current angle
+
+    for (int i = 0; i < CT_TUBE_STEPS_POUR * 4; ++i) {
 
         angleIncrement = 0.5 * CT_DEG2RAD;
         expectedArea = (CtGlobal::images().colorArea() * 4)
@@ -359,43 +377,41 @@ void CtImages::calculateTiltAngles()
         do {
             int triangleNumber = 3;
 
-            trianglesArea = 0.0;
-            while ((currentAngle < triangles[triangleNumber].angle0) && (triangleNumber > 0)) {
-                trianglesArea += triangles[triangleNumber].area;
+            baseArea = 0.0;
+            while ((currentAngle < triangles[triangleNumber].angleZ) && (triangleNumber > 0)) {
+                baseArea += triangles[triangleNumber].area;
                 triangleNumber --;
             }
 
-            currentArea = trianglesArea
+            calculatedArea = baseArea
                     + triangleArea(triangles[triangleNumber].side,
-                                   triangles[triangleNumber].angle1 - (currentAngle - triangles[triangleNumber].angle0),
+                                   triangles[triangleNumber].angle1 - (currentAngle - triangles[triangleNumber].angleZ),
                                    triangles[triangleNumber].angle2);
 
             if (qFuzzyIsNull(angleIncrement / 2.0))  {
-                currentArea = expectedArea;
+                calculatedArea = expectedArea;
             }
 
-            if (!qFuzzyCompare(currentArea, expectedArea)) {
-                if (currentArea < expectedArea) {
+            if (!qFuzzyCompare(calculatedArea, expectedArea)) {
+                if (calculatedArea < expectedArea) {
                     currentAngle -= angleIncrement;
-                    angleIncrement = angleIncrement / 2.0;
+                    angleIncrement /= 2.0;
                 } else
                     currentAngle += angleIncrement;
             }
 
-        } while (!qFuzzyCompare(currentArea, expectedArea));
+        } while (!qFuzzyCompare(calculatedArea, expectedArea));
 
-        m_tiltAngles[(CT_TUBE_STEPS_POUR << 2) - i] = currentAngle;
-        i++;
+        m_tiltAngles[(CT_TUBE_STEPS_POUR * 4) - i] = currentAngle;
+    }
 
-    } while (!qFuzzyIsNull(expectedArea));
-
+    m_tiltAngles[0] = a501;
     m_tiltAngles[1] = (m_tiltAngles[0] + m_tiltAngles[2]) / 2;
 
-    anglesCalculated = true;
-    qDebug() << i << "tilt angles were calculated";
+    anglesExist = true;
+    qDebug() << (CT_TUBE_STEPS_POUR * 4) + 1 << "tilt angles were calculated";
 
     saveTiltAngles();
-
 }
 
 bool CtImages::loadTiltAngles()
@@ -431,17 +447,21 @@ bool CtImages::loadTiltAngles()
                 value = jAngles[key].toString();
                 m_tiltAngles[i] = value.toDouble(&result) * CT_DEG2RAD;
                 if (!result)
-                    qDebug() << key << "cannot read";
+                    qDebug() << "Cannot read value at" << key;
+            } else {
+                qDebug() << "Cannot find the key" << key;
             }
             i++;
         }
     }
 
     if (result) {
-        anglesCalculated = true;
-        qDebug() << CT_TUBE_STEPS_POUR * 4 + 1 << "tilt angles were restored";
+        qDebug() << CT_TUBE_STEPS_POUR * 4 + 1 << "tilt angles were restored from" << CtGlobal::io().anglesFileName();
+    } else {
+        qDebug() << "Error while loading tilt angles from" << CtGlobal::io().anglesFileName();
     }
 
+    anglesExist = result;
     return result;
 }
 
@@ -470,4 +490,21 @@ bool CtImages::saveTiltAngles()
     }
 
     return false;
+}
+
+qreal CtImages::lineLength(QPointF p1, QPointF p2)
+{
+    return sqrt((p2.x() - p1.x()) * (p2.x() - p1.x())
+                + (p2.y() - p1.y()) * (p2.y() - p1.y()));
+}
+
+qreal CtImages::lineAngle(QPointF p1, QPointF p2)
+{
+    return atan2(p2.y() - p1.y(), p2.x() - p1.x());
+}
+
+qreal CtImages::triangleArea(qreal lineLength, qreal angle1, qreal angle2)
+{
+    // triangle area by one side and two angles adjacent to it (ASA, angle-side-angle)
+    return lineLength * lineLength * qSin(angle1) * qSin(angle2) / qSin(angle1 + angle2) / 2.0;
 }

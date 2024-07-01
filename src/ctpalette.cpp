@@ -1,4 +1,4 @@
-#include "ctpalette.h"
+﻿#include "ctpalette.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -7,7 +7,7 @@
 #include "ctglobal.h"
 #include "ctio.h"
 
-CtPalette* CtPalette::m_instance = nullptr;
+CtPalette * CtPalette::m_instance = nullptr;
 
 CtPalette& CtPalette::create()
 {

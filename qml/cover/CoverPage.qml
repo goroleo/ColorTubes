@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import Sailfish.Silica 1.0
 import GameBoard 1.0
 
@@ -10,7 +10,7 @@ CoverBackground {
         width: parent.width
         anchors.top: parent.top
         anchors.topMargin: Theme.horizontalPageMargin
-        text: qsTr("Color Tubes")
+        text: qsTr("#ColorTubes")
         wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignTop

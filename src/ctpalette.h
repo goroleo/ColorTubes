@@ -1,4 +1,4 @@
-#ifndef CTPALETTE_H
+﻿#ifndef CTPALETTE_H
 #define CTPALETTE_H
 
 #include <QtGlobal>
@@ -11,18 +11,18 @@ public:
     static CtPalette & instance();
     ~CtPalette();
 
-    int size();
+    int    size();
 
     QColor getColor(int index);
-    void setColor(int index, quint32 rgb);
+    void   setColor(int index, quint32 rgb);
 
-    void setDefault();
-    bool load();
-    bool save();
+    void   setDefault();
+    bool   load();
+    bool   save();
 
 private:
     CtPalette() {};
-    void initialize();
+    void   initialize();
     quint32 * m_items;
 
     static CtPalette * m_instance;

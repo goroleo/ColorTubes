@@ -1,4 +1,4 @@
-#ifndef TUBEITEM_H
+﻿#ifndef TUBEITEM_H
 #define TUBEITEM_H
 
 #include <QQuickItem>
@@ -13,8 +13,6 @@ class GameBoard;
 class TubeItem : public QQuickItem
 {
     Q_OBJECT
-//    Q_PROPERTY(qreal angle READ angle NOTIFY angleChanged)
-    Q_PROPERTY(int shade READ shade WRITE setShade NOTIFY shadeChanged)
 
     friend class ColorsLayer;  // the inner layer, it calculates vertical shift when rotate
     friend class BottleLayer;  // the inner layer, it uses vertical shift when rotate
@@ -26,51 +24,43 @@ public:
 
     TubeModel   * model() { return m_model; }
 
-    int           tubeIndex();
-
-    void          setPosition(const QPointF newPoint);
-    QPointF       position() {return m_regularPosition;}
-
-    bool          isDone();
-    bool          isClosed() {return m_closed;}
-    bool          isEmpty();
+    bool          isDone();                        // unused?
+    bool          isClosed() { return m_closed;}   // unused?
+    bool          isEmpty();                       // unused?
     bool          isActive();
     bool          isFlyed();
-    bool          isPouredIn();
+    bool          isPouredIn();                    // unused?
     bool          isSelected();
 
     void          refresh();
-    int           shade();
     void          setSelected(bool value);
     void          showAvailable(bool value);
     void          setClosed(bool value);
 
     quint8        currentColor();
-    quint8        colorAt(quint8 index);
     bool          canPutColor(quint8 colorNumber);
     bool          canExtractColor();
-    void          putColor(quint8 colorNumber);
-    quint8        extractColor();
 
     void          moveColorTo(TubeItem * tube);
 
-public slots:
-    void          setShade(int newShade);
-
 signals:
     void          angleChanged(const qreal newAngle);
-    void          shadeChanged(const int newShade);
 
 private slots:
     void          onScaleChanged();
+    void          onTubeStateChanged();
 
 private:
     GameBoard   * m_board;  // parent component
-    TubeModel   * m_model;  // current model
+    TubeModel   * m_model;  // this tube's model
 
     void          mousePressEvent(QMouseEvent * event);
 
-//  layers
+    int           tubeIndex();
+    quint8        colorAt(quint8 index);
+    void          setShade(int newShade);
+
+//  layers from top to bottom
     CorkLayer   * m_cork;
     BottleLayer * m_front;
     ColorsLayer * m_colors;
@@ -78,8 +68,10 @@ private:
     ShadeLayer  * m_shade;
 
 //  scale, position & rotation
-    qreal         scale() const;
+    qreal         scale() const;                           // unused?
 
+    QPointF       position() { return m_regularPosition;}  // unused?
+    void          setRegularPosition(QPointF newPoint);
     void          setCurrentPosition(QPointF newPoint);
     void          setVerticalShift(qreal yShift);
     QPointF       m_regularPosition;
@@ -89,13 +81,11 @@ private:
     qreal         angle() const;
     void          setAngle(qreal newAngle);
     qreal         m_currentAngle    = 0.0;
-
     bool          m_closed;
-
 
 //  animation frames
     void          startAnimation();         // ... with predefined (pre-calculated) parameters
-    void          currentFrame();           // calculates current frame of animation
+    void          nextFrame();              // calculates current frame of animation
 
     QTimer      * m_timer;
 

@@ -5,7 +5,6 @@
     #include <QRandomGenerator>
 #endif
 
-
 UsedColors::UsedColors()
 {
     m_items = new quint8[CT_NUM_OF_COLORS];
@@ -113,6 +112,15 @@ quint8 UsedColors::numberOfAvailableCells()
         c += (4 - m_items[i]);
     }
     return c;
+}
+
+void UsedColors::disableUnusedColors()
+{
+    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
+        if (m_items[i] == 0) {
+            m_items[i] = 4;
+        }
+    }
 }
 
 quint8 UsedColors::getRandomColor()

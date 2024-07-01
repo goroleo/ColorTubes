@@ -1,14 +1,15 @@
-#include "tubeitem.h"
+﻿#include "tubeitem.h"
 
 #include "src/ctglobal.h"
 #include "src/ctimages.h"
 
+#include "gameboard.h"
 #include "core/tubemodel.h"
-#include "bottlelayer.h"
+
 #include "corklayer.h"
+#include "bottlelayer.h"
 #include "colorslayer.h"
 #include "shadelayer.h"
-#include "gameboard.h"
 
 TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
     QQuickItem(parent),
@@ -38,11 +39,15 @@ TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, [=]() {
-        currentFrame();
+        nextFrame();
         update();
     });
 
-    setClosed(tm->isDone());
+    if (tm) {
+        QObject::connect(tm, &TubeModel::stateChanged,
+                         this, &TubeItem::onTubeStateChanged);
+        setClosed(tm->isDone());
+    }
 }
 
 TubeItem::~TubeItem()
@@ -66,7 +71,7 @@ int TubeItem::tubeIndex()
     return m_board->indexOf(this);
 }
 
-void TubeItem::setPosition(const QPointF newPoint)
+void TubeItem::setRegularPosition(QPointF newPoint)
 {
     m_regularPosition = newPoint;
     m_currentPosition = newPoint;
@@ -111,12 +116,12 @@ bool TubeItem::isActive()
 bool TubeItem::isFlyed()
 {
     return (currentStageId > CT_STAGE_SELECT)
-            && (currentStageId != CT_STAGE_POUR_IN);
+            && (currentStageId != CT_STAGE_BUSY);
 }
 
 bool TubeItem::isPouredIn()
 {
-    return currentStageId == CT_STAGE_POUR_IN;
+    return currentStageId == CT_STAGE_BUSY;
 }
 
 bool TubeItem::isSelected()
@@ -127,12 +132,7 @@ bool TubeItem::isSelected()
 void TubeItem::refresh()
 {
     m_colors->refresh();
-    setClosed(isDone());
-}
-
-int TubeItem::shade()
-{
-    return m_shade->shade();
+    setClosed(m_model->isDone());
 }
 
 void TubeItem::setShade(int newShade)
@@ -143,12 +143,11 @@ void TubeItem::setShade(int newShade)
     m_shade->setShade(newShade);
     if (newShade != 0)
         m_shade->startShow();
-    emit shadeChanged(newShade);
 }
 
 void TubeItem::setSelected(bool value)
 {
-    if (!isActive() || isEmpty())
+    if (!isActive() || m_model->isEmpty())
         return;
 
     if (value)
@@ -159,14 +158,28 @@ void TubeItem::setSelected(bool value)
 
 void TubeItem::showAvailable(bool value)
 {
-    if (isDone())
+    if (m_model->isDone())
         return;
+
     if (value) {
         if (m_shade->shade() != 2)
-            m_shade->setShadeAfterHiding(2);
+            m_shade->setShadeAfterHide(2);
     } else
         if (m_shade->shade() != 0)
             m_shade->startHide();
+}
+
+void TubeItem::onTubeStateChanged()
+{
+    setClosed(m_model->isDone());
+
+    if (m_closed) {
+        qDebug() << "Closed tube" << tubeIndex();
+        if (m_board->isSolved()) {
+            qDebug() << "!!! SOLVED !!!";
+            emit m_board->solved();
+        }
+    }
 }
 
 void TubeItem::setClosed(bool value)
@@ -175,13 +188,12 @@ void TubeItem::setClosed(bool value)
         return;
     if (value) {
         if (m_shade->shade() != 3)
-            m_shade->setShadeAfterHiding(3);
-        m_cork->setVisible(true);
+            m_shade->setShadeAfterHide(3);
     } else {
         if (m_shade->shade() != 0)
             m_shade->startHide();
-        m_cork->setVisible(false);
     }
+    m_cork->setVisible(value);
     m_closed = value;
 }
 
@@ -200,27 +212,14 @@ bool TubeItem::canPutColor(quint8 colorNum)
     return (currentStageId == CT_STAGE_DEFAULT
                 && m_model->canPutColor(colorNum))
 
-            || (currentStageId == CT_STAGE_POUR_IN
+            || (currentStageId == CT_STAGE_BUSY
                 && m_fillingColor == colorNum
                 && m_pouringCells < m_model->rest());
-}
-
-void TubeItem::putColor(quint8 colorNumber)
-{
-    m_model->putColor(colorNumber);
-    m_colors->refresh();
 }
 
 bool TubeItem::canExtractColor()
 {
     return m_model->canExtractColor();
-}
-
-quint8 TubeItem::extractColor()
-{
-    quint8 result = m_model->extractColor();
-    m_colors->refresh();
-    return result;
 }
 
 void TubeItem::moveColorTo(TubeItem * tube)
@@ -269,13 +268,13 @@ void TubeItem::startAnimation() {
     if (m_timer->isActive())
         m_timer->stop();
 
-    m_moveIncrement.setX((m_endPoint.x() - m_startPoint.x()) / steps);
-    m_moveIncrement.setY((m_endPoint.y() - m_startPoint.y()) / steps);
-    m_angleIncrement = (m_endAngle - m_startAngle) / steps;
+    m_moveIncrement.setX( (m_endPoint.x() - m_startPoint.x()) / steps);
+    m_moveIncrement.setY( (m_endPoint.y() - m_startPoint.y()) / steps);
+    m_angleIncrement = ( m_endAngle - m_startAngle ) / steps;
     m_timer->start(CT_TIMER_TICKS);
 }
 
-void TubeItem::currentFrame()
+void TubeItem::nextFrame()
 {
     if (steps > 0) {
 
@@ -338,15 +337,6 @@ void TubeItem::regularTube()
     if (m_board->selectedTube()
             && canPutColor(m_board->selectedTube()->currentColor()))
         showAvailable(true);
-
-    if (isDone()) {
-        setClosed(true);
-        qDebug() << "Closed tube" << tubeIndex();
-        if (m_board->isSolved()) {
-            qDebug() << "!!! SOLVED !!!";
-            emit m_board->solved();
-        }
-    }
 }
 
 void TubeItem::moveUp()
@@ -391,39 +381,41 @@ void TubeItem::flyTo(TubeItem * tubeTo)
     setWidth(0);
     setHeight(0);
 
+// recipient
     m_recipient = tubeTo;
     m_recipient->setShade(0);
-    m_pouringCells = qMin(m_model->sameColorCount(),
-                        tubeTo->model()->rest());
-    if (m_recipient)
-        m_recipient->connectTube(this);
+    m_pouringCells = qMin(m_model->sameColorCount(), tubeTo->model()->rest());
+    m_recipient->connectTube(this);
 
+// angles
     m_startAngle = m_currentAngle;
-
-    // end angle & rotation direction
     m_endAngle = CtGlobal::images().tiltAngle(CT_TUBE_STEPS_POUR * m_model->count());
-    bool counterClockWise = tubeTo->m_currentPosition.x() < this->m_currentPosition.x();
-    if (counterClockWise) {
-        if (tubeTo->m_currentPosition.x() + CtGlobal::tubeWidth() / 2.0
-                + CtGlobal::images().tubeRotationWidth() > m_board->width())
-            counterClockWise = false;
-    } else {
+
+// rotation direction
+    bool clockWise = this->m_currentPosition.x() < tubeTo->m_currentPosition.x();
+    if (clockWise) {
         if (tubeTo->m_currentPosition.x() + CtGlobal::tubeWidth() / 2.0
                 - CtGlobal::images().tubeRotationWidth() < 0)
-            counterClockWise = true;
+            clockWise = false;
+    } else {
+        if (tubeTo->m_currentPosition.x() + CtGlobal::tubeWidth() / 2.0
+                + CtGlobal::images().tubeRotationWidth() > m_board->width())
+            clockWise = true;
     }
-    if (counterClockWise)
+    if (!clockWise)
         m_endAngle *= -1;
 
+// coordinates
     m_startPoint = m_currentPosition;
     m_endPoint = QPointF(tubeTo->m_currentPosition.x()
                              - CtGlobal::images().vertex(5).x() * CtGlobal::sign(m_endAngle),
                          tubeTo->m_currentPosition.y()
                              - CtGlobal::images().shiftHeight() * 2);
-    steps = CT_TUBE_STEPS_FLY;
-    setZ(m_board->maxChildrenZ() + 1);
 
+    steps = CT_TUBE_STEPS_FLY;
     nextStageId = CT_STAGE_POUR_OUT;
+
+    setZ(m_board->maxChildrenZ() + 1);
     startAnimation();
 }
 
@@ -467,10 +459,10 @@ void TubeItem::connectTube(TubeItem * tubeFrom)
         return;
     m_connectedTubes ++;
     m_pouringCells += tubeFrom->m_pouringCells;
-    if (currentStageId != CT_STAGE_POUR_IN) {
+    if (currentStageId != CT_STAGE_BUSY) {
         m_fillingColor = tubeFrom->currentColor();
         m_colors->resetPourArea();
-        currentStageId = CT_STAGE_POUR_IN;
+        currentStageId = CT_STAGE_BUSY;
     }
 }
 

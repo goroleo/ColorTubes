@@ -46,25 +46,30 @@ public:
     void          deleteCurrentMove();
     quint32       undoMove();
     void          startAgain();
-    GameMoves   * moves() {return m_moves;}
+    MoveItems   * moves() {return m_moves;}
 
     int           calculateMoves();
+    QString       toString();
+
+    void          randomFill(int fillTubes, int emptyTubes);
+
+    int           level() {return m_level; }
+    void          setLevel(int newLevel) {m_level = newLevel;}
 
     bool operator == (const BoardModel &other) const;
 
-    QString toString();
-
-    void sortMoves() {
-        std::sort(m_moves->begin(), m_moves->end());
-    }
 
 private:
     BoardModel  * m_parentBoard = nullptr;
     BoardModel  * m_rootBoard = nullptr;
     MoveItem    * m_parentMove = nullptr;
 
-    GameTubes   * m_tubes;
-    GameMoves   * m_moves;
+    TubeModels  * m_tubes;
+    MoveItems   * m_moves;
+    qint32        m_level;
+
+    bool          checkBoard();
+
 };
 
 #endif // BOARDMODEL_H

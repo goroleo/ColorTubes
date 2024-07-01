@@ -1,10 +1,10 @@
-#ifndef GAMEBOARD_H
+﻿#ifndef GAMEBOARD_H
 #define GAMEBOARD_H
 
 #include <QQuickItem>
 
 class BoardModel;
-class GameMoves;
+class MoveItems;
 class TubeItem;
 class TubeItems;
 
@@ -12,6 +12,7 @@ class GameBoard : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(bool hasMoves READ hasMoves NOTIFY movesChanged)
+    Q_PROPERTY(int level READ level NOTIFY levelChanged)
 
 public:
     explicit GameBoard(QQuickItem *parent = nullptr);
@@ -21,23 +22,26 @@ public:
     int          indexOf(TubeItem * tube);
     TubeItem   * selectedTube() { return m_selectedTube; }
 
-    GameMoves  * moves();
+    MoveItems  * moves();
     void         addNewMove(TubeItem * tubeFrom, TubeItem * tubeTo);
     bool         hasMoves();
-    void         showAvailableMoves();
+    void         showAvailableTubes();
 
     void         clickTube(TubeItem * tube);
     int          maxChildrenZ();
 
     bool         isSolved();
+    int          level();
 
 signals:
     void         solved();
     void         movesChanged();
+    void         levelChanged();
 
 public slots:
     void         undoMove();
     void         startAgain();
+    void         randomFill();
 
 private slots:
     void         onScaleChanged();
@@ -48,6 +52,8 @@ private:
     void         geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
     void         mousePressEvent(QMouseEvent* event);
     qreal        scale() const;
+    void         rescale();
+
     void         placeTubes();
 
     TubeItems  * m_tubes;

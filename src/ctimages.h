@@ -1,4 +1,4 @@
-#ifndef CTIMAGES_H
+﻿#ifndef CTIMAGES_H
 #define CTIMAGES_H
 
 #include <QtGlobal>
@@ -15,43 +15,44 @@ public:
 
     ~CtImages();
 
-    // images
-    QPixmap   bottle() {return *m_bottle;}
-    QPixmap   bottleBack() {return *m_bottleBack;}
+    qreal     scale()       {return m_scale;}
+
+// scaled images of the tube
+    QPixmap   bottle()      {return *m_bottle;}
+    QPixmap   bottleBack()  {return *m_bottleBack;}
     QPixmap   bottleFront() {return *m_bottleFront;}
 
     QPixmap   shadeYellow() {return *m_shadeYellow;}
-    QPixmap   shadeGreen() {return *m_shadeGreen;}
-    QPixmap   shadeBlue() {return *m_shadeBlue;}
-    QPixmap   shadeRed() {return *m_shadeRed;}
-    QPixmap   shadeGray() {return *m_shadeGray;}
+    QPixmap   shadeGreen()  {return *m_shadeGreen;}
+    QPixmap   shadeBlue()   {return *m_shadeBlue;}
+    QPixmap   shadeRed()    {return *m_shadeRed;}
+    QPixmap   shadeGray()   {return *m_shadeGray;}
 
-    QPixmap   cork() {return *m_cork;}
+    QPixmap   cork()        {return *m_cork;}
 
-    qreal     scale() {return m_scale;}
+// scaled tube's coordinates and sizes
+//    QPointF * vertices()    {return m_vertices;}
+    QPointF   vertex(quint8 index) {return m_vertices[index];}
 
-    qreal     tubeWidth() {return m_tubeWidth;}
+    qreal     tubeWidth()   {return m_tubeWidth;}
     qreal     tubeFullWidth() {return m_tubeFullWidth;}
     qreal     tubeRotationWidth() {return m_tubeRotationWidth;}
-    qreal     shiftWidth() {return m_shiftWidth;}
-
-    qreal     tubeHeight() {return m_tubeHeight;}
+    qreal     shiftWidth()  {return m_shiftWidth;}
+    qreal     tubeHeight()  {return m_tubeHeight;}
     qreal     tubeFullHeight() {return m_tubeFullHeight;}
     qreal     shiftHeight() {return m_shiftHeight;}
-
-    QPointF * vertices() {return m_vertices;}
-    QPointF   vertex(quint8 index) {return m_vertices[index];}
 
     QRectF    colorRect(quint8 index);
     qreal     colorWidth()  {return m_colorWidth;}
     qreal     colorHeight() {return m_colorHeight;}
     qreal     colorArea()   {return m_colorArea;}
+
     qreal     jetWidth()    {return m_jetWidth;}
     qreal     jetHeight(quint8 index)
                  {return m_vertices[3].y() - m_colorHeight * index;}
-    QRectF    jetRect()    {return m_jetRect;}
-    QRectF    scaleRect (QRectF rect);
+    QRectF    jetRect()     {return m_jetRect;}
 
+// angles to rotate tube
     qreal     tiltAngle(uint index);
 
 public slots:
@@ -67,6 +68,7 @@ private:
     static    CtImages * m_instance;
 
     void      scalePoints();
+    QRectF    scaleRect (QRectF rect);
     void      renderImages();
 
     qreal     m_scale = 1.0;
@@ -92,21 +94,21 @@ private:
     qreal       m_tubeFullHeight;
     qreal       m_shiftHeight;
 
-    qreal       m_colorWidth;
-    qreal       m_colorHeight; // width of the one color cell after scaling
+    qreal       m_colorWidth;  // width of the one color cell after scaling
+    qreal       m_colorHeight;
     qreal       m_colorArea;   // colorWidth * colorHeight
     qreal       m_jetWidth;
     QRectF      m_jetRect;
 
     qreal     * m_tiltAngles;
-    bool        anglesCalculated = false;
+    bool        anglesExist = false;
     void        calculateTiltAngles();
     bool        loadTiltAngles();
     bool        saveTiltAngles();
 
-//    qreal       lineLength(QPointF p1, QPointF p2);
-//    qreal       lineAngle(QPointF p1, QPointF p2);
-//    qreal       triangleArea(qreal lineLength, qreal angle1, qreal angle2);
+    qreal       lineLength(QPointF p1, QPointF p2);
+    qreal       lineAngle(QPointF p1, QPointF p2);
+    qreal       triangleArea(qreal lineLength, qreal angle1, qreal angle2);
 };
 
 #endif // CTIMAGES_H

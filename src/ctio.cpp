@@ -32,11 +32,6 @@ CtIo & CtIo::instance()
     return * m_instance;
 }
 
-bool CtIo::created()
-{
-    return m_instance != nullptr;
-}
-
 void CtIo::initialize()
 {
     QDir qdir;

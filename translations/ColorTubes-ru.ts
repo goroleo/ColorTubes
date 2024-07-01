@@ -1,34 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU">
+<TS version="2.1" language="ru">
 <context>
     <name>CongratsPanel</name>
     <message>
-        <source>Victory!</source>
+        <source>#victory</source>
         <translation>Победа!</translation>
     </message>
 </context>
 <context>
     <name>CoverPage</name>
     <message>
-        <source>Color Tubes</source>
+        <source>#ColorTubes</source>
         <translation>Цветные пробирки</translation>
     </message>
 </context>
 <context>
     <name>MainPage</name>
     <message>
-        <source>I will try to find a solution to this game, but it can take some time.
-Do you want to get started?</source>
-        <translation>Я попытаюсь найти решение игры, но это может занять некоторое время.
-Вы хотите начать поиск?</translation>
+        <source>#wantToSolve</source>
+        <translation>Я попытаюсь найти решение игры, но это может занять некоторое время.&lt;br&gt;Вы хотите начать поиск?</translation>
     </message>
     <message>
-        <source>Level</source>
-        <translation>Уровень</translation>
-    </message>
-    <message>
-        <source>Do you want to start this level again?</source>
+        <source>#wantToStartAgain</source>
         <translation>Вы хотите запустить этот уровень сначала?</translation>
     </message>
     <message>
@@ -36,31 +30,35 @@ Do you want to get started?</source>
         <translation>Да</translation>
     </message>
     <message>
-        <source>Application settings will be here</source>
-        <translation>Здесь будут настройки приложения</translation>
-    </message>
-    <message>
         <source>I see</source>
         <translation>Понятно</translation>
     </message>
     <message>
-        <source>Unavailable now</source>
-        <translation>Пока недоступно</translation>
+        <source>#unavailable</source>
+        <translation>Временно недоступно</translation>
+    </message>
+    <message>
+        <source>#settings</source>
+        <translation>Здесь будут настройки приложения.</translation>
+    </message>
+    <message>
+        <source>#level</source>
+        <translation>Уровень</translation>
     </message>
 </context>
 <context>
     <name>MessagePanel</name>
     <message>
-        <source>Color Tubes</source>
-        <translation>Цветные пробирки</translation>
-    </message>
-    <message>
         <source>Ok</source>
         <translation>Ок</translation>
     </message>
     <message>
-        <source>Some message will be here.</source>
+        <source>#someMessage</source>
         <translation>Здесь будет сообщение.</translation>
+    </message>
+    <message>
+        <source>#ColorTubes</source>
+        <translation>Цветные пробирки</translation>
     </message>
 </context>
 </TS>

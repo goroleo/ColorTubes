@@ -2,16 +2,13 @@
 Type=Application
 X-Nemo-Application-Type=silica-qt5
 Icon=ColorTubes
-Name=ColorTubes
+Name=Color Tubes
+Name[en]=Color Tubes
+Name[ru]=Цветные пробирки
+Name[tr]=Renkli tüpler
+
 Exec=/usr/bin/ColorTubes
 # Exec=/usr/bin/sailjail -p ColorTubes.desktop /usr/bin/ColorTubes
-# translation example:
-# your app name in German locale (de)
-#
-# Remember to comment out the following line, if you do not want to use
-# a different app name in German locale (de).
-# Name[de]=Color Tubes
-Name[ru]=Цветные пробирки
 
 [X-Sailjail]
 # Permissions=Audio;Calendar;Documents;Email;Music;UserDirs

@@ -3,8 +3,10 @@
 
 #include <QtCore>
 
-class TubeModel
+class TubeModel : public QObject
 {
+    Q_OBJECT
+
 public:
 
     TubeModel();
@@ -43,6 +45,8 @@ public:
     void assignColors(TubeModel * other);
     quint32 store() const;
 
+signals:
+    void stateChanged();
 
 private:
     bool checkDone();
@@ -58,6 +62,6 @@ private:
     quint8 m_count;
 };
 
-class GameTubes: public QVector<TubeModel*>{};
+class TubeModels: public QVector<TubeModel*>{};
 
 #endif // TUBEMODEL_H

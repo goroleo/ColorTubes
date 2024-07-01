@@ -29,7 +29,6 @@ public:
     bool loadGame(QString fName, QByteArray &buffer);
     bool saveGame(QString fName, QByteArray &buffer);
 
-    bool created();
 private:
     CtIo() {};
     void initialize();

@@ -134,9 +134,15 @@ void ColorsLayer::onAngleChanged()
         bottleLines[i].x2 = tubeVertices[i+1].x;
         bottleLines[i].y2 = tubeVertices[i+1].y;
 
-        bottleLines[i].k = (bottleLines[i].y2 - bottleLines[i].y1)
-                / (bottleLines[i].x2 - bottleLines[i].x1);
-        bottleLines[i].b = bottleLines[i].y1 - (bottleLines[i].k * bottleLines[i].x1);
+        if (qFuzzyCompare(bottleLines[i].x1, bottleLines[i].x2)) {
+            // avoid division by zero
+            bottleLines[i].k = CtGlobal::images().tubeFullWidth();
+            bottleLines[i].b = CtGlobal::images().tubeFullHeight();
+        } else {
+            bottleLines[i].k = (bottleLines[i].y2 - bottleLines[i].y1)
+                    / (bottleLines[i].x2 - bottleLines[i].x1);
+            bottleLines[i].b = bottleLines[i].y1 - (bottleLines[i].k * bottleLines[i].x1);
+        }
     }
 
 // --- sort points by vertical. The lowest point will be tubeVertices[0]

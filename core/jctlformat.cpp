@@ -1,4 +1,4 @@
-#include "jctlformat.h"
+﻿#include "jctlformat.h"
 
 #include <QDataStream>
 
@@ -156,7 +156,7 @@ bool JctlFormat::writeTo(QByteArray &buffer, quint32 version)
 
     if (formatVersion == 1) {
         crc = crcVersion1();
-        data << (quint16) (crc & 0xffff);
+        data << crc;
     } else { // if (ver == 2)
         crc = crcVersion2(buffer);
         data << (quint16) (crc & 0xffff);
@@ -169,8 +169,8 @@ bool JctlFormat::readFrom(QByteArray &buffer)
 {
     bool result = true;
 
-    quint32 dWord;                  // double word unsigned 32 bits
-    quint16 word;                   // word unsigned 16 bits
+    quint32 dWord;                  // double word unsigned 4 bytes
+    quint16 word;                   // word unsigned 2 bytes
 
     QDataStream data(&buffer, QIODevice::ReadOnly);
 
@@ -271,8 +271,8 @@ bool JctlFormat::readFrom(QByteArray &buffer)
             result = (crc == crcVersion1());
         } else if (formatVersion == 2) {
             data >> word;
-            crc = word & 0xffff;                              // CRC ver 2
-            result = (word == crcVersion2(buffer, fileSize - 2));
+            crc = word;                                      // CRC ver 2
+            result = (crc == crcVersion2(buffer, fileSize - 2));
         }
     }
 
@@ -324,8 +324,11 @@ void JctlFormat::storeGame() {
 
 void JctlFormat::storeGame(BoardModel * model) {
 
-    level = 0;
-    gameMode = 0;
+    if (!model)
+        return;
+
+    gameMode = CtGlobal::gameMode();
+    level = model->level();
 
     tubesCount = model->tubesCount();
     emptyCount = 0;
@@ -344,7 +347,7 @@ void JctlFormat::storeMoves()
     // storeGame(CtGlobal::board().);
 }
 
-void JctlFormat::storeMoves(GameMoves * moves)
+void JctlFormat::storeMoves(MoveItems * moves)
 {
 
 }
@@ -360,6 +363,7 @@ void JctlFormat::restoreGame(BoardModel * boardModel)
     for (quint16 i = 0; i < tubesCount; i++) {
         boardModel->addNewTube(storedTubes->at(i));
     }
+    boardModel->setLevel(level);
 }
 
 void JctlFormat::restoreMoves()
@@ -367,7 +371,7 @@ void JctlFormat::restoreMoves()
 
 }
 
-void JctlFormat::restoreMoves(GameMoves * moves)
+void JctlFormat::restoreMoves(MoveItems * moves)
 {
 
 }

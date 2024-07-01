@@ -8,9 +8,6 @@
 #include "ctimages.h"
 #include "game.h"
 
-int game_mode = CT_END_GAME;
-bool created = false;
-
 extern Game m_game;
 extern CtIo m_io;
 extern CtImages m_images;
@@ -24,26 +21,24 @@ void CtGlobal::create()
     m_images.create();  // TubeImages must be after IO and before Game
 
     m_game.create();
-    created = true;
 }
 
 void CtGlobal::destroy()
 {
-    created = false;
     m_game.instance().~Game();
     m_images.instance().~CtImages();
     m_palette.instance().~CtPalette();
     m_io.instance().~CtIo();
 }
 
-int CtGlobal::gameMode()
-{
-    return m_game.instance().mode();
-}
-
 Game& CtGlobal::game()
 {
     return m_game.instance();
+}
+
+int CtGlobal::gameMode()
+{
+    return m_game.instance().mode();
 }
 
 BoardModel * CtGlobal::board()

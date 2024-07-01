@@ -108,7 +108,7 @@ void FlowerLayer::paint(QPainter * painter)
     painter->drawImage(0, 0, * m_drawImage);
 }
 
-void FlowerLayer::repaintFrame()
+void FlowerLayer::paintFrame()
 {
     m_drawImage->fill(0);
     m_source->render(m_painter);
@@ -119,7 +119,7 @@ void FlowerLayer::connectToSvg()
 {
     if (!svgConnected && m_painter) {
         QObject::connect(m_source, &QSvgRenderer::repaintNeeded,
-                         this, &FlowerLayer::repaintFrame);
+                         this, &FlowerLayer::paintFrame);
         svgConnected = true;
     }
 }
@@ -128,7 +128,7 @@ void FlowerLayer::disconnectFromSvg()
 {
     if (svgConnected) {
         QObject::disconnect(m_source, &QSvgRenderer::repaintNeeded,
-                            this, &FlowerLayer::repaintFrame);
+                            this, &FlowerLayer::paintFrame);
         svgConnected = false;
     }
 }

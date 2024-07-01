@@ -6,7 +6,7 @@ class UsedColors;
 class JctlFormat;
 class BoardModel;
 class GameBoard;
-class GameMoves;
+class MoveItems;
 class MoveItem;
 
 /*!
@@ -30,8 +30,6 @@ public:
 
     void load(QString fileName);
     void save(QString fileName);
-
-//    MoveItem * moves() {return m_board.moves();}
 
 signals:
     void onGameLoaded();

@@ -1,14 +1,15 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import Sailfish.Silica 1.0
 
 Rectangle {
     id: msgPanel
 
-    property string caption: qsTr("Color Tubes")
-    property string messageText: qsTr("Some message will be here.")
-    property string buttonText: qsTr("Ok")
     signal accepted
     signal rejected
+
+    property string caption: qsTr("#ColorTubes")
+    property string messageText: qsTr("#someMessage")
+    property string buttonText: qsTr("Ok")
 
     property color dialogColor: "#1c1127"
 
@@ -16,13 +17,19 @@ Rectangle {
     height: parent.height
     color: Theme.rgba(Theme.highlightBackgroundColor, 0.2)
     enabled: false
+
     opacity: enabled ? 1.0 : 0.0
-    Behavior on opacity { FadeAnimation {} }
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.InOutQuad
+        }
+    }
 
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            console.log("message panel pressed")
+            console.log("Message panel pressed. Answer is negative.")
             msgPanel.enabled = false
             msgPanel.rejected()
         }
@@ -105,9 +112,9 @@ Rectangle {
                             btnCloseIcon.highlighted = pressed;
                         }
                         onClicked: {
-                            console.log("close button pressed")
-                            msgPanel.rejected()
+                            console.log("Close button pressed. Answer is negative.")
                             msgPanel.enabled = false
+                            msgPanel.rejected()
                         }
                     }
                 }
@@ -131,6 +138,7 @@ Rectangle {
                 color: Theme.darkPrimaryColor
                 backgroundColor: Theme.highlightBackgroundColor
                 onClicked: {
+                    console.log("Message button pressed. Answer is positive.")
                     msgPanel.enabled = false
                     msgPanel.accepted()
                 }

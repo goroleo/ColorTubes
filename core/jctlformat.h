@@ -4,11 +4,11 @@
 #include <QtCore>
 
 class BoardModel;
-class GameMoves;
+class MoveItems;
 
 /**
  * @brief The JctlFormat class.
- * Java ColorTubes by Legoru (Firstly wrote on java)
+ * (J)ava (C)olor(T)ubes by (L)egoru - this game firstly wrote on java :)
  */
 
 
@@ -17,8 +17,8 @@ class GameMoves;
 
     ---------- ver.1 ----------         ---------- ver.2 ----------
     FILE_ID             4 bytes         FILE_ID             4 bytes
-    EOF                 4 bytes         EOF                 4 bytes
-    FormatVersion       4 bytes         FormatVersion       4 bytes
+    EOF sign            4 bytes         EOF sign            4 bytes
+    Format Version      4 bytes         Format Version      4 bytes
     FileSize            4 bytes         FileSize            4 bytes
 
     ---                                 Level               4 bytes
@@ -69,17 +69,18 @@ public:
     void storeGame();
     void storeGame(BoardModel * model);
     void storeMoves();
-    void storeMoves(GameMoves * moves);
+    void storeMoves(MoveItems * moves);
     void restoreGame();
     void restoreGame(BoardModel * model);
     void restoreMoves();
-    void restoreMoves(GameMoves * moves);
+    void restoreMoves(MoveItems * moves);
 
     bool readFrom(QByteArray & buffer);
     bool writeTo(QByteArray & buffer);
     bool writeTo(QByteArray & buffer, quint32 version);
 
     void clear();
+    bool checkTubes();
 
 private:
     static const quint32 JCTL_FILE_ID = 0x6a63746c;  // "JCTL"
@@ -104,7 +105,6 @@ private:
     quint16 crcVersion2(QByteArray &buffer);
     quint16 crcVersion2(QByteArray &buffer, quint32 length);
 
-    bool checkTubes();
 };
 
 #endif // JCTLFORMAT_H

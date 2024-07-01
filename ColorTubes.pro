@@ -18,6 +18,7 @@ CONFIG += \
 SOURCES += src/ColorTubes.cpp \
     core/boardmodel.cpp \
     core/jctlformat.cpp \
+    core/levelsengine.cpp \
     core/moveitem.cpp \
     core/tubemodel.cpp \
     core/usedcolors.cpp \
@@ -49,21 +50,17 @@ DISTFILES += qml/ColorTubes.qml \
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
-# to disable building translations every time, comment out the
-# following CONFIG line
 CONFIG += \
     sailfishapp_i18n
 
-# German translation is enabled as an example. If you aren't
-# planning to localize your app, remember to comment out the
-# following TRANSLATIONS line. And also do not forget to
-# modify the localized app name in the the .desktop file.
 TRANSLATIONS += \
+    translations/ColorTubes.ts \
     translations/ColorTubes-ru.ts
 
 HEADERS += \
     core/boardmodel.h \
     core/jctlformat.h \
+    core/levelsengine.h \
     core/moveitem.h \
     core/tubemodel.h \
     core/usedcolors.h \

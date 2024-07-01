@@ -1,4 +1,4 @@
-#include "corklayer.h"
+﻿#include "corklayer.h"
 
 #include <QPainter>
 #include <QBrush>
@@ -11,14 +11,14 @@
 CorkLayer::CorkLayer(QQuickItem *parent) :
     QQuickPaintedItem(parent)
 {
-    internalTimer = new QTimer(this);
+    m_timer = new QTimer(this);
 
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
-    connect(internalTimer, &QTimer::timeout, [=](){
-        nextStep();
-        prepareImage();
+    connect(m_timer, &QTimer::timeout, [=](){
+        nextFrame();
+        paintFrame();
         update();
     });
 
@@ -27,7 +27,7 @@ CorkLayer::CorkLayer(QQuickItem *parent) :
 
 CorkLayer::~CorkLayer()
 {
-    delete internalTimer;
+    delete m_timer;
 }
 
 bool CorkLayer::isVisible()
@@ -43,15 +43,14 @@ void CorkLayer::setVisible(bool newVisible)
         startShow();
     else
         startHide();
-    emit visibleChanged(m_visible);
 }
 
 void CorkLayer::startShow()
 {
     m_visible = true;
     m_alphaIncrement = 1.0 / qreal(CT_CORK_STEPS_INC);
-    if (!internalTimer->isActive()) {
-        internalTimer->start(CT_TIMER_TICKS);
+    if (!m_timer->isActive()) {
+        m_timer->start(CT_TIMER_TICKS);
     }
 }
 
@@ -59,8 +58,8 @@ void CorkLayer::startHide()
 {
     m_visible = false;
     m_alphaIncrement = -1.0 / qreal(CT_CORK_STEPS_DEC);
-    if (!internalTimer->isActive()) {
-        internalTimer->start(CT_TIMER_TICKS);
+    if (!m_timer->isActive()) {
+        m_timer->start(CT_TIMER_TICKS);
     }
 }
 
@@ -74,7 +73,7 @@ void CorkLayer::onScaleChanged()
     setHeight(m_drawImage.height() + CtGlobal::images().shiftHeight());
 
     m_drawImage.fill(0x00ffffff);
-    prepareImage();
+    paintFrame();
     update();
 }
 
@@ -83,19 +82,19 @@ void CorkLayer::paint(QPainter * painter)
     painter->drawImage(0, m_currentY, m_drawImage);
 }
 
-void CorkLayer::nextStep()
+void CorkLayer::nextFrame()
 {
     m_alpha += m_alphaIncrement;
 
     if (m_visible) {
         if (m_alpha > 1) {
             m_alpha = 1.0;
-            internalTimer->stop();
+            m_timer->stop();
         }
     } else {
         if (m_alpha < 0) {
             m_alpha = 0.0;
-            internalTimer->stop();
+            m_timer->stop();
         }
     }
 
@@ -103,7 +102,7 @@ void CorkLayer::nextStep()
             + CtGlobal::images().shiftHeight() * 2 * exp(-0.5 * (1 - m_alpha));
 }
 
-void CorkLayer::prepareImage()
+void CorkLayer::paintFrame()
 {
     quint32 pix;
     int newAlpha;

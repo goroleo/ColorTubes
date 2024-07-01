@@ -25,6 +25,8 @@ public:
     quint8 numberOfUsedCells();
     quint8 numberOfAvailableCells();
     quint8 getRandomColor();
+    void disableUnusedColors();
+
 
 private:
     quint8* m_items;

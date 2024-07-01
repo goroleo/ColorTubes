@@ -27,3 +27,16 @@ quint32 MoveItem::stored()
 {
     return m_data.stored;
 }
+
+void MoveItems::sortByRank()
+{
+    if (size() > 1)
+        std::sort(first(), last());
+}
+
+MoveItem * MoveItems::current()
+{
+    if (!empty())
+        return last();
+    return nullptr;
+}

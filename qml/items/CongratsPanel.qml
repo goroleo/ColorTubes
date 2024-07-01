@@ -1,11 +1,10 @@
-import QtQuick 2.6
+﻿import QtQuick 2.6
 import Sailfish.Silica 1.0
 import FlowerLayer 1.0
-import "../pages"
-
 
 Rectangle {
     id: congratsPanel
+    signal clicked
 
     width: parent.width
     height: parent.height
@@ -48,7 +47,7 @@ Rectangle {
         }
 
         Text {
-            text: qsTr("Victory!")
+            text: qsTr("#victory")
 
             width: parent.width * 0.5
             height: parent.height * 0.5
@@ -69,6 +68,7 @@ Rectangle {
         anchors.fill: parent
         onClicked: {
             congratsPanel.enabled = false
+            congratsPanel.clicked()
         }
     }
 }
