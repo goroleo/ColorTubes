@@ -1,4 +1,4 @@
-﻿#include "gameboard.h"
+#include "gameboard.h"
 
 #include "src/ctglobal.h"
 #include "tubeitem.h"
@@ -45,6 +45,16 @@ int GameBoard::indexOf(TubeItem * tube)
         return -1;
 }
 
+bool GameBoard::isSolved()
+{
+    return m_model->isSolved();
+}
+
+int GameBoard::level()
+{
+    return m_model->level();
+}
+
 int GameBoard::maxChildrenZ()
 {
     int result = 0;
@@ -85,7 +95,6 @@ void GameBoard::rescale()
         placeTubes();
     }
 }
-
 
 void GameBoard::onScaleChanged()
 {
@@ -148,7 +157,8 @@ void GameBoard::clickTube(TubeItem * tube)
             else
                 m_selectedTube = nullptr;
         }
-    } else {
+    } else { // tube and selectedTube are both assigned
+
         if (tube == m_selectedTube) {
          // qDebug() << "Disable selection 2";
             m_selectedTube->setSelected(false);
@@ -167,15 +177,10 @@ void GameBoard::clickTube(TubeItem * tube)
                 m_selectedTube = nullptr;
         }
     }
-    showAvailableTubes();
+    showAvailableMoves();
 }
 
-MoveItems * GameBoard::moves()
-{
-    return m_model->moves();
-}
-
-void GameBoard::showAvailableTubes()
+void GameBoard::showAvailableMoves()
 {
     TubeItem * tube;
 
@@ -188,61 +193,59 @@ void GameBoard::showAvailableTubes()
             tube->showAvailable(true);
         else
             tube->showAvailable(false);
-
     }
 }
 
-void GameBoard::addNewMove(TubeItem * tubeFrom, TubeItem * tubeTo)
+bool GameBoard::hasMoves()
 {
-    m_model->addNewMove(indexOf(tubeFrom), indexOf(tubeTo));
-    emit movesChanged();
+    return CtGlobal::game().hasMoves();
 }
 
 void GameBoard::undoMove()
 {
-    if (m_model->hasMoves() && maxChildrenZ() == 0) {
+    if (CtGlobal::game().hasMoves() && maxChildrenZ() == 0) {
 
         if (m_selectedTube)
             clickTube(nullptr);
 
-        MoveItem::MoveData data;
-        data.stored = m_model->undoMove();
-        if (data.stored > 0) {
-            m_tubes->at(data.fields.tubeFrom)->refresh();
-            m_tubes->at(data.fields.tubeTo)->refresh();
+        MoveItem * move = CtGlobal::game().lastMove();
+        if (move) {
+            for (int i = 0; i < move->count(); ++i) {
+                m_model->tubeAt( move->tubeFrom() )->putColor(
+                            m_model->tubeAt( move->tubeTo() )->extractColor());
+            }
+            m_tubes->at(move->tubeFrom())->refresh();
+            m_tubes->at(move->tubeTo())->refresh();
+            CtGlobal::game().deleteLastMove();
             emit movesChanged();
         }
     }
 }
 
-bool GameBoard::isSolved()
-{
-    return m_model->isSolved();
-}
-
-int GameBoard::level()
-{
-    return m_model->level();
-}
-
-bool GameBoard::hasMoves()
-{
-    return m_model->hasMoves();
-}
-
 void GameBoard::startAgain()
 {
-    if (m_model->hasMoves() && maxChildrenZ() == 0) {
+    if (maxChildrenZ() != 0)
+        return;
 
-        if (m_selectedTube)
-            clickTube(nullptr);
+    if (m_selectedTube)
+        clickTube(nullptr);
 
-        m_model->startAgain();
-        for (int i = 0; i < tubesCount(); ++i)
-            m_tubes->at(i)->refresh();
+    while (CtGlobal::game().hasMoves()) {
 
-        emit movesChanged();
+        MoveItem * move = CtGlobal::game().lastMove();
+        if (move) {
+            for (int i = 0; i < move->count(); ++i) {
+                m_model->tubeAt( move->tubeFrom() )->putColor(
+                            m_model->tubeAt( move->tubeTo() )->extractColor());
+            }
+            CtGlobal::game().deleteLastMove();
+        }
     }
+
+    for (int i = 0; i < tubesCount(); ++i)
+        m_tubes->at(i)->refresh();
+
+    emit movesChanged();
 }
 
 void GameBoard::randomFill()
@@ -250,6 +253,7 @@ void GameBoard::randomFill()
     if (!m_tubes->isEmpty())
         qDeleteAll(m_tubes->begin(), m_tubes->end());
     m_tubes->clear();
+    CtGlobal::moves()->clear();
 
     m_model->randomFill(9, 2);
     for (int i = 0; i < tubesCount(); ++i) {
@@ -261,4 +265,15 @@ void GameBoard::randomFill()
 
     m_model->setLevel(m_model->level()+1);
     emit levelChanged();
+}
+
+void GameBoard::solve()
+{
+    if (maxChildrenZ() != 0)
+        return;
+
+    if (m_selectedTube)
+        clickTube(nullptr);
+
+    m_model->calculateMoves();
 }

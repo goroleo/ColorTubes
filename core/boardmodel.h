@@ -41,15 +41,13 @@ public:
     bool          canDoMove(TubeModel * tubeFrom, TubeModel * tubeTo);
     quint8        colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo);
     quint32       getMove(int tubeFromIndex, int tubeToIndex);
-    quint32       addNewMove(int tubeFromIndex, int tubeToIndex);
+    MoveItem    * addNewMove(int tubeFromIndex, int tubeToIndex);
     bool          hasMoves() { return !m_moves->empty(); }
     void          deleteCurrentMove();
-    quint32       undoMove();
-    void          startAgain();
+
     MoveItems   * moves() {return m_moves;}
 
-    int           calculateMoves();
-    QString       toString();
+    quint16       calculateMoves();
 
     void          randomFill(int fillTubes, int emptyTubes);
 
@@ -57,7 +55,7 @@ public:
     void          setLevel(int newLevel) {m_level = newLevel;}
 
     bool operator == (const BoardModel &other) const;
-
+    QString       toString() const;
 
 private:
     BoardModel  * m_parentBoard = nullptr;
@@ -68,8 +66,11 @@ private:
     MoveItems   * m_moves;
     qint32        m_level;
 
-    bool          checkBoard();
+    bool          checkFilledTubes();
 
 };
+
+QDebug operator << (QDebug dbg, const BoardModel &board);
+QDebug operator << (QDebug dbg, const BoardModel *board);
 
 #endif // BOARDMODEL_H

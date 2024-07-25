@@ -1,4 +1,4 @@
-﻿#ifndef GAMEBOARD_H
+#ifndef GAMEBOARD_H
 #define GAMEBOARD_H
 
 #include <QQuickItem>
@@ -22,10 +22,8 @@ public:
     int          indexOf(TubeItem * tube);
     TubeItem   * selectedTube() { return m_selectedTube; }
 
-    MoveItems  * moves();
-    void         addNewMove(TubeItem * tubeFrom, TubeItem * tubeTo);
     bool         hasMoves();
-    void         showAvailableTubes();
+    void         showAvailableMoves();
 
     void         clickTube(TubeItem * tube);
     int          maxChildrenZ();
@@ -42,6 +40,7 @@ public slots:
     void         undoMove();
     void         startAgain();
     void         randomFill();
+    void         solve();
 
 private slots:
     void         onScaleChanged();

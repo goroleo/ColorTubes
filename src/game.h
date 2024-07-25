@@ -23,13 +23,21 @@ public:
 
     BoardModel * boardModel() {return m_board; }
     UsedColors * usedColors() {return m_usedColors; }
-    JctlFormat * jctl() {return m_jctl; }
+    JctlFormat * jctl()       {return m_jctl; }
+    MoveItems  * moves()      {return m_moves; }
 
-    void setMode(int newMode);
-    int mode() {return gameMode;}
+    bool         hasMoves();
+    void         clearMoves();
+    MoveItem   * lastMove();
+    void         deleteLastMove();
 
-    void load(QString fileName);
-    void save(QString fileName);
+    void         setMode(int newMode);
+    int          mode() {return gameMode;}
+
+    void         load(QString fileName);
+    void         save(QString fileName);
+
+    MoveItem * addNewMove(int tubeFromIndex, int tubeToIndex);
 
 signals:
     void onGameLoaded();
@@ -38,11 +46,12 @@ private:
     Game() {};
     void initialize();
 
-    UsedColors * m_usedColors;
-    JctlFormat * m_jctl;
-    BoardModel * m_board;
+    UsedColors  * m_usedColors;
+    JctlFormat  * m_jctl;
+    BoardModel  * m_board;
+    MoveItems   * m_moves;
     int gameMode;
-    static Game* m_instance;
+    static Game * m_instance;
 };
 
 

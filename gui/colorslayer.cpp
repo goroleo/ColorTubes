@@ -253,7 +253,7 @@ void ColorsLayer::nextSegment()
     if (m_fillArea > sliceArea)
     {
 
-        // Whole the segment is filled by the current color
+        // whole the segment is filled by the current color
 
         addColorSegment(m_topLine);
         m_fillArea -= sliceArea;
@@ -264,7 +264,6 @@ void ColorsLayer::nextSegment()
             drawColorCell();
             clearColorSegments();
             m_colorIndex ++;
-
         }
 
     } else {

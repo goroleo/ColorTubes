@@ -1,4 +1,4 @@
-﻿#include "jctlformat.h"
+#include "jctlformat.h"
 
 #include <QDataStream>
 
@@ -344,7 +344,7 @@ void JctlFormat::storeGame(BoardModel * model) {
 
 void JctlFormat::storeMoves()
 {
-    // storeGame(CtGlobal::board().);
+    storeMoves(CtGlobal::moves());
 }
 
 void JctlFormat::storeMoves(MoveItems * moves)
@@ -368,11 +368,11 @@ void JctlFormat::restoreGame(BoardModel * boardModel)
 
 void JctlFormat::restoreMoves()
 {
-
+    restoreMoves(CtGlobal::moves());
 }
 
 void JctlFormat::restoreMoves(MoveItems * moves)
 {
-
+    moves->clear();
 }
 

@@ -77,11 +77,9 @@ quint8 TubeModel::color(quint8 index)
 
 bool TubeModel::hasColor(quint8 colorNumber) const
 {
-    quint8 index = 0;
-    while (index < m_count) {
-        if (m_colors.items[index] == colorNumber)
+    for (quint8 i = 0; i < m_count; ++i) {
+        if (m_colors.items[i] == colorNumber)
             return true;
-        index ++;
     }
     return false;
 }
@@ -115,8 +113,8 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
     m_count ++;
 
     // update tube's state
-    quint8 oldState = m_state;
     if (updateState) {
+        quint8 oldState = m_state;
         if (m_count < 4) {
             m_state = CT_STATE_REGULAR;
         } else if (checkDone()) {
@@ -124,9 +122,10 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
         } else {
             m_state = CT_STATE_FILLED;
         }
+        if (oldState != m_state)
+            emit stateChanged();
     }
-    if (oldState != m_state)
-        emit stateChanged();
+
     return true;
 }
 
@@ -191,8 +190,8 @@ void TubeModel::assignColors(TubeModel * other)
 {
     if (other) {
         m_colors.stored = other->store();
-        m_state = other->state();
         m_count = other->count();
+        m_state = other->state();
     }
 }
 

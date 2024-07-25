@@ -1,4 +1,4 @@
-﻿#include "boardmodel.h"
+#include "boardmodel.h"
 #include "src/ctglobal.h"
 #include "src/game.h"
 #include "core/usedcolors.h"
@@ -8,6 +8,9 @@ BoardModel::BoardModel()
 {
     m_moves = new MoveItems;
     m_tubes = new TubeModels;
+    m_parentBoard = nullptr;
+    m_parentMove = nullptr;
+    m_rootBoard = this;
 }
 
 BoardModel::BoardModel(BoardModel * parentBoard)
@@ -45,19 +48,19 @@ void BoardModel::clear()
 
 void BoardModel::clearTubes()
 {
-    qDeleteAll(m_tubes->begin(), m_tubes->end());
+    if (!m_tubes->empty())
+        qDeleteAll(m_tubes->begin(), m_tubes->end());
     m_tubes->clear();
 }
 
 void BoardModel::clearMoves()
 {
-    qDeleteAll(m_moves->begin(), m_moves->end());
     m_moves->clear();
 }
 
 MoveItem * BoardModel::currentMove()
 {
-    return (m_moves->current());
+    return m_moves->current();
 }
 
 void BoardModel::deleteCurrentMove()
@@ -74,44 +77,44 @@ bool BoardModel::operator == (const BoardModel & other) const
         return false;
 
     bool result = true;
-    quint32 * stored1 = new quint32[tubesCount()];
-    quint32 * stored2 = new quint32[tubesCount()];
+    quint32 * store1 = new quint32[tubesCount()];
+    quint32 * store2 = new quint32[tubesCount()];
 
     for (int i = 0; i < tubesCount(); ++i) {
-        stored1[i] = tubeAt(i)->store();
-        stored2[i] = other.tubeAt(i)->store();
+        store1[i] = tubeAt(i)->store();
+        store2[i] = other.tubeAt(i)->store();
     }
 
     int j1, j2;
     quint32 temp1, temp2;
 
-    // sort stored1 & stored2
+    // sort store1 & store2
     for (int i = 1; i < tubesCount(); ++i) {
-        temp1 = stored1[i];
-        temp2 = stored2[i];
+        temp1 = store1[i];
+        temp2 = store2[i];
         j1 = j2 = i;
-        while ( (j1 > 0) && (stored1[j1-1] < temp1) ) {
-            stored1[j1] = stored1[j1-1];
+        while ( (j1 > 0) && (store1[j1-1] < temp1) ) {
+            store1[j1] = store1[j1-1];
             j1--;
         }
-        while ( (j2 > 0) && (stored2[j2-1] < temp2) ) {
-            stored2[j2] = stored2[j2-1];
+        while ( (j2 > 0) && (store2[j2-1] < temp2) ) {
+            store2[j2] = store2[j2-1];
             j2--;
         }
-        stored1[j1] = temp1;
-        stored2[j2] = temp2;
+        store1[j1] = temp1;
+        store2[j2] = temp2;
     }
 
     // compare sorted
     j1 = 0;
     while (result && j1 < tubesCount()) {
-        if (stored1[j1] != stored2[j1])
+        if (store1[j1] != store2[j1])
             result = false;
         j1++;
     }
 
-    delete [] stored1;
-    delete [] stored2;
+    delete [] store1;
+    delete [] store2;
 
     return result;
 }
@@ -146,34 +149,6 @@ TubeModel * BoardModel::addNewTube(quint32 storedTube)
     return tube;
 }
 
-QString BoardModel::toString() {
-
-    if (m_tubes->isEmpty())
-        return QString("");
-
-    QString str("");
-
-    str.append(CtGlobal::endOfLine()).append("  ");
-    for (int i = 0; i < m_tubes->size(); i++) {
-        str.append(QString::number(i, 16)).append("   ");
-    }
-    str.append(CtGlobal::endOfLine());
-
-    for (int i = 3; i >= 0; i--) {
-        str.append("| ");
-
-        for (quint8 j = 0; j < m_tubes->size(); ++j) {
-            if (tubeAt(j)->color(i) != 0) {
-                str.append(QString::number(tubeAt(j)->color(i), 16));
-            } else {
-                str.append(" ");
-            }
-            str.append(" | ");
-        }
-        str.append(CtGlobal::endOfLine());
-    }
-    return str;
-}
 
 bool BoardModel::isSolved()
 {
@@ -235,40 +210,40 @@ quint32 BoardModel::getMove(int tubeFromIndex, int tubeToIndex)
     return move.stored;
 }
 
-quint32 BoardModel::addNewMove(int tubeFromIndex, int tubeToIndex)
+MoveItem * BoardModel::addNewMove(int tubeFromIndex, int tubeToIndex)
 {
     MoveItem * move = new MoveItem(this, tubeFromIndex, tubeToIndex);
     m_moves->append(move);
-    return move->stored();
+    return move;
 }
 
+/*
 quint32 BoardModel::undoMove()
 {
-    MoveItem * move = currentMove();
-    if (move) {
-        quint32 result = move->stored();
-        for (int i = 0; i < move->count(); ++i) {
-            m_tubes->at(move->tubeTo())->extractColor();
-            m_tubes->at(move->tubeFrom())->putColor(move->color());
-        }
-        deleteCurrentMove();
-        return result;
+    if (!currentMove())
+        return 0;
+
+    quint32 result = currentMove()->stored();
+    for (int i = 0; i < currentMove()->count(); ++i) {
+        m_tubes->at(currentMove()->tubeTo())->extractColor();
+        m_tubes->at(currentMove()->tubeFrom())->putColor(currentMove()->color());
     }
-    return 0;
+    deleteCurrentMove();
+    return result;
 }
 
 void BoardModel::startAgain()
 {
-    MoveItem * move;
     while (currentMove()) {
-        move = currentMove();
-        for (int i=0; i < move->count(); ++i) {
-            m_tubes->at(move->tubeTo())->extractColor();
-            m_tubes->at(move->tubeFrom())->putColor(move->color());
+        for (int i=0; i < currentMove()->count(); ++i) {
+            m_tubes->at(currentMove()->tubeTo())->extractColor();
+            m_tubes->at(currentMove()->tubeFrom())->putColor(currentMove()->color());
         }
         deleteCurrentMove();
     }
 }
+
+*/
 
 void BoardModel::randomFill(int fillTubes, int emptyTubes)
 {
@@ -290,10 +265,10 @@ void BoardModel::randomFill(int fillTubes, int emptyTubes)
                 }
             }
         }
-   } while (!checkBoard());
+    } while (!checkFilledTubes());
 }
 
-bool BoardModel::checkBoard()
+bool BoardModel::checkFilledTubes()
 {
     if (m_tubes->isEmpty())
         return false;
@@ -305,4 +280,104 @@ bool BoardModel::checkBoard()
     }
     CtGlobal::game().jctl()->storeGame(this);
     return CtGlobal::game().jctl()->checkTubes();
+}
+
+quint16 BoardModel::calculateMoves()
+{
+    TubeModel * tubeFrom;
+    TubeModel * tubeTo;
+    MoveItem  * move;
+
+    quint8 result = 0;                   // number of available moves
+    bool emptyTubeProcessed = false;     // true if one of empty tube has processed already
+
+    clearMoves();
+    for (quint8 tubeToIndex = 0; tubeToIndex < tubesCount(); ++tubeToIndex) {
+
+        tubeTo = m_tubes->at(tubeToIndex);
+        if ( (tubeTo->state() == CT_STATE_EMPTY && !emptyTubeProcessed)
+                || tubeTo->state() == CT_STATE_REGULAR) {
+
+            if (!emptyTubeProcessed && tubeTo->isEmpty())
+                emptyTubeProcessed = true;
+
+            quint8 toCount = tubeTo->sameColorCount();
+
+            for (quint8 tubeFromIndex = 0; tubeFromIndex < tubesCount(); ++tubeFromIndex) {
+
+                if (tubeFromIndex != tubeToIndex
+                        && canDoMove(tubeFromIndex, tubeToIndex)) {
+
+                    tubeFrom = m_tubes->at(tubeFromIndex);
+                    if (tubeTo->canPutColor(tubeFrom->currentColor())) {
+
+                        quint8 fromCount = tubeFrom->sameColorCount();
+
+                        move = addNewMove(tubeFromIndex, tubeToIndex);
+                        qint8 rank = move->count() + 100 - result;
+
+
+
+
+
+                        move->setRank(rank);
+                        result ++;
+                    }
+                }
+            }
+        }
+    }
+
+    if (result > 1)
+        m_moves->sortByRank();
+
+    // --- debug
+    qDebug() << this; // out current board
+    qDebug() << "found" << result << "moves.";
+    for (int i=0; i < m_moves->size(); ++i) {
+        qDebug() <<"#" << i << (m_moves->at(i));
+    }
+
+    return result;
+}
+
+QString BoardModel::toString() const
+{
+    if (tubesCount() == 0)
+        return "";
+
+    QString str("BoardModel:\n");
+
+    str.append("  ");
+    for (int i = 0; i < tubesCount(); i++) {
+        str.append(QString::number(i, 16)).append("   ");
+    }
+    str.append("\n");
+
+    for (int i = 3; i >= 0; i--) {
+        str.append("| ");
+
+        for (quint8 j = 0; j < tubesCount(); ++j) {
+            if (tubeAt(j)->color(i) != 0) {
+                str.append(QString::number(tubeAt(j)->color(i), 16));
+            } else {
+                str.append(" ");
+            }
+            str.append(" | ");
+        }
+        if (i != 0) str.append("\n");
+    }
+    return str;
+}
+
+QDebug operator << (QDebug dbg, const BoardModel &board)
+{
+    dbg.noquote().nospace() << board.toString();
+    return dbg.maybeSpace();
+}
+
+QDebug operator << (QDebug dbg, const BoardModel *board)
+{
+    dbg.nospace() << *board;
+    return dbg.maybeSpace();
 }

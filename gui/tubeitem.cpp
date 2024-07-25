@@ -1,7 +1,8 @@
-﻿#include "tubeitem.h"
+#include "tubeitem.h"
 
 #include "src/ctglobal.h"
 #include "src/ctimages.h"
+#include "src/game.h"
 
 #include "gameboard.h"
 #include "core/tubemodel.h"
@@ -316,7 +317,7 @@ void TubeItem::nextStage()
         pourOut();
         return;
 
-    case CT_STAGE_FLY_BACK:
+    case CT_STAGE_BACK:
         flyBack();
         return;
     }
@@ -434,7 +435,7 @@ void TubeItem::pourOut()
 
     steps = CT_TUBE_STEPS_POUR * m_pouringCells;
 
-    nextStageId = CT_STAGE_FLY_BACK;
+    nextStageId = CT_STAGE_BACK;
     startAnimation();
 }
 
@@ -473,10 +474,12 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     if (tubeFrom->m_recipient != this)
         return;
 
-    m_board->addNewMove(tubeFrom, this);
+ // !!!   m_board->addBoardMove(tubeFrom, this);
+    CtGlobal::game().addNewMove(tubeFrom->tubeIndex(), this->tubeIndex());
     for (int i = 0; i < tubeFrom->m_pouringCells; i++) {
         m_model->putColor(tubeFrom->model()->extractColor());
     }
+    emit m_board->movesChanged();
 
     m_pouringCells -= tubeFrom->m_pouringCells;
     tubeFrom->m_pouringCells = 0;

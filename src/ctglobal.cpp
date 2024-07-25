@@ -46,6 +46,11 @@ BoardModel * CtGlobal::board()
     return m_game.instance().boardModel();
 }
 
+MoveItems * CtGlobal::moves()
+{
+    return m_game.instance().moves();
+}
+
 CtIo& CtGlobal::io()
 {
     return m_io.instance();

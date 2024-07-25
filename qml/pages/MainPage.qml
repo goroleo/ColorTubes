@@ -1,4 +1,4 @@
-﻿import QtQuick 2.6
+import QtQuick 2.6
 import Sailfish.Silica 1.0
 import GameBoard 1.0
 import FlowerLayer 1.0
@@ -134,7 +134,7 @@ Page {
             switch (questionNumber) {
             case 1: board.startAgain(); return;
             case 2: board.undoMove(); return;
-            case 3:
+            case 3: board.solve(); return;
             case 4:
             }
         }
