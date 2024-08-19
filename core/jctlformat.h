@@ -67,17 +67,17 @@ public:
     ~JctlFormat();
 
     void storeGame();
-    void storeGame(BoardModel * model);
+    void storeGame(BoardModel * boardModel);
     void storeMoves();
     void storeMoves(MoveItems * moves);
     void restoreGame();
-    void restoreGame(BoardModel * model);
+    void restoreGame(BoardModel * boardModel);
     void restoreMoves();
     void restoreMoves(MoveItems * moves);
 
-    bool readFrom(QByteArray & buffer);
-    bool writeTo(QByteArray & buffer);
-    bool writeTo(QByteArray & buffer, quint32 version);
+    bool read(QByteArray & bufferFrom);
+    bool write(QByteArray & bufferTo);
+    bool write(QByteArray & bufferTo, quint32 version);
 
     void clear();
     bool checkTubes();

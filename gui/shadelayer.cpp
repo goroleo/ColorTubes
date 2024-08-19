@@ -8,7 +8,7 @@
 
 ShadeLayer::ShadeLayer(QQuickItem *parent) :
       QQuickPaintedItem(parent),
-      m_shadeNumber(1)
+      m_shadeNumber(0)
 {
     m_drawImage = QImage(CtGlobal::images().tubeWidth(),
                          CtGlobal::images().tubeHeight(),
@@ -38,19 +38,33 @@ ShadeLayer::~ShadeLayer()
 
 void ShadeLayer::startShow()
 {
-    m_visible = true;
-    m_pulse = false;
-    m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
-    m_timer->start(CT_TIMER_TICKS);
+    if (m_animated) {
+        m_visible = true;
+        m_pulse = false;
+        m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+        m_timer->start(CT_TIMER_TICKS);
+    } else
+        showImmediately();
 }
 
 void ShadeLayer::startHide()
 {
-    m_visible = false;
+    if (m_animated) {
+        m_visible = false;
+        m_pulse = false;
+        m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
+        m_timer->start(CT_TIMER_TICKS);
+    } else
+        hideImmediately();
+}
+
+void ShadeLayer::showImmediately()
+{
+    m_visible = true;
     m_pulse = false;
-    m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
-    m_shadeAfterHiding = 0;
-    m_timer->start(CT_TIMER_TICKS);
+    m_alpha = 1.0;
+    paintFrame();
+    update();
 }
 
 void ShadeLayer::hideImmediately()
@@ -69,11 +83,13 @@ void ShadeLayer::hideImmediately()
 
 void ShadeLayer::startPulse()
 {
-    m_pulse = true;
-    m_visible = true;
-    m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
-    m_timer->start(CT_TIMER_TICKS * 3);
-    emit pulseChanged(m_pulse);
+    if (m_animated) {
+        m_pulse = true;
+        m_visible = true;
+        m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+        m_timer->start(CT_TIMER_TICKS * 3);
+        emit pulseChanged(m_pulse);
+    }
 }
 
 void ShadeLayer::stopPulse()
@@ -123,7 +139,7 @@ void ShadeLayer::paintFrame()
     quint32 pix;
     int newAlpha;
 
-    for (int x = 0; x < m_shadeImage.width(); ++x)
+    for (int x = 0; x < m_shadeImage.width(); ++x) {
         for (int y = 0; y < m_shadeImage.height(); ++y) {
             pix = m_shadeImage.pixel(x, y);
             if ((pix >> 24) > 0) {
@@ -131,6 +147,7 @@ void ShadeLayer::paintFrame()
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
+    }
 }
 
 void ShadeLayer::paint(QPainter *painter)
@@ -174,8 +191,8 @@ bool ShadeLayer::pulse()
 
 void ShadeLayer::setShade(int newShadeNumber)
 {
-    if (m_shadeNumber == newShadeNumber)
-        return;
+//    if (m_shadeNumber == newShadeNumber)
+//        return;
     m_shadeNumber = newShadeNumber;
     switch (m_shadeNumber)
     {
@@ -199,7 +216,6 @@ void ShadeLayer::setShade(int newShadeNumber)
         startHide();
         break;
     }
-//    emit shadeChanged(m_shadeNumber);
 }
 
 void ShadeLayer::setShadeAfterHide(int newShadeNumber)
@@ -221,6 +237,18 @@ void ShadeLayer::setPulse(bool value)
         else
             stopPulse();
         emit pulseChanged(value);
+    }
+}
+
+void ShadeLayer::setAnimated(bool value)
+{
+    m_animated = value;
+    if (!m_animated && m_timer->isActive()) {
+        m_timer->stop();
+        if (m_visible)
+            showImmediately();
+        else
+            hideImmediately();
     }
 }
 

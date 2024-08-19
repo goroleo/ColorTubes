@@ -13,7 +13,7 @@ TubeModel::~TubeModel()
 void TubeModel::clear()
 {
     m_colors.stored = 0;
-    m_state = 0;
+    m_state = CT_STATE_EMPTY;
     m_count = 0;
 }
 
@@ -125,7 +125,6 @@ bool TubeModel::putColor(quint8 colorNumber, bool updateState)
         if (oldState != m_state)
             emit stateChanged();
     }
-
     return true;
 }
 
@@ -155,7 +154,7 @@ quint8 TubeModel::extractColor()
     return result;
 }
 
-quint8 TubeModel::sameColorCount() const
+quint8 TubeModel::currentColorCount() const
 {
     if (m_count == 0)
         return 0;
@@ -188,11 +187,14 @@ void TubeModel::assignColors(quint32 storedColors)
 
 void TubeModel::assignColors(TubeModel * other)
 {
+    quint8 oldState = m_state;
     if (other) {
         m_colors.stored = other->store();
         m_count = other->count();
         m_state = other->state();
     }
+    if (oldState != m_state)
+        emit stateChanged();
 }
 
 quint32 TubeModel::store() const

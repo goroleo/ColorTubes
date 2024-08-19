@@ -28,8 +28,6 @@ private:
     TubeItem  * m_tube;                     // parent tube for this layer
     void        paint(QPainter * painter) override;
 
-    qreal       scale();
-
     //  draw colors
     QImage    * m_drawImage;
     QPainter  * m_painter;

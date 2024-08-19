@@ -25,6 +25,7 @@ public:
 
     //  get color(s)
     quint8 currentColor() const;
+    quint8 currentColorCount() const;     // how much colors we can get from the tube on one move
     quint8 color(quint8 index);
     bool hasColor(quint8 colorNumber) const;
 
@@ -35,7 +36,6 @@ public:
     //  extract color(s)
     bool canExtractColor() const;
     quint8 extractColor();
-    quint8 sameColorCount() const;
 
     //  compare to another tube
     bool operator == (const TubeModel & other);

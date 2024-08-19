@@ -12,11 +12,14 @@ Game * Game::m_instance = nullptr;
 
 Game::~Game()
 {
+    if (!m_board->isSolved())
+        saveTemporary();
+
     delete m_usedColors;
     delete m_jctl;
     delete m_board;
 
-    clearMoves();
+    m_moves->clear();
     delete m_moves;
 
     m_instance = nullptr;
@@ -45,10 +48,15 @@ void Game::initialize()
     m_moves = new MoveItems;
     m_board = new BoardModel;
 
-    load(QLatin1String(":/jctl/example1.jctl"));
+    bool loaded = false;
+    if (CtGlobal::io().tempFileExists())
+        loaded = loadTemporary();
+
+    if (!loaded)
+        load(QLatin1String(":/jctl/example1.jctl"));
 }
 
-void Game::load(QString fileName)
+bool Game::load(QString fileName)
 {
     QByteArray buffer;
     bool result;
@@ -56,7 +64,7 @@ void Game::load(QString fileName)
     result = CtGlobal::io().loadGame(fileName, buffer);
 
     if (result)
-        result = m_jctl->readFrom(buffer);
+        result = m_jctl->read(buffer);
 
     if (result) {
         m_jctl->restoreGame(m_board);
@@ -65,21 +73,37 @@ void Game::load(QString fileName)
 
     if (result) {
         // signal to redraw GameBoard
-        qDebug() << "game loaded" << fileName;
-        emit onGameLoaded();
+        qDebug() << "Game loaded" << fileName;
+        emit gameLoaded();
     } else
-        qDebug() << "unsuccessfuly";
+        qDebug() << "game is not loaded";
 
+    return result;
 }
 
-void Game::save(QString fileName)
+bool Game::loadTemporary()
+{
+    return load(CtGlobal::tempFileName());
+}
+
+bool Game::save(QString fileName)
 {
     QByteArray buffer;
 
     m_jctl->storeGame();
     m_jctl->storeMoves();
-    m_jctl->writeTo(buffer);
-    CtGlobal::io().saveGame(fileName, buffer);
+    m_jctl->write(buffer);
+    return CtGlobal::io().saveGame(fileName, buffer);
+}
+
+bool Game::saveTemporary()
+{
+    return save(CtGlobal::tempFileName());
+}
+
+void Game::removeTemporary()
+{
+    CtGlobal::io().tempFileDelete();
 }
 
 bool Game::hasMoves()
@@ -107,7 +131,7 @@ void Game::deleteLastMove()
 
 MoveItem * Game::addNewMove(int tubeFromIndex, int tubeToIndex)
 {
-    MoveItem * move = new MoveItem(m_board, tubeFromIndex, tubeToIndex);
+    MoveItem * move = new MoveItem(m_board->getMoveData(tubeFromIndex, tubeToIndex));
     m_moves->append(move);
     return move;
 }

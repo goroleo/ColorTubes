@@ -50,7 +50,6 @@ private:
 
     void         geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
     void         mousePressEvent(QMouseEvent* event);
-    qreal        scale() const;
     void         rescale();
 
     void         placeTubes();

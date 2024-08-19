@@ -68,20 +68,18 @@ void CtPalette::setColor(int index, quint32 rgb)
 
 void CtPalette::setDefault()
 {
-    m_items[0] = 0xff38ff4d; // 1
-    m_items[1] = 0xff1dd3f4; // 2
-    m_items[2] = 0xff884822; // 3
-    m_items[3] = 0xff8eaf00; // 4
-    m_items[4] = 0xff737f8c; // 5
-    m_items[5] = 0xff067606; // 6
-    m_items[6] = 0xff3632de; // 7
-    m_items[7] = 0xfff36d00; // 8
-    m_items[8] = 0xffaf008f; // 9
-    m_items[9] = 0xffe60f04; // 10
-    m_items[10] = 0xffff7abc; // 11
-    m_items[11] = 0xffffeb04; // 12
-//    m_background = QColor(0xff282828);
-//    m_dialogColor = QColor(0xff1c1127);
+    m_items[0]  = 0xff38ff4d;
+    m_items[1]  = 0xff1dd3f4;
+    m_items[2]  = 0xff884822;
+    m_items[3]  = 0xff8eaf00;
+    m_items[4]  = 0xff737f8c;
+    m_items[5]  = 0xff067606;
+    m_items[6]  = 0xff3632de;
+    m_items[7]  = 0xfff36d00;
+    m_items[8]  = 0xffaf008f;
+    m_items[9]  = 0xffe60f04;
+    m_items[10] = 0xffff7abc;
+    m_items[11] = 0xffffeb04;
 }
 
 bool CtPalette::load()
@@ -121,36 +119,6 @@ bool CtPalette::load()
         }
     } // end process palette
 
-/*
- *     // process system colors
-    result = result && jObj.contains("colors") && jObj["colors"].isObject();
-    if (result) {
-        QJsonObject jColors = jObj["colors"].toObject();
-
-        // background color
-        if (jColors.contains("background") && jColors["background"].isString()) {
-            value = jColors["background"].toString();
-            if ((value.length() == 7) && value.startsWith("#"))
-                m_background = QColor(CtGlobal::colorStrToRgb(result, value));
-            else
-                result = false;
-        } else
-            result = false;
-
-
-        // dialog color
-        if (result && jColors.contains("dialog") && jColors["dialog"].isString()) {
-            value = jColors["dialog"].toString();
-            if ((value.length() == 7) && value.startsWith("#")) {
-                m_dialogColor = QColor(CtGlobal::colorStrToRgb(result, value));
-            } else
-                result = false;
-        } else
-            result = false;
-
-
-    }
-*/
     return result;
 }
 
@@ -168,13 +136,6 @@ bool CtPalette::save()
         jItem["color"+CtGlobal::intToStr(i+1)] = CtGlobal::colorRgbToStr(m_items[i]);
     }
     jObj["palette"] = jItem;
-
-//    jItem = QJsonObject();
-
-    // adds system colors
-//    jItem["background"] = CtGlobal::colorRgbToStr(m_background.rgb());
-//    jItem["dialog"] = CtGlobal::colorRgbToStr(m_dialogColor.rgb());;
-//    jObj["colors"] = jItem;
 
     // save
     return CtGlobal::io().saveJson(CtGlobal::paletteFileName(), jObj);

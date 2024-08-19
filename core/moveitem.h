@@ -11,10 +11,10 @@ class MoveItem
 public:
 
     struct MoveFields {
-        quint8 tubeFrom;
-        quint8 tubeTo;
-        quint8 count;
         quint8 color;
+        quint8 count;
+        quint8 tubeTo;
+        quint8 tubeFrom;
     };
 
     union MoveData {
@@ -23,10 +23,10 @@ public:
     };
 
     MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo);
+    MoveItem(quint32 storedMove);
     ~MoveItem();
 
     bool         doMove();
-    bool         undoMove();
 
     bool operator < (const MoveItem & other) const {
         return m_rank < other.m_rank;
@@ -57,7 +57,8 @@ private:
 QDebug operator << (QDebug dbg, const MoveItem & moveItem);
 QDebug operator << (QDebug dbg, const MoveItem * moveItem);
 
-class MoveItems: public QVector<MoveItem*>{
+class MoveItems: public QVector<MoveItem * >
+{
 public:
     void         sortByRank();
     MoveItem   * current();

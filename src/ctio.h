@@ -22,6 +22,8 @@ public:
     QString statsFileName()    {return localFileName("statsistics.json");}
     QString anglesFileName()   {return localFileName("tiltangles.json");}
     QString tempFileName()     {return localFileName("tempgame.jctl");}
+    bool tempFileExists();
+    void tempFileDelete();
 
     bool loadJson(QString fName, QJsonObject &jsonObj);
     bool saveJson(QString fName, QJsonObject &jsonObj);

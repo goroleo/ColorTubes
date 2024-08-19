@@ -6,20 +6,27 @@ MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
 {
     m_boardBefore = board;
     m_parentMove = board->parentMove();
-    m_data.stored = board->getMove(idxTubeFrom, idxTubeTo);
+    m_data.stored = board->getMoveData(idxTubeFrom, idxTubeTo);
     m_rank = 0;
-//    qDebug() << "New move added." << this;
+}
+
+MoveItem::MoveItem(quint32 storedMove)
+{
+    m_data.stored = storedMove;
+    m_rank = 0;
 }
 
 MoveItem::~MoveItem()
 {
     if (m_boardAfter)
         delete m_boardAfter;
-//    qDebug() << "Move deleted." << this;
 }
 
 bool MoveItem::doMove()
 {
+    if (m_data.stored == 0)
+        return false;
+
     m_boardAfter = new BoardModel(m_boardBefore);
     for (int i = 0; i < m_data.fields.count; ++i) {
         m_boardAfter->tubeAt(m_data.fields.tubeFrom)->extractColor();
@@ -42,7 +49,7 @@ void MoveItems::sortByRank()
     for (quint8 i = 1; i < size(); ++i) {
         temp = at(i);
         j = i;
-        while ( (j > 0) && (at(j-1)->rank() > temp->rank()) ) {
+        while ( (j > 0) && (at(j-1)->rank() < temp->rank()) ) {
             move(j-1, j);
             j--;
         }

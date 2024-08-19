@@ -17,9 +17,10 @@ TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
     m_model(tm)
 {
     m_board = (GameBoard *) parent;
+    if (!m_model)
+        m_model = new TubeModel();
 
     m_shade = new ShadeLayer(this);
-    m_shade->setShade(0);
 
     m_back = new BottleLayer(this);
     m_back->setSource(BottleLayer::CT_BOTTLE_BACK);
@@ -30,13 +31,6 @@ TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
     m_front->setSource(BottleLayer::CT_BOTTLE_FRONT);
 
     m_cork = new CorkLayer(this);
-    m_cork->setVisible(false);
-
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-                     this, SLOT(onScaleChanged()));
-
-    setAcceptedMouseButtons(Qt::AllButtons);
-    setFlag(ItemAcceptsInputMethod, true);
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, [=]() {
@@ -44,11 +38,17 @@ TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
         update();
     });
 
-    if (tm) {
-        QObject::connect(tm, &TubeModel::stateChanged,
-                         this, &TubeItem::onTubeStateChanged);
-        setClosed(tm->isDone());
-    }
+    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
+                     this, SLOT(onScaleChanged()));
+    QObject::connect(m_model, &TubeModel::stateChanged,
+                     this, &TubeItem::onTubeStateChanged);
+
+    setAcceptedMouseButtons(Qt::AllButtons);
+    setFlag(ItemAcceptsInputMethod, true);
+
+    setClosed(m_model->isDone());
+    m_shade->setAnimated(true);
+    m_cork->setAnimated(true);
 }
 
 TubeItem::~TubeItem()
@@ -59,7 +59,6 @@ TubeItem::~TubeItem()
     delete m_colors;
     delete m_back;
     delete m_shade;
-    qDebug() << "Tube" << tubeIndex() << "deleted";
 }
 
 void TubeItem::mousePressEvent(QMouseEvent * event)
@@ -178,6 +177,7 @@ void TubeItem::onTubeStateChanged()
         qDebug() << "Closed tube" << tubeIndex();
         if (m_board->isSolved()) {
             qDebug() << "!!! SOLVED !!!";
+            CtGlobal::game().removeTemporary();
             emit m_board->solved();
         }
     }
@@ -185,8 +185,8 @@ void TubeItem::onTubeStateChanged()
 
 void TubeItem::setClosed(bool value)
 {
-    if (value == m_closed)
-        return;
+//    if (value == m_closed)
+//        return;
     if (value) {
         if (m_shade->shade() != 3)
             m_shade->setShadeAfterHide(3);
@@ -385,7 +385,7 @@ void TubeItem::flyTo(TubeItem * tubeTo)
 // recipient
     m_recipient = tubeTo;
     m_recipient->setShade(0);
-    m_pouringCells = qMin(m_model->sameColorCount(), tubeTo->model()->rest());
+    m_pouringCells = qMin(m_model->currentColorCount(), tubeTo->model()->rest());
     m_recipient->connectTube(this);
 
 // angles
@@ -395,11 +395,11 @@ void TubeItem::flyTo(TubeItem * tubeTo)
 // rotation direction
     bool clockWise = this->m_currentPosition.x() < tubeTo->m_currentPosition.x();
     if (clockWise) {
-        if (tubeTo->m_currentPosition.x() + CtGlobal::tubeWidth() / 2.0
+        if (tubeTo->m_currentPosition.x() + CtGlobal::images().tubeWidth() / 2.0
                 - CtGlobal::images().tubeRotationWidth() < 0)
             clockWise = false;
     } else {
-        if (tubeTo->m_currentPosition.x() + CtGlobal::tubeWidth() / 2.0
+        if (tubeTo->m_currentPosition.x() + CtGlobal::images().tubeWidth() / 2.0
                 + CtGlobal::images().tubeRotationWidth() > m_board->width())
             clockWise = true;
     }
@@ -474,7 +474,6 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     if (tubeFrom->m_recipient != this)
         return;
 
- // !!!   m_board->addBoardMove(tubeFrom, this);
     CtGlobal::game().addNewMove(tubeFrom->tubeIndex(), this->tubeIndex());
     for (int i = 0; i < tubeFrom->m_pouringCells; i++) {
         m_model->putColor(tubeFrom->model()->extractColor());

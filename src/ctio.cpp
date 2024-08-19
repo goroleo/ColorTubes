@@ -5,7 +5,6 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonDocument>
-#include <QLatin1String>
 
 #include <QDebug>
 
@@ -38,13 +37,26 @@ void CtIo::initialize()
     m_sep = qdir.separator();
 
     QString dirName = SailfishApp::pathToSharedDir().toString();
+
     if (!qdir.exists(dirName)) {
-        qDebug() << "Creating path" << dirName;
         qdir.mkpath(dirName);
-    }
+        qDebug() << "Creating application path" << dirName;
+    } else
+        qDebug() << "Application path:" << dirName;
+
     qdir.setPath(dirName);
     m_dir = qdir.path();
-    qDebug() << "Application path:" << m_dir;
+}
+
+bool CtIo::tempFileExists()
+{
+    return QFile::exists(tempFileName());
+}
+
+void CtIo::tempFileDelete()
+{
+    if (tempFileExists())
+        QFile::remove(tempFileName());
 }
 
 bool CtIo::loadJson(QString fName, QJsonObject &jsonObj)
@@ -97,3 +109,4 @@ bool CtIo::saveGame(QString fName, QByteArray &buffer)
     saveFile.write(buffer);
     return true;
 }
+

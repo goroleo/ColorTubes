@@ -22,6 +22,7 @@ public:
     void        startShow();
     void        startHide();
     void        hideImmediately();
+    void        showImmediately();
     void        startPulse();
     void        stopPulse();
 
@@ -29,6 +30,8 @@ public:
     void        setShadeAfterHide(int newShadeNumber);
 
     void        setPulse(bool value);
+    void        setAnimated(bool value);
+    bool        isAnimated() {return m_animated;}
 
 signals:
     void        pulseChanged(const bool newPulse);
@@ -52,6 +55,7 @@ private:
 
     QImage      m_shadeImage;
     QImage      m_drawImage;
+    bool        m_animated = false;
 };
 
 #endif // SHADELAYER_H

@@ -17,6 +17,7 @@ GameBoard::GameBoard(QQuickItem *parent) :
         m_tubes->append(tube);
     }
 
+
     QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
             this, SLOT(onScaleChanged()));
 
@@ -74,11 +75,6 @@ void GameBoard::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
         rescale();
 }
 
-qreal GameBoard::scale() const
-{
-    return CtGlobal::images().scale();
-}
-
 void GameBoard::rescale()
 {
     // rescale and replace all tubes
@@ -89,7 +85,7 @@ void GameBoard::rescale()
 
     qreal newScale = qMin(qreal(width() / boardWidth), qreal(height() / boardHeight));
 
-    if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(scale(), newScale)) {
+    if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(CtGlobal::images().scale(), newScale)) {
         CtGlobal::images().setScale(newScale);
     } else {
         placeTubes();
@@ -105,13 +101,13 @@ void GameBoard::placeTubes()
 {
     int columns = m_model->tubesCount() / 2 + m_model->tubesCount() % 2 ;
 
-    qreal leftMargin = scale() * spaceX;
-    qreal colSpace = scale() * spaceY;
+    qreal leftMargin = CtGlobal::images().scale() * spaceX;
+    qreal colSpace = CtGlobal::images().scale() * spaceY;
     qreal rowWidth = width() - leftMargin * 2;
     int   rowColumns = columns;
-    qreal rowSpace = (rowWidth - rowColumns * CtGlobal::tubeWidth()) / (rowColumns + 1);
+    qreal rowSpace = (rowWidth - rowColumns * CtGlobal::images().tubeWidth()) / (rowColumns + 1);
 
-    qreal realHeight = colSpace * 3 + CtGlobal::tubeHeight() * 2;
+    qreal realHeight = colSpace * 3 + CtGlobal::images().tubeHeight() * 2;
     qreal topMargin = qreal (height() - realHeight) / 2;
 
     int row = 0;
@@ -123,14 +119,14 @@ void GameBoard::placeTubes()
         if (tubeNumber == columns) {
             row++;
             rowColumns = m_model->tubesCount() - columns;
-            rowSpace = (rowWidth - rowColumns * CtGlobal::tubeWidth()) / (rowColumns + 1);
+            rowSpace = (rowWidth - rowColumns * CtGlobal::images().tubeWidth()) / (rowColumns + 1);
         }
 
         col = tubeNumber - row * columns;
 
         m_tubes->at(tubeNumber)->setRegularPosition(
-                    QPointF(leftMargin + rowSpace + col * (CtGlobal::tubeWidth() + rowSpace),
-                            topMargin + colSpace + row * (CtGlobal::tubeHeight() + colSpace)));
+                    QPointF(leftMargin + rowSpace + col * (CtGlobal::images().tubeWidth() + rowSpace),
+                            topMargin + colSpace + row * (CtGlobal::images().tubeHeight() + colSpace)));
         tubeNumber ++;
     }
 }

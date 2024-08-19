@@ -36,9 +36,19 @@ Game& CtGlobal::game()
     return m_game.instance();
 }
 
-int CtGlobal::gameMode()
+CtIo& CtGlobal::io()
 {
-    return m_game.instance().mode();
+    return m_io.instance();
+}
+
+CtImages& CtGlobal::images()
+{
+    return m_images.instance();
+}
+
+CtPalette& CtGlobal::palette()
+{
+    return m_palette.instance();
 }
 
 BoardModel * CtGlobal::board()
@@ -51,46 +61,6 @@ MoveItems * CtGlobal::moves()
     return m_game.instance().moves();
 }
 
-CtIo& CtGlobal::io()
-{
-    return m_io.instance();
-}
-
-CtPalette& CtGlobal::palette()
-{
-    return m_palette.instance();
-}
-
-QColor CtGlobal::paletteColor(quint8 colorIndex)
-{
-    return m_palette.instance().getColor(colorIndex);
-}
-
-CtImages& CtGlobal::images()
-{
-    return m_images.instance();
-}
-
-qreal CtGlobal::tubeWidth()
-{
-    return m_images.instance().tubeWidth();
-}
-
-qreal CtGlobal::tubeHeight()
-{
-    return m_images.instance().tubeHeight();
-}
-
-qreal CtGlobal::scale()
-{
-    return m_images.instance().scale();
-}
-
-QString CtGlobal::localFileName(QString fName)
-{
-    return m_io.instance().localFileName(fName);
-}
-
 QString CtGlobal::paletteFileName()
 {
     return m_io.instance().paletteFileName();
@@ -99,6 +69,16 @@ QString CtGlobal::paletteFileName()
 QString CtGlobal::settingsFileName()
 {
     return m_io.instance().settingsFileName();
+}
+
+QString CtGlobal::tempFileName()
+{
+    return m_io.instance().tempFileName();
+}
+
+QColor CtGlobal::paletteColor(quint8 colorIndex)
+{
+    return m_palette.instance().getColor(colorIndex);
 }
 
 quint32 CtGlobal::colorStrToRgb(bool &ok, QString value)
@@ -136,19 +116,4 @@ QString CtGlobal::intToStr(int value)
 QString CtGlobal::intToHex(int value)
 {
     return QString().setNum(value, 16);
-}
-
-QString CtGlobal::endOfLine()
-{
-    const QChar newline('\n');
-    const QChar cr('\r');
-
-    #ifdef __linux__
-        const QString eol = QString(newline);
-    #elif _WIN32
-        const QString eol = QString(cr) + QString(newline);
-    #else
-        const QString eol = QString(cr);
-    #endif
-    return eol;
 }

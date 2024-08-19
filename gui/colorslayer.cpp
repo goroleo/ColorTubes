@@ -60,11 +60,6 @@ void ColorsLayer::refresh()
     update();
 }
 
-qreal ColorsLayer::scale()
-{
-    return CtGlobal::images().scale();
-}
-
 void ColorsLayer::onScaleChanged()
 {
     if (m_drawImage) {

@@ -35,13 +35,15 @@ public:
 
     bool          isSolved();
 
-    int           movesCount() { return m_moves->size(); }
     bool          canDoMove(int tubeFromIndex, int tubeToIndex);
-    quint8        colorsToMove(int tubeFromIndex, int tubeToIndex);
     bool          canDoMove(TubeModel * tubeFrom, TubeModel * tubeTo);
+    quint8        colorsToMove(int tubeFromIndex, int tubeToIndex);
     quint8        colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo);
-    quint32       getMove(int tubeFromIndex, int tubeToIndex);
+
+    quint32       getMoveData(int tubeFromIndex, int tubeToIndex);
     MoveItem    * addNewMove(int tubeFromIndex, int tubeToIndex);
+
+    int           movesCount() { return m_moves->size(); }
     bool          hasMoves() { return !m_moves->empty(); }
     void          deleteCurrentMove();
 
@@ -67,6 +69,7 @@ private:
     qint32        m_level;
 
     bool          checkFilledTubes();
+    void          fillActiveColors();
 
 };
 

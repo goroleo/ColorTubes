@@ -35,11 +35,22 @@ bool CorkLayer::isVisible()
     return m_visible;
 }
 
-void CorkLayer::setVisible(bool newVisible)
+void CorkLayer::setVisible(bool value)
 {
-    if (m_visible == newVisible)
+    if (m_visible == value)
         return;
-    if (newVisible)
+    if (value)
+        startShow();
+    else
+        startHide();
+}
+
+void CorkLayer::setAnimated(bool value)
+{
+    if (m_animated == value)
+        return;
+    m_animated = value;
+    if (m_visible)
         startShow();
     else
         startHide();
@@ -48,18 +59,32 @@ void CorkLayer::setVisible(bool newVisible)
 void CorkLayer::startShow()
 {
     m_visible = true;
-    m_alphaIncrement = 1.0 / qreal(CT_CORK_STEPS_INC);
-    if (!m_timer->isActive()) {
-        m_timer->start(CT_TIMER_TICKS);
+    if (m_animated) {
+        m_alphaIncrement = 1.0 / qreal(CT_CORK_STEPS_INC);
+        if (!m_timer->isActive()) {
+            m_timer->start(CT_TIMER_TICKS);
+        }
+    } else {
+        m_alpha = 1.1;
+        nextFrame();
+        paintFrame();
+        update();
     }
 }
 
 void CorkLayer::startHide()
 {
     m_visible = false;
-    m_alphaIncrement = -1.0 / qreal(CT_CORK_STEPS_DEC);
-    if (!m_timer->isActive()) {
-        m_timer->start(CT_TIMER_TICKS);
+    if (m_animated) {
+        m_alphaIncrement = -1.0 / qreal(CT_CORK_STEPS_DEC);
+        if (!m_timer->isActive()) {
+            m_timer->start(CT_TIMER_TICKS);
+        }
+    } else {
+        m_alpha = -0.1;
+        nextFrame();
+        paintFrame();
+        update();
     }
 }
 

@@ -16,17 +16,21 @@ BoardModel::BoardModel()
 BoardModel::BoardModel(BoardModel * parentBoard)
 {
     BoardModel();
-    m_parentBoard = parentBoard;
-    m_parentMove = parentBoard->currentMove();
-    m_rootBoard = parentBoard->rootBoard();
+    if (parentBoard) {
+        m_parentBoard = parentBoard;
+        m_parentMove = parentBoard->currentMove();
+        m_rootBoard = parentBoard->rootBoard();
+    }
 }
 
 BoardModel::BoardModel(MoveItem * parentMove)
 {
     BoardModel();
-    m_parentMove = parentMove;
-    m_parentBoard = parentMove->boardBefore();
-    m_rootBoard = m_parentBoard->rootBoard();
+    if (parentMove) {
+        m_parentMove = parentMove;
+        m_parentBoard = parentMove->boardBefore();
+        m_rootBoard = m_parentBoard->rootBoard();
+    }
 }
 
 BoardModel::~BoardModel()
@@ -55,12 +59,16 @@ void BoardModel::clearTubes()
 
 void BoardModel::clearMoves()
 {
+    if (!m_moves->empty())
+        qDeleteAll(m_moves->begin(), m_moves->end());
     m_moves->clear();
 }
 
 MoveItem * BoardModel::currentMove()
 {
-    return m_moves->current();
+    if (!m_moves->empty())
+        return m_moves->last();
+    return nullptr;
 }
 
 void BoardModel::deleteCurrentMove()
@@ -149,7 +157,6 @@ TubeModel * BoardModel::addNewTube(quint32 storedTube)
     return tube;
 }
 
-
 bool BoardModel::isSolved()
 {
     bool result = true;
@@ -191,13 +198,13 @@ quint8 BoardModel::colorsToMove(int tubeFromIndex, int tubeToIndex)
 quint8 BoardModel::colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo)
 {
     if (canDoMove(tubeFrom, tubeTo))
-        return qMin(tubeFrom->sameColorCount(),
+        return qMin(tubeFrom->currentColorCount(),
                     tubeTo->rest());
     else
         return 0;
 }
 
-quint32 BoardModel::getMove(int tubeFromIndex, int tubeToIndex)
+quint32 BoardModel::getMoveData(int tubeFromIndex, int tubeToIndex)
 {
     if (!canDoMove(tubeFromIndex, tubeToIndex))
         return 0;
@@ -216,34 +223,6 @@ MoveItem * BoardModel::addNewMove(int tubeFromIndex, int tubeToIndex)
     m_moves->append(move);
     return move;
 }
-
-/*
-quint32 BoardModel::undoMove()
-{
-    if (!currentMove())
-        return 0;
-
-    quint32 result = currentMove()->stored();
-    for (int i = 0; i < currentMove()->count(); ++i) {
-        m_tubes->at(currentMove()->tubeTo())->extractColor();
-        m_tubes->at(currentMove()->tubeFrom())->putColor(currentMove()->color());
-    }
-    deleteCurrentMove();
-    return result;
-}
-
-void BoardModel::startAgain()
-{
-    while (currentMove()) {
-        for (int i=0; i < currentMove()->count(); ++i) {
-            m_tubes->at(currentMove()->tubeTo())->extractColor();
-            m_tubes->at(currentMove()->tubeFrom())->putColor(currentMove()->color());
-        }
-        deleteCurrentMove();
-    }
-}
-
-*/
 
 void BoardModel::randomFill(int fillTubes, int emptyTubes)
 {
@@ -282,6 +261,17 @@ bool BoardModel::checkFilledTubes()
     return CtGlobal::game().jctl()->checkTubes();
 }
 
+void BoardModel::fillActiveColors()
+{
+    CtGlobal::game().usedColors()->clearAllUsed();
+    for (int i = 0; i < tubesCount(); ++i) {
+//        if (!m_tubes->at(i)->isDone())
+            CtGlobal::game().usedColors()->incUsed(
+                        m_tubes->at(i)->currentColor(),
+                        m_tubes->at(i)->currentColorCount());
+    }
+}
+
 quint16 BoardModel::calculateMoves()
 {
     TubeModel * tubeFrom;
@@ -292,6 +282,8 @@ quint16 BoardModel::calculateMoves()
     bool emptyTubeProcessed = false;     // true if one of empty tube has processed already
 
     clearMoves();
+    fillActiveColors();
+
     for (quint8 tubeToIndex = 0; tubeToIndex < tubesCount(); ++tubeToIndex) {
 
         tubeTo = m_tubes->at(tubeToIndex);
@@ -301,7 +293,7 @@ quint16 BoardModel::calculateMoves()
             if (!emptyTubeProcessed && tubeTo->isEmpty())
                 emptyTubeProcessed = true;
 
-            quint8 toCount = tubeTo->sameColorCount();
+            quint8 toCount = tubeTo->currentColorCount();
 
             for (quint8 tubeFromIndex = 0; tubeFromIndex < tubesCount(); ++tubeFromIndex) {
 
@@ -311,7 +303,7 @@ quint16 BoardModel::calculateMoves()
                     tubeFrom = m_tubes->at(tubeFromIndex);
                     if (tubeTo->canPutColor(tubeFrom->currentColor())) {
 
-                        quint8 fromCount = tubeFrom->sameColorCount();
+                        quint8 fromCount = tubeFrom->currentColorCount();
 
                         move = addNewMove(tubeFromIndex, tubeToIndex);
                         qint8 rank = move->count() + 100 - result;
@@ -378,6 +370,6 @@ QDebug operator << (QDebug dbg, const BoardModel &board)
 
 QDebug operator << (QDebug dbg, const BoardModel *board)
 {
-    dbg.nospace() << *board;
+    dbg.noquote().nospace() << board->toString();
     return dbg.maybeSpace();
 }

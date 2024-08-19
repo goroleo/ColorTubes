@@ -38,10 +38,10 @@ static const quint8  CT_CORK_STEPS_DEC   = 9;            // steps to opacity dec
 // ------------- tubes animation stages
 static const quint8  CT_STAGE_DEFAULT    = 0;            // tube is at its regular position
 static const quint8  CT_STAGE_SELECT     = 1;            // tube is selected
-static const quint8  CT_STAGE_FLY        = 2;            // tube flies to another tube to pour its color(s) into
+static const quint8  CT_STAGE_FLY        = 2;            // tube is flying to another tube to pour its color(s) into
 static const quint8  CT_STAGE_POUR_OUT   = 3;            // tube pours its color(s) out
-static const quint8  CT_STAGE_BACK       = 4;            // tube flies back to its position
-static const quint8  CT_STAGE_BUSY       = 10;           // tube receives colors from another tube
+static const quint8  CT_STAGE_BACK       = 4;            // tube is flying back to its position
+static const quint8  CT_STAGE_BUSY       = 10;           // tube is receiving colors from another tube
 
 // ------------- tubes states
 static const quint8  CT_STATE_EMPTY      = 0;            // there's no any filled color cell in the tube
@@ -61,32 +61,29 @@ namespace CtGlobal
     void create();
     void destroy();
 
-    // set of global singletons
+    // global singletons
     Game & game();
     CtIo & io();
     CtImages & images();
     CtPalette & palette();
 
-    // files
-    QString localFileName(QString fName);
-    QString paletteFileName();
-    QString settingsFileName();
-
-    int    gameMode();
-    qreal  scale();
+    // game
     BoardModel * board();
     MoveItems * moves();
-    qreal  tubeWidth();
-    qreal  tubeHeight();
 
+    // files
+    QString paletteFileName();
+    QString settingsFileName();
+    QString tempFileName();
+
+    // colors
     QColor paletteColor(quint8 colorIndex);
 
-    // service routines
+    // service
     quint32 colorStrToRgb(bool &ok, QString value);
     QString colorRgbToStr(quint32 value);
     QString intToStr(int value);
     QString intToHex(int value);
-    QString endOfLine();
     template <typename T> int sign(T val) {
         return (T(0) < val) - (val < T(0));
     }

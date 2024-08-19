@@ -15,10 +15,14 @@ public:
     ~CorkLayer();
 
     bool     isVisible();
+    bool     isAnimated() {return m_animated;}
 
-    void     setVisible(bool newVisible);
+
+    void     setVisible(bool value);
+    void     setAnimated(bool value);
     void     startShow();
     void     startHide();
+
 
 private slots:
     void     onScaleChanged();
@@ -36,6 +40,7 @@ private:
     qreal    m_alpha = 0.0;
     qreal    m_alphaIncrement;
     qreal    m_currentY = 0;
+    bool     m_animated = false;
 };
 
 #endif // COLORSLAYER_H

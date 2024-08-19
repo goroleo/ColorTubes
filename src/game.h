@@ -26,6 +26,7 @@ public:
     JctlFormat * jctl()       {return m_jctl; }
     MoveItems  * moves()      {return m_moves; }
 
+    MoveItem   * addNewMove(int tubeFromIndex, int tubeToIndex);
     bool         hasMoves();
     void         clearMoves();
     MoveItem   * lastMove();
@@ -34,13 +35,14 @@ public:
     void         setMode(int newMode);
     int          mode() {return gameMode;}
 
-    void         load(QString fileName);
-    void         save(QString fileName);
-
-    MoveItem * addNewMove(int tubeFromIndex, int tubeToIndex);
+    bool         load(QString fileName);
+    bool         loadTemporary();
+    bool         save(QString fileName);
+    bool         saveTemporary();
+    void         removeTemporary();
 
 signals:
-    void onGameLoaded();
+    void         gameLoaded();
 
 private:
     Game() {};
@@ -50,9 +52,8 @@ private:
     JctlFormat  * m_jctl;
     BoardModel  * m_board;
     MoveItems   * m_moves;
-    int gameMode;
+    int           gameMode;
     static Game * m_instance;
 };
-
 
 #endif // GAME_H
