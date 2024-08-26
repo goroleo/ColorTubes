@@ -13,8 +13,7 @@ class BoardModel
 {
 public:
     BoardModel();
-    BoardModel(BoardModel * parentBoard);
-    BoardModel(MoveItem * parentMove);
+    BoardModel(MoveItem * move);
     ~BoardModel();
 
     BoardModel  * rootBoard()   {return m_rootBoard;}
@@ -23,8 +22,6 @@ public:
     MoveItem    * currentMove();
 
     void          clear();
-    void          clearTubes();
-    void          clearMoves();
 
     int           tubesCount() const { return m_tubes->size(); }
     TubeModel   * tubeAt(int index) const;
@@ -43,11 +40,11 @@ public:
     quint32       getMoveData(int tubeFromIndex, int tubeToIndex);
     MoveItem    * addNewMove(int tubeFromIndex, int tubeToIndex);
 
-    int           movesCount() { return m_moves->size(); }
-    bool          hasMoves() { return !m_moves->empty(); }
+    MoveItems   * moves();
+    int           movesCount();
+    bool          hasMoves();
     void          deleteCurrentMove();
 
-    MoveItems   * moves() {return m_moves;}
 
     quint16       calculateMoves();
 
@@ -56,8 +53,9 @@ public:
     int           level() {return m_level; }
     void          setLevel(int newLevel) {m_level = newLevel;}
 
-    bool operator == (const BoardModel &other) const;
+//    bool operator == (const BoardModel &other) const;
     QString       toString() const;
+    quint16       hash() {return m_hash;}
 
 private:
     BoardModel  * m_parentBoard = nullptr;
@@ -65,11 +63,13 @@ private:
     MoveItem    * m_parentMove = nullptr;
 
     TubeModels  * m_tubes;
-    MoveItems   * m_moves;
+    MoveItems   * m_moves = nullptr;
     qint32        m_level;
+    quint16       m_hash;
 
     bool          checkFilledTubes();
     void          fillActiveColors();
+    void          calculateHash();
 
 };
 

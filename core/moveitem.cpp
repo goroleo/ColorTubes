@@ -4,22 +4,27 @@
 
 MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
 {
-    m_boardBefore = board;
-    m_parentMove = board->parentMove();
-    m_data.stored = board->getMoveData(idxTubeFrom, idxTubeTo);
-    m_rank = 0;
+    rank = 0;
+    if (board) {
+        m_boardBefore = board;
+        m_parentMove = board->parentMove();
+        m_data.stored = board->getMoveData(idxTubeFrom, idxTubeTo);
+    }
 }
 
 MoveItem::MoveItem(quint32 storedMove)
 {
+    rank = 0;
     m_data.stored = storedMove;
-    m_rank = 0;
 }
 
 MoveItem::~MoveItem()
 {
     if (m_boardAfter)
         delete m_boardAfter;
+    if (m_children) {
+        delete m_children;
+    }
 }
 
 bool MoveItem::doMove()
@@ -27,16 +32,83 @@ bool MoveItem::doMove()
     if (m_data.stored == 0)
         return false;
 
-    m_boardAfter = new BoardModel(m_boardBefore);
-    for (int i = 0; i < m_data.fields.count; ++i) {
-        m_boardAfter->tubeAt(m_data.fields.tubeFrom)->extractColor();
-        m_boardAfter->tubeAt(m_data.fields.tubeTo)->putColor(m_data.fields.color);
-    }
+    m_boardAfter = new BoardModel(this);
 
     bool result = m_boardAfter->isSolved() || m_boardAfter->calculateMoves() > 0;
-    if (!result)
+    if (!result) {
         delete m_boardAfter;
+        m_boardAfter = nullptr;
+    }
     return result;
+}
+
+bool MoveItem::hasChildren()
+{
+    if (m_children)
+        return !(m_children->isEmpty());
+    return false;
+}
+
+int MoveItem::childrenCount()
+{
+    if (m_children)
+        return m_children->size();
+    return 0;
+}
+
+MoveItem * MoveItem::currentChild()
+{
+    if (m_children)
+        return m_children->current();
+    return nullptr;
+}
+
+void MoveItem::addChild(quint32 storedMove)
+{
+    addChild(new MoveItem(storedMove));
+}
+
+void MoveItem::addChild(MoveItem * move)
+{
+    if (!m_children)
+        m_children = new MoveItems();
+    move->m_parentMove = this;
+    move->m_boardBefore = this->m_boardAfter;
+    m_children->append(move);
+}
+
+void MoveItem::removeLastChild()
+{
+    if (m_children)
+        m_children->removeLast();
+}
+
+MoveItem * MoveItems::current()
+{
+    if (!isEmpty())
+        return last();
+    return nullptr;
+}
+
+
+MoveItems::~MoveItems()
+{
+    clear();
+}
+
+
+void MoveItems::removeLast()
+{
+   if (!isEmpty()) {
+       delete last();
+       remove (size() - 1);
+   }
+}
+
+void MoveItems::clear()
+{
+    while (!isEmpty())
+        removeLast();
 }
 
 void MoveItems::sortByRank()
@@ -49,26 +121,12 @@ void MoveItems::sortByRank()
     for (quint8 i = 1; i < size(); ++i) {
         temp = at(i);
         j = i;
-        while ( (j > 0) && (at(j-1)->rank() < temp->rank()) ) {
+        while ( (j > 0) && (at(j-1)->rank > temp->rank) ) {
             move(j-1, j);
             j--;
         }
         replace(j, temp);
     }
-}
-
-MoveItem * MoveItems::current()
-{
-    if (!empty())
-        return last();
-    return nullptr;
-}
-
-void MoveItems::clear()
-{
-    if (!empty())
-        qDeleteAll(begin(), end());
-    QVector::clear();
 }
 
 QDebug operator << (QDebug dbg, const MoveItem & moveItem)
@@ -78,7 +136,7 @@ QDebug operator << (QDebug dbg, const MoveItem & moveItem)
         << ", to: "    << QString::number(moveItem.tubeTo(), 16)
         << ", color: " << QString::number(moveItem.color(), 16)
         << ", count: " << moveItem.count()
-        << ", rank: "  << moveItem.rank()
+        << ", rank: "  << moveItem.rank
         << " }";
     return dbg.maybeSpace();
 }

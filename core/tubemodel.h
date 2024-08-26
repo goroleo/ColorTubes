@@ -3,6 +3,11 @@
 
 #include <QtCore>
 
+union ColorCells {
+    quint8 items[4];
+    quint32 stored;
+};
+
 class TubeModel : public QObject
 {
     Q_OBJECT
@@ -52,16 +57,17 @@ private:
     bool checkDone();
     bool putColor(quint8 colorNum, bool updateState);
 
-    union ColorCells {
-        quint8 items[4];
-        quint32 stored;
-    };
 
     ColorCells m_colors;
     quint8 m_state;
     quint8 m_count;
 };
 
-class TubeModels: public QVector<TubeModel*>{};
+class TubeModels: public QVector<TubeModel*>
+{
+public:
+    void         removeLast();
+    void         clear();
+};
 
 #endif // TUBEMODEL_H

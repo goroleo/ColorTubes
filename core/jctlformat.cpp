@@ -283,7 +283,7 @@ bool JctlFormat::read(QByteArray &bufferFrom)
             for (int i = 0; i < movesCount; i++) {
                 data >> dWord;
 
-                MoveItem::MoveData move;
+                MoveData move;
                 move.stored = dWord;
 
                 if (move.fields.tubeFrom < tubesCount

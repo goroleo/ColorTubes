@@ -264,7 +264,7 @@ void ColorsLayer::nextSegment()
     } else {
 
         // The current segment is not filled by one color,
-        // so we need to calculate size of the current color.
+        // so we have to calculate size of the current color.
 
         qreal newHeight;
         if (qFuzzyIsNull(dx1))  {
@@ -282,7 +282,7 @@ void ColorsLayer::nextSegment()
              * The current segment is a trapeze or a triangle.
              * We have to solve a sqare equation:
              *   ( k/2 ) * x^2 + dx0 * x - S = 0,
-             * where k   - a trapeze's coefficient
+             * where k   - a trapeze's coefficient (see below)
              *       dx0 - bottom section length
              *       S   - color's fill area
             */
