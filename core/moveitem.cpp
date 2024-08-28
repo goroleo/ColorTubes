@@ -4,6 +4,7 @@
 
 MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
 {
+//    moves_count ++;
     rank = 0;
     if (board) {
         m_boardBefore = board;
@@ -14,6 +15,7 @@ MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
 
 MoveItem::MoveItem(quint32 storedMove)
 {
+//    moves_count ++;
     rank = 0;
     m_data.stored = storedMove;
 }
@@ -25,6 +27,7 @@ MoveItem::~MoveItem()
     if (m_children) {
         delete m_children;
     }
+//    moves_count --;
 }
 
 bool MoveItem::doMove()
@@ -90,12 +93,10 @@ MoveItem * MoveItems::current()
     return nullptr;
 }
 
-
 MoveItems::~MoveItems()
 {
     clear();
 }
-
 
 void MoveItems::removeLast()
 {

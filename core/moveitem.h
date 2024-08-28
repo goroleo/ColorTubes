@@ -56,6 +56,7 @@ private:
     BoardModel * m_boardBefore = nullptr;
     BoardModel * m_boardAfter = nullptr;
     MoveItems  * m_children = nullptr;
+//    static int moves_count;
 };
 
 QDebug operator << (QDebug dbg, const MoveItem & moveItem);

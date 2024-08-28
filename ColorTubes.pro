@@ -11,11 +11,14 @@
 
 # The name of your application
 TARGET = ColorTubes
+#TARGET = com.me.legoru.ColorTubes
 
 CONFIG += \
-    sailfishapp
+    sailfishapp \
+    sailfishapp_i18n
 
-SOURCES += src/ColorTubes.cpp \
+SOURCES += \
+    src/ColorTubes.cpp \
     core/boardmodel.cpp \
     core/jctlformat.cpp \
     core/levelsengine.cpp \
@@ -35,7 +38,8 @@ SOURCES += src/ColorTubes.cpp \
     src/ctpalette.cpp \
     src/game.cpp
 
-DISTFILES += qml/ColorTubes.qml \
+DISTFILES += \
+    qml/ColorTubes.qml \
     qml/cover/CoverPage.qml \
     qml/items/CongratsPanel.qml \
     qml/items/IconButtonItem.qml \
@@ -49,9 +53,6 @@ DISTFILES += qml/ColorTubes.qml \
     ColorTubes.desktop
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
-
-CONFIG += \
-    sailfishapp_i18n
 
 TRANSLATIONS += \
     translations/ColorTubes.ts \

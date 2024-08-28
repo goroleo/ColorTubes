@@ -1,5 +1,5 @@
 #include "ctio.h"
-#include "sailfishapp.h"
+#include <sailfishapp.h>
 
 #include <QIODevice>
 #include <QDir>
@@ -37,7 +37,6 @@ void CtIo::initialize()
     m_sep = qdir.separator();
 
     QString dirName = SailfishApp::pathToSharedDir().toString();
-
     if (!qdir.exists(dirName)) {
         qdir.mkpath(dirName);
         qDebug() << "Creating application path" << dirName;
