@@ -10,15 +10,15 @@
 #   - translation filenames have to be changed
 
 # The name of your application
-TARGET = ColorTubes
-#TARGET = com.me.legoru.ColorTubes
+#TARGET = ColorTubes
+TARGET = com.me.legoru.ColorTubes
 
 CONFIG += \
-    sailfishapp \
-    sailfishapp_i18n
+    auroraapp \
+
+PKGCONFIG += \
 
 SOURCES += \
-    src/ColorTubes.cpp \
     core/boardmodel.cpp \
     core/jctlformat.cpp \
     core/levelsengine.cpp \
@@ -32,6 +32,7 @@ SOURCES += \
     gui/gameboard.cpp \
     gui/shadelayer.cpp \
     gui/tubeitem.cpp \
+    src/com.me.legoru.ColorTubes.cpp \
     src/ctglobal.cpp \
     src/ctimages.cpp \
     src/ctio.cpp \
@@ -39,24 +40,27 @@ SOURCES += \
     src/game.cpp
 
 DISTFILES += \
-    qml/ColorTubes.qml \
+    qml/com.me.legoru.ColorTubes.qml \
     qml/cover/CoverPage.qml \
     qml/items/CongratsPanel.qml \
     qml/items/IconButtonItem.qml \
     qml/items/MessagePanel.qml \
     qml/pages/MainPage.qml \
-    rpm/ColorTubes.changes.in \
-    rpm/ColorTubes.changes.run.in \
-    rpm/ColorTubes.spec \
-    rpm/ColorTubes.yaml \
+    rpm/com.me.legoru.ColorTubes.changes.in \
+    rpm/com.me.legoru.ColorTubes.changes.run.in \
+    rpm/com.me.legoru.ColorTubes.spec \
+    rpm/com.me.legoru.ColorTubes.yaml \
     translations/*.ts \
-    ColorTubes.desktop
+    com.me.legoru.ColorTubes.desktop
 
-SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
+AURORAAPP_ICONS = 86x86 108x108 128x128 172x172
+
+CONFIG += \
+    auroraapp_i18n
 
 TRANSLATIONS += \
-    translations/ColorTubes.ts \
-    translations/ColorTubes-ru.ts
+    translations/com.me.legoru.ColorTubes.ts \
+    translations/com.me.legoru.ColorTubes-ru.ts
 
 HEADERS += \
     core/boardmodel.h \
@@ -79,7 +83,7 @@ HEADERS += \
     src/game.h
 
 RESOURCES += \
-    ColorTubes.qrc
+    com.me.legoru.ColorTubes.qrc
 
 QT += \
     core \

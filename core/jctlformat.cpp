@@ -177,38 +177,38 @@ bool JctlFormat::read(QByteArray &bufferFrom)
 
     data >> dWord;
     result = (dWord == JCTL_FILE_ID);
-    if (result)
-        qDebug() << "JCTL ID is ok.";
-    else
-        qDebug() << "JCTL ID has errors!";
+//    if (result)
+//        qDebug() << "JCTL ID is ok.";
+//    else
+//        qDebug() << "JCTL ID has errors!";
 
     if (result) {
         data >> dWord;
         result = (dWord == JCTL_FILE_EOF);
-        if (result)
-            qDebug() << "File EOF is ok.";
-        else
-            qDebug() << "File EOF has errors!";
+//        if (result)
+//            qDebug() << "File EOF is ok.";
+//        else
+//            qDebug() << "File EOF has errors!";
     }
 
     if (result) {
         data >> formatVersion;
         result = (formatVersion == 1 || formatVersion == 2);
 
-        if (result)
-            qDebug() << "Format version is ok:" << formatVersion;
-        else
-            qDebug() << "Format version has errors!";
+//        if (result)
+//            qDebug() << "Format version is ok:" << formatVersion;
+//        else
+//            qDebug() << "Format version has errors!";
     }
 
     if (result) {
         data >> fileSize;
         result = (fileSize = bufferFrom.size());
 
-        if (result)
-            qDebug() << "File size is ok:" << fileSize << "b";
-        else
-            qDebug() << "File size version has errors!";
+//        if (result)
+//            qDebug() << "File size is ok:" << fileSize << "b";
+//        else
+//            qDebug() << "File size version has errors!";
     }
 
     if (result) {
@@ -242,16 +242,16 @@ bool JctlFormat::read(QByteArray &bufferFrom)
             }
         }
 
-        qDebug().nospace() << "Game mode " << gameMode
-                 << ", Tubes count " << tubesCount << "." << emptyCount
-                 << ", Moves count " << movesCount << "." << movesDone;
+//        qDebug().nospace() << "Game mode " << gameMode
+//                 << ", Tubes count " << tubesCount << "." << emptyCount
+//                 << ", Moves count " << movesCount << "." << movesDone;
 
         result = fileSize == size();
 
-        if (result)
-            qDebug() << "All datas are ok.";
-        else
-            qDebug() << "Errors!";
+//        if (result)
+//            qDebug() << "All datas are ok.";
+//        else
+//            qDebug() << "Errors!";
     }
 
 
@@ -261,7 +261,7 @@ bool JctlFormat::read(QByteArray &bufferFrom)
             for (int i = 0; i < tubesCount; i++) {
                 data >> dWord;
                 storedTubes->append(dWord);
-                qDebug() << "Tube" << i << QString::number(dWord, 16);
+//                qDebug() << "Tube" << i << QString::number(dWord, 16);
             }
 
             // check tubes for used colors
@@ -270,10 +270,10 @@ bool JctlFormat::read(QByteArray &bufferFrom)
                 result = checkTubes();
             }
 
-            if (result)
-                qDebug() << "Tubes are ok.";
-            else
-                qDebug() << "Error at Tubes!";
+//            if (result)
+//                qDebug() << "Tubes are ok.";
+//            else
+//                qDebug() << "Error at Tubes!";
         }
     }
 
@@ -291,15 +291,15 @@ bool JctlFormat::read(QByteArray &bufferFrom)
                         && move.fields.count > 0
                         && move.fields.color > 0) {
 
-                    qDebug() << "Move" << i << QString::number(dWord, 16) << "is ok.";
+//                    qDebug() << "Move" << i << QString::number(dWord, 16) << "is ok.";
                     storedMoves->append(dWord);
                 } else {
                     result = false;
-                    qDebug() << "Error at Move" << i << QString::number(dWord, 16);
-                    qDebug().nospace() << "TubeFrom " << QString::number(move.fields.tubeFrom, 16)
-                                       << ", TubeTo " << QString::number(move.fields.tubeTo, 16)
-                                       << ", Color " << QString::number(move.fields.color, 16)
-                                       << ", Count " << move.fields.count;
+//                    qDebug() << "Error at Move" << i << QString::number(dWord, 16);
+//                    qDebug().nospace() << "TubeFrom " << QString::number(move.fields.tubeFrom, 16)
+//                                       << ", TubeTo " << QString::number(move.fields.tubeTo, 16)
+//                                       << ", Color " << QString::number(move.fields.color, 16)
+//                                       << ", Count " << move.fields.count;
                 }
             }
         }
@@ -315,10 +315,10 @@ bool JctlFormat::read(QByteArray &bufferFrom)
             result = (crc == crcVersion2(bufferFrom, fileSize - 2));
         }
 
-        if (result)
-            qDebug() << "CRC is ok.";
-        else
-            qDebug() << "Error at CRC!";
+//        if (result)
+//            qDebug() << "CRC is ok.";
+//        else
+//            qDebug() << "Error at CRC!";
     }
 
     if (!result)

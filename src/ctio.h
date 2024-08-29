@@ -1,6 +1,7 @@
 #ifndef CTIO_H
 #define CTIO_H
 
+#include <QDir>
 #include <QJsonObject>
 
 /*!
@@ -14,8 +15,7 @@ public:
     static CtIo & instance();
     ~CtIo();
 
-    QString localDir() {return m_dir;}
-    QString localFileName(QString fName) {return m_dir + m_sep + fName;}
+    QString localFileName(QString fName);
 
     QString paletteFileName()  {return localFileName("palette.json");}
     QString settingsFileName() {return localFileName("settings.json");}
@@ -36,8 +36,7 @@ private:
     void initialize();
 
     static CtIo * m_instance;
-    QString m_dir;
-    QString m_sep;
+    QDir m_dir;
 };
 
 #endif // CTIO_H

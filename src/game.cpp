@@ -73,10 +73,10 @@ bool Game::load(QString fileName)
 
     if (result) {
         // signal to redraw GameBoard
-        qDebug() << "Game loaded" << fileName;
+        qDebug() << "Game loaded from" << fileName;
         emit gameLoaded();
     } else
-        qDebug() << "game is not loaded";
+        qDebug() << "Game is not loaded." << fileName;
 
     return result;
 }
@@ -111,22 +111,9 @@ bool Game::hasMoves()
     return !m_moves->empty();
 }
 
-void Game::clearMoves()
+void Game::removeLastMove()
 {
-    m_moves->clear();
-}
-
-MoveItem * Game::lastMove()
-{
-    return m_moves->current();
-}
-
-void Game::deleteLastMove()
-{
-    if (!m_moves->isEmpty()) {
-        delete m_moves->last();
-        m_moves->remove(m_moves->size() - 1);
-    }
+    m_moves->removeLast();
 }
 
 MoveItem * Game::addNewMove(int tubeFromIndex, int tubeToIndex)

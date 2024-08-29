@@ -194,7 +194,7 @@ void GameBoard::showAvailableMoves()
 
 bool GameBoard::hasMoves()
 {
-    return CtGlobal::game().hasMoves();
+    return !(CtGlobal::game().moves()->empty());
 }
 
 void GameBoard::undoMove()
@@ -204,7 +204,7 @@ void GameBoard::undoMove()
         if (m_selectedTube)
             clickTube(nullptr);
 
-        MoveItem * move = CtGlobal::game().lastMove();
+        MoveItem * move = CtGlobal::game().moves()->current();
         if (move) {
             for (int i = 0; i < move->count(); ++i) {
                 m_model->tubeAt( move->tubeFrom() )->putColor(
@@ -212,7 +212,7 @@ void GameBoard::undoMove()
             }
             m_tubes->at(move->tubeFrom())->refresh();
             m_tubes->at(move->tubeTo())->refresh();
-            CtGlobal::game().deleteLastMove();
+            CtGlobal::game().removeLastMove();
             emit movesChanged();
         }
     }
@@ -228,13 +228,13 @@ void GameBoard::startAgain()
 
     while (CtGlobal::game().hasMoves()) {
 
-        MoveItem * move = CtGlobal::game().lastMove();
+        MoveItem * move = CtGlobal::game().moves()->current();
         if (move) {
             for (int i = 0; i < move->count(); ++i) {
                 m_model->tubeAt( move->tubeFrom() )->putColor(
                             m_model->tubeAt( move->tubeTo() )->extractColor());
             }
-            CtGlobal::game().deleteLastMove();
+            CtGlobal::game().removeLastMove();
         }
     }
 

@@ -1,8 +1,8 @@
 #include "ctio.h"
-#include <sailfishapp.h>
+#include <auroraapp.h>
 
 #include <QIODevice>
-#include <QDir>
+
 #include <QFile>
 #include <QJsonDocument>
 
@@ -33,18 +33,34 @@ CtIo & CtIo::instance()
 
 void CtIo::initialize()
 {
-    QDir qdir;
-    m_sep = qdir.separator();
+/*
+    qDebug() << "app filesDir(false)" << Application::filesDir(false).path();
+    qDebug() << "app filesDir(true)" << Application::filesDir(true).path();
+    qDebug() << "app cacheDir(false)" << Application::cacheDir(false).path();
+    qDebug() << "app cacheDir(true)" << Application::cacheDir(true).path();
 
-    QString dirName = SailfishApp::pathToSharedDir().toString();
-    if (!qdir.exists(dirName)) {
-        qdir.mkpath(dirName);
-        qDebug() << "Creating application path" << dirName;
+    qDebug() << "org filesDir(false)" << Application::organizationFilesDir(false).path();
+    qDebug() << "org filesDir(true)" << Application::organizationFilesDir(true).path();
+    qDebug() << "org cacheDir(false)" << Application::organizationCacheDir(false).path();
+    qDebug() << "org cacheDir(true)" << Application::organizationCacheDir(true).path();
+
+    qDebug() << "static pathTo(\"\")" << Application::pathTo("").path();
+    qDebug() << "static org pathTo(\"\")" << Application::organizationPathTo("").path();
+
+*/
+    m_dir = Aurora::Application::filesDir(false);
+
+    if (!m_dir.exists()) {
+        m_dir.mkpath(m_dir.path());
+        qDebug() << "Creating application path" << m_dir.path();
     } else
-        qDebug() << "Application path:" << dirName;
+        qDebug() << "Application path:" << m_dir.path();
+}
 
-    qdir.setPath(dirName);
-    m_dir = qdir.path();
+QString CtIo::localFileName(QString fName)
+{
+//    qDebug() << "file mame" << fName << "path" << m_dir.filePath(fName);
+    return m_dir.filePath(fName);
 }
 
 bool CtIo::tempFileExists()

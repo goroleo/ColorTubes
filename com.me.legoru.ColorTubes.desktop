@@ -1,17 +1,16 @@
 [Desktop Entry]
 Type=Application
 X-Nemo-Application-Type=silica-qt5
-Icon=ColorTubes
+Icon=com.me.legoru.ColorTubes
 Name=Color Tubes
 Name[en]=Color Tubes
 Name[ru]=Цветные пробирки
 Name[tr]=Renkli tüpler
 
-Exec=/usr/bin/ColorTubes
+Exec=/usr/bin/com.me.legoru.ColorTubes
 # Exec=/usr/bin/sailjail -p ColorTubes.desktop /usr/bin/ColorTubes
 
 [X-Sailjail]
 # Permissions=Audio;Calendar;Documents;Email;Music;UserDirs
-Permissions=UserDirs
 OrganizationName=com.me.legoru
 ApplicationName=ColorTubes

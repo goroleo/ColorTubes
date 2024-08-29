@@ -12,13 +12,14 @@ License: LICENSE
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  Short description of my Sailfish OS Application
+  Color tubes game for Aurora OS
 Builder: qmake5
 
 # This section specifies build dependencies that are resolved using pkgconfig.
 # This is the preferred way of specifying build dependencies for your package.
 PkgConfigBR:
-  - sailfishapp >= 1.0.2
+#  - sailfishapp >= 1.0.2
+  - auroraapp
   - Qt5Core
   - Qt5Qml
   - Qt5Quick

@@ -119,6 +119,8 @@ bool CtPalette::load()
         }
     } // end process palette
 
+    if (result)
+        qDebug() << "Palette loaded from" << CtGlobal::paletteFileName();
     return result;
 }
 
@@ -138,6 +140,7 @@ bool CtPalette::save()
     jObj["palette"] = jItem;
 
     // save
+    qDebug() << "Saving palette to" << CtGlobal::paletteFileName();
     return CtGlobal::io().saveJson(CtGlobal::paletteFileName(), jObj);
 }
 

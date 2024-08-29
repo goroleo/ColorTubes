@@ -28,9 +28,8 @@ public:
 
     MoveItem   * addNewMove(int tubeFromIndex, int tubeToIndex);
     bool         hasMoves();
-    void         clearMoves();
     MoveItem   * lastMove();
-    void         deleteLastMove();
+    void         removeLastMove();
 
     void         setMode(int newMode);
     int          mode() {return gameMode;}
