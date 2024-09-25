@@ -22,7 +22,7 @@ public:
     explicit TubeItem(QQuickItem * parent = 0, TubeModel * tm = 0);
     ~TubeItem();
 
-    TubeModel   * model() { return m_model; }
+    TubeModel   * model() const { return m_model; }
 
     bool          isDone();                        // unused?
     bool          isClosed() { return m_closed;}   // unused?

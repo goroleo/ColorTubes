@@ -1,18 +1,15 @@
 #include "ctio.h"
-#include <auroraapp.h>
+#include "auroraapp.h"
 
 #include <QIODevice>
-
 #include <QFile>
 #include <QJsonDocument>
-
-#include <QDebug>
 
 CtIo * CtIo::m_instance = nullptr;
 
 CtIo::~CtIo()
 {
-    qDebug() << "IO destroyed";
+    qDebug() << "IO destroyed.";
     m_instance = nullptr;
 }
 
@@ -24,9 +21,9 @@ CtIo & CtIo::create()
 CtIo & CtIo::instance()
 {
     if (m_instance == nullptr) {
+        qDebug() << "Creating input-output.";
         m_instance = new CtIo();
         m_instance->initialize();
-        qDebug() << "IO created";
     }
     return * m_instance;
 }
@@ -34,18 +31,19 @@ CtIo & CtIo::instance()
 void CtIo::initialize()
 {
 /*
-    qDebug() << "app filesDir(false)" << Application::filesDir(false).path();
-    qDebug() << "app filesDir(true)" << Application::filesDir(true).path();
-    qDebug() << "app cacheDir(false)" << Application::cacheDir(false).path();
-    qDebug() << "app cacheDir(true)" << Application::cacheDir(true).path();
+    // Aurora's predefined dirs
+    qDebug() << "app filesDir(false)" << Aurora::Application::filesDir(false).path();
+    qDebug() << "app filesDir(true)"  << Aurora::Application::filesDir(true).path();
+    qDebug() << "app cacheDir(false)" << Aurora::Application::cacheDir(false).path();
+    qDebug() << "app cacheDir(true)"  << Aurora::Application::cacheDir(true).path();
 
-    qDebug() << "org filesDir(false)" << Application::organizationFilesDir(false).path();
-    qDebug() << "org filesDir(true)" << Application::organizationFilesDir(true).path();
-    qDebug() << "org cacheDir(false)" << Application::organizationCacheDir(false).path();
-    qDebug() << "org cacheDir(true)" << Application::organizationCacheDir(true).path();
+    qDebug() << "org filesDir(false)" << Aurora::Application::organizationFilesDir(false).path();
+    qDebug() << "org filesDir(true)"  << Aurora::Application::organizationFilesDir(true).path();
+    qDebug() << "org cacheDir(false)" << Aurora::Application::organizationCacheDir(false).path();
+    qDebug() << "org cacheDir(true)"  << Aurora::Application::organizationCacheDir(true).path();
 
-    qDebug() << "static pathTo(\"\")" << Application::pathTo("").path();
-    qDebug() << "static org pathTo(\"\")" << Application::organizationPathTo("").path();
+    qDebug() << "static pathTo(\"\")" << Aurora::Application::pathTo("").path();
+    qDebug() << "static org pathTo(\"\")" << Aurora::Application::organizationPathTo("").path();
 
 */
     m_dir = Aurora::Application::filesDir(false);
@@ -59,7 +57,6 @@ void CtIo::initialize()
 
 QString CtIo::localFileName(QString fName)
 {
-//    qDebug() << "file mame" << fName << "path" << m_dir.filePath(fName);
     return m_dir.filePath(fName);
 }
 
@@ -82,8 +79,8 @@ bool CtIo::loadJson(QString fName, QJsonObject &jsonObj)
         return false;
     }
 
-    QByteArray saveData = loadFile.readAll();
-    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+    QByteArray buffer = loadFile.readAll();
+    QJsonDocument loadDoc(QJsonDocument::fromJson(buffer));
 
     jsonObj = loadDoc.object();
     return true;

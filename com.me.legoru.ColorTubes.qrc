@@ -14,5 +14,6 @@
         <file>img/tube.svg</file>
         <file>img/icon-cover.png</file>
         <file>img/flower.svg</file>
+        <file>jctl/unsolved.jctl</file>
     </qresource>
 </RCC>

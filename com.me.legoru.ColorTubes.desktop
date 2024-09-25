@@ -14,3 +14,7 @@ Exec=/usr/bin/com.me.legoru.ColorTubes
 # Permissions=Audio;Calendar;Documents;Email;Music;UserDirs
 OrganizationName=com.me.legoru
 ApplicationName=ColorTubes
+
+[X-Aurora-Application]
+Orientation=Portrait;PortraitInverted
+IconMode=Crop

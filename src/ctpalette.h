@@ -1,7 +1,6 @@
 ﻿#ifndef CTPALETTE_H
 #define CTPALETTE_H
 
-#include <QtGlobal>
 #include <QColor>
 
 class CtPalette
@@ -11,7 +10,7 @@ public:
     static CtPalette & instance();
     ~CtPalette();
 
-    int    size();
+//  int    size();    // use CT_NUM_OF_COLORS instead
 
     QColor getColor(int index);
     void   setColor(int index, quint32 rgb);

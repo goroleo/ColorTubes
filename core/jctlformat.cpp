@@ -357,7 +357,7 @@ bool JctlFormat::checkTubes()
         {
             return false;
         }
-    } while (color < CtGlobal::game().usedColors()->size());
+    } while (color < CT_NUM_OF_COLORS);
 
     return true;
 }

@@ -44,6 +44,7 @@ public slots:
 
 private slots:
     void         onScaleChanged();
+    void         onApplicationStateChanged();
 
 private:
     BoardModel * m_model;

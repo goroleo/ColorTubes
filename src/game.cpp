@@ -34,9 +34,9 @@ Game& Game::create()
 Game& Game::instance()
 {
     if (m_instance == nullptr) {
+        qDebug() << "Creating game.";
         m_instance = new Game();
         m_instance->initialize();
-        qDebug() << "Game created";
     }
     return *m_instance;
 }
@@ -53,7 +53,7 @@ void Game::initialize()
         loaded = loadTemporary();
 
     if (!loaded)
-        load(QLatin1String(":/jctl/example1.jctl"));
+        load(QLatin1String(":/jctl/difficult8.jctl"));
 }
 
 bool Game::load(QString fileName)
@@ -72,8 +72,8 @@ bool Game::load(QString fileName)
     }
 
     if (result) {
-        // signal to redraw GameBoard
         qDebug() << "Game loaded from" << fileName;
+        // signal to redraw GameBoard
         emit gameLoaded();
     } else
         qDebug() << "Game is not loaded." << fileName;
@@ -116,9 +116,9 @@ void Game::removeLastMove()
     m_moves->removeLast();
 }
 
-MoveItem * Game::addNewMove(int tubeFromIndex, int tubeToIndex)
+MoveItem * Game::addNewMove(TubeModel &tubeFrom, TubeModel &tubeTo)
 {
-    MoveItem * move = new MoveItem(m_board->getMoveData(tubeFromIndex, tubeToIndex));
+    MoveItem * move = new MoveItem(m_board->getMoveData(tubeFrom, tubeTo));
     m_moves->append(move);
     return move;
 }

@@ -17,9 +17,9 @@ CtPalette& CtPalette::create()
 CtPalette& CtPalette::instance()
 {
     if (m_instance == nullptr) {
+        qDebug() << "Creating palette.";
         m_instance = new CtPalette();
         m_instance->initialize();
-        qDebug() << "Palette created";
     }
     return *m_instance;
 }
@@ -38,15 +38,10 @@ void CtPalette::initialize()
 
 CtPalette::~CtPalette()
 {
-    qDebug() << "Palette destroyed";
     save();
     delete[] m_items;
     m_instance = nullptr;
-}
-
-int CtPalette::size()
-{
-    return CT_NUM_OF_COLORS;
+    qDebug() << "Palette has destroyed.";
 }
 
 QColor CtPalette::getColor(int index)
@@ -68,6 +63,7 @@ void CtPalette::setColor(int index, quint32 rgb)
 
 void CtPalette::setDefault()
 {
+    qDebug() << "Using default palette.";
     m_items[0]  = 0xff38ff4d;
     m_items[1]  = 0xff1dd3f4;
     m_items[2]  = 0xff884822;
@@ -140,7 +136,7 @@ bool CtPalette::save()
     jObj["palette"] = jItem;
 
     // save
-    qDebug() << "Saving palette to" << CtGlobal::paletteFileName();
+    qDebug() << "Palette saves to" << CtGlobal::paletteFileName();
     return CtGlobal::io().saveJson(CtGlobal::paletteFileName(), jObj);
 }
 

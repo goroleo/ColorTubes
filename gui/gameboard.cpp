@@ -1,10 +1,12 @@
 #include "gameboard.h"
+#include <qguiapplication.h>
 
 #include "src/ctglobal.h"
 #include "tubeitem.h"
 #include "src/ctimages.h"
 #include "src/game.h"
 #include "core/boardmodel.h"
+#include "core/solver.h"
 
 GameBoard::GameBoard(QQuickItem *parent) :
     QQuickItem(parent)
@@ -17,9 +19,11 @@ GameBoard::GameBoard(QQuickItem *parent) :
         m_tubes->append(tube);
     }
 
+    QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
+                     this, &GameBoard::onScaleChanged);
 
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-            this, SLOT(onScaleChanged()));
+    QObject::connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+            this, &GameBoard::onApplicationStateChanged);
 
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
@@ -59,8 +63,7 @@ int GameBoard::level()
 int GameBoard::maxChildrenZ()
 {
     int result = 0;
-    for (int i = 0; i < this->children().size(); ++i)
-    {
+    for (int i = 0; i < this->children().size(); ++i) {
         if (children().at(i)->inherits("TubeItem")
                 && result < ((TubeItem *) children().at(i))->z())
             result = ((TubeItem *) children().at(i))->z();
@@ -95,6 +98,13 @@ void GameBoard::rescale()
 void GameBoard::onScaleChanged()
 {
     placeTubes();
+}
+
+void GameBoard::onApplicationStateChanged()
+{
+    if (QGuiApplication::applicationState() != Qt::ApplicationActive)
+        if (!isSolved())
+            CtGlobal::game().saveTemporary();
 }
 
 void GameBoard::placeTubes()
@@ -271,5 +281,7 @@ void GameBoard::solve()
     if (m_selectedTube)
         clickTube(nullptr);
 
-    m_model->calculateMoves();
+    SolveProcess solver;
+    solver.doSolve(m_model);
+
 }

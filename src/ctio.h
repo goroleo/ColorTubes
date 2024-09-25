@@ -21,6 +21,7 @@ public:
     QString settingsFileName() {return localFileName("settings.json");}
     QString statsFileName()    {return localFileName("statsistics.json");}
     QString anglesFileName()   {return localFileName("tiltangles.json");}
+
     QString tempFileName()     {return localFileName("tempgame.jctl");}
     bool tempFileExists();
     void tempFileDelete();

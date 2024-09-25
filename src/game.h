@@ -2,9 +2,11 @@
 #define GAME_H
 
 #include <QObject>
+
 class UsedColors;
 class JctlFormat;
 class BoardModel;
+class TubeModel;
 class GameBoard;
 class MoveItems;
 class MoveItem;
@@ -26,9 +28,8 @@ public:
     JctlFormat * jctl()       {return m_jctl; }
     MoveItems  * moves()      {return m_moves; }
 
-    MoveItem   * addNewMove(int tubeFromIndex, int tubeToIndex);
+    MoveItem   * addNewMove(TubeModel &tubeFrom, TubeModel &tubeTo);
     bool         hasMoves();
-    MoveItem   * lastMove();
     void         removeLastMove();
 
     void         setMode(int newMode);
@@ -44,7 +45,7 @@ signals:
     void         gameLoaded();
 
 private:
-    Game() {};
+    explicit Game() {};
     void initialize();
 
     UsedColors  * m_usedColors;

@@ -2,6 +2,7 @@
 #define TUBEMODEL_H
 
 #include <QtCore>
+#include "src/ctglobal.h"
 
 union ColorCells {
     quint8 items[4];
@@ -14,7 +15,7 @@ class TubeModel : public QObject
 
 public:
 
-    TubeModel();
+    explicit TubeModel();
     ~TubeModel();
 
     void clear();
@@ -43,11 +44,11 @@ public:
     quint8 extractColor();
 
     //  compare to another tube
-    bool operator == (const TubeModel & other);
+    bool operator == (const TubeModel &other);
 
     // store & restore
     void assignColors(quint32 storedColors);
-    void assignColors(TubeModel * other);
+    void assignColors(const TubeModel &other);
     quint32 store() const;
 
 signals:
@@ -57,15 +58,15 @@ private:
     bool checkDone();
     bool putColor(quint8 colorNum, bool updateState);
 
-
     ColorCells m_colors;
-    quint8 m_state;
-    quint8 m_count;
+    quint8 m_state = CT_STATE_EMPTY;
+    quint8 m_count = 0;
 };
 
 class TubeModels: public QVector<TubeModel*>
 {
 public:
+    ~TubeModels();
     void         removeLast();
     void         clear();
 };

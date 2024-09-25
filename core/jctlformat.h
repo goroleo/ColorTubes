@@ -75,9 +75,9 @@ public:
     void restoreMoves();
     void restoreMoves(MoveItems * moves);
 
-    bool read(QByteArray & bufferFrom);
-    bool write(QByteArray & bufferTo);
-    bool write(QByteArray & bufferTo, quint32 version);
+    bool read(QByteArray &bufferFrom);
+    bool write(QByteArray &bufferTo);
+    bool write(QByteArray &bufferTo, quint32 version);
 
     void clear();
     bool checkTubes();
@@ -104,7 +104,6 @@ private:
     quint32 crcVersion1();
     quint16 crcVersion2(QByteArray &buffer);
     quint16 crcVersion2(QByteArray &buffer, quint32 length);
-
 };
 
 #endif // JCTLFORMAT_H

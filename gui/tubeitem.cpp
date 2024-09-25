@@ -38,8 +38,9 @@ TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
         update();
     });
 
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-                     this, SLOT(onScaleChanged()));
+    QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
+                     this, &TubeItem::onScaleChanged);
+
     QObject::connect(m_model, &TubeModel::stateChanged,
                      this, &TubeItem::onTubeStateChanged);
 
@@ -474,7 +475,7 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     if (tubeFrom->m_recipient != this)
         return;
 
-    CtGlobal::game().addNewMove(tubeFrom->tubeIndex(), this->tubeIndex());
+    CtGlobal::game().addNewMove(* tubeFrom->model(), * this->model());
     for (int i = 0; i < tubeFrom->m_pouringCells; i++) {
         m_model->putColor(tubeFrom->model()->extractColor());
     }

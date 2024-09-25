@@ -1,7 +1,4 @@
-#include <auroraapp.h>
-
-#include <QtQuick>
-#include <QObject>
+#include "auroraapp.h"
 
 #include "ctglobal.h"
 #include "gui/gameboard.h"

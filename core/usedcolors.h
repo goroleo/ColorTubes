@@ -8,28 +8,28 @@ class UsedColors
 public:
     UsedColors();
     ~UsedColors();
+//  int     size();                                 // use CT_NUM_OF_COLORS instead
 
-    int size();
+    void    incUsed(quint8 colorNum);
+    void    incUsed(quint8 colorNum, quint8 count);
+    void    decUsed(quint8 colorNum);               // reserved for FILL_MODE if I'll realize it...
+    void    setUsed(quint8 colorNum, quint8 count); // reserved for FILL_MODE also
+    quint8  getUsed(quint8 colorNum);
 
-    void incUsed(quint8 colorNum);
-    void incUsed(quint8 colorNum, quint8 count);
-    void decUsed(quint8 colorNum);
-    void setUsed(quint8 colorNum, quint8 count);
-    quint8 getUsed(quint8 colorNum);
-    void clearUsed(quint8 colorNum);
-    void clearAllUsed();
+//  void    clearUsed(quint8 colorNum);             // unused routine?
+    void    clearAllUsed();
 
-    quint8 numberOfFilledColors();
-    quint8 numberOfUsedColors();
-    quint8 numberOfUnusedColors();
-    quint8 numberOfUsedCells();
-    quint8 numberOfAvailableCells();
-    quint8 getRandomColor();
-    void disableUnusedColors();
+//  quint8  numberOfFilledColors();                 // unused routine?
+    quint8  numberOfUsedColors();
+//  quint8  numberOfUnusedColors();                 // unused routine?
+//  quint8  numberOfUsedCells();                    // unused routine?
+    quint8  numberOfAvailableCells();
 
+    void    disableUnusedColors();
+    quint8  getRandomColor();
 
 private:
-    quint8* m_items;
+    quint8 *m_items;
 
 };
 

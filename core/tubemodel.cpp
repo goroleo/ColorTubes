@@ -1,9 +1,8 @@
 #include "tubemodel.h"
-#include "src/ctglobal.h"
 
 TubeModel::TubeModel()
 {
-    clear();
+    m_colors.stored = 0;
 }
 
 TubeModel::~TubeModel()
@@ -188,21 +187,21 @@ void TubeModel::assignColors(quint32 storedColors)
     updateState(); // don't forget!
 }
 
-void TubeModel::assignColors(TubeModel * other)
+void TubeModel::assignColors(const TubeModel &other)
 {
-    if (other) {
-        quint8 oldState = m_state;
-        m_colors.stored = other->store();
-        m_count = other->count();
-        m_state = other->state();
-        if (oldState != m_state)
-            emit stateChanged();
-    }
+    m_colors.stored = other.store();
+    m_count = other.count();
+    m_state = other.state();
 }
 
 quint32 TubeModel::store() const
 {
     return m_colors.stored;
+}
+
+TubeModels::~TubeModels()
+{
+    clear();
 }
 
 void TubeModels::removeLast()

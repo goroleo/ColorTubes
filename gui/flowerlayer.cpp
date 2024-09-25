@@ -1,5 +1,5 @@
 #include "flowerlayer.h"
-#include <qapplication.h>
+#include <qguiapplication.h>
 
 FlowerLayer::FlowerLayer(QQuickItem * parent) :
     QQuickPaintedItem(parent)
@@ -15,7 +15,7 @@ FlowerLayer::FlowerLayer(QQuickItem * parent) :
         m_edgeSize = 0;
     m_source = new QSvgRenderer(QLatin1String(":/img/flower.svg"));
 
-    QObject::connect(qGuiApp, &QApplication::applicationStateChanged,
+    QObject::connect(qGuiApp, &QGuiApplication::applicationStateChanged,
             this, &FlowerLayer::onApplicationStateChanged);
 
 }
@@ -53,7 +53,7 @@ void FlowerLayer::onOpacityChanged()
 
 void FlowerLayer::onApplicationStateChanged()
 {
-    if (QApplication::applicationState() != Qt::ApplicationActive)
+    if (QGuiApplication::applicationState() != Qt::ApplicationActive)
         m_source->blockSignals(true);
     else
         m_source->blockSignals(false);

@@ -1,7 +1,6 @@
 ﻿#include "ctimages.h"
 
 #include <QImage>
-#include <QtMath>
 #include <QPainter>
 #include <QDebug>
 #include <QJsonObject>
@@ -9,7 +8,7 @@
 #include "ctglobal.h"
 #include "ctio.h"
 
-CtImages* CtImages::m_instance = nullptr;
+CtImages * CtImages::m_instance = nullptr;
 
 /*
 
@@ -47,19 +46,17 @@ CtImages& CtImages::create()
 CtImages& CtImages::instance()
 {
     if (m_instance == nullptr) {
+        qDebug() << "Creating tube images.";
         m_instance = new CtImages();
         m_instance->initialize();
-        qDebug() << "Images created";
     }
     return * m_instance;
 }
 
 void CtImages::initialize()
 {
-    m_tiltAngles = new qreal[(CT_TUBE_STEPS_POUR << 2) + 1];
-    anglesExist = false;
-
     m_source = new QSvgRenderer(QLatin1String(":/img/tube.svg"));
+
     m_bottle = new QPixmap;
     m_bottleFront = new QPixmap;
     m_bottleBack = new QPixmap;
@@ -71,7 +68,10 @@ void CtImages::initialize()
     m_cork = new QPixmap;
     m_vertices = new QPointF[6];
 
-    scalePoints();
+    m_tiltAngles = new qreal[(CT_TUBE_STEPS_POUR * 4) + 1];
+    anglesExist = false;
+
+    scaleVertices();
     renderImages();
 }
 
@@ -79,17 +79,18 @@ void CtImages::setScale(qreal value)
 {
     if (!qFuzzyCompare(m_scale, value)) {
         m_scale = value;
-        scalePoints();
+        scaleVertices();
         renderImages();
         emit scaleChanged(m_scale);
     }
     if (!anglesExist)
         if (!loadTiltAngles()) {
             calculateTiltAngles();
+            saveTiltAngles();
         }
 }
 
-void CtImages::scalePoints()
+void CtImages::scaleVertices()
 {
 /*
            5 +  neck  + 0
@@ -175,7 +176,7 @@ void CtImages::renderImages()
         if (part < 0.3) {
             alpha = 0x88;
         } else if (part < 0.9) {
-            alpha = 0x88 - round(0x88 / 0.6 * (part - 0.3));
+            alpha = 0x88 - qRound(0x88 / 0.6 * (part - 0.3));
         } else {
             alpha = 0;
         }
@@ -183,7 +184,7 @@ void CtImages::renderImages()
         for (int x = 0; x < shineImage.width(); ++x) {
             pix = shineImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = round (qreal(pix >> 24) * alpha / 255.0);
+                newAlpha = qRound (qreal(pix >> 24) * alpha / 255.0);
                 shineImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
@@ -205,15 +206,15 @@ void CtImages::renderImages()
     for (int x = 0; x < sideImage.width(); ++x) {
         part = qreal(x) / sideImage.width();
         if (part < 0.2) {
-            alpha = 0x44 - round((0x44-0x11) / 0.2 * part);
+            alpha = 0x44 - qRound((0x44-0x11) / 0.2 * part);
         } else {
-            alpha = 0x11 + round((0x88-0x11) / 0.8 * (part - 0.2));
+            alpha = 0x11 + qRound((0x88-0x11) / 0.8 * (part - 0.2));
         }
 
         for (int y = 0; y < sideImage.height(); ++y) {
             pix = sideImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = round ( qreal(pix >> 24) * alpha / 255.0);
+                newAlpha = qRound ( qreal(pix >> 24) * alpha / 255.0);
                 sideImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
@@ -279,7 +280,7 @@ void CtImages::renderImages()
 
 qreal CtImages::tiltAngle(uint index)
 {
-    if (index <= 4 * CT_TUBE_STEPS_POUR)
+    if (anglesExist && index <= 4 * CT_TUBE_STEPS_POUR)
         return m_tiltAngles[index];
     return 0.0;
 }
@@ -289,7 +290,7 @@ void CtImages::calculateTiltAngles()
 /*
     The tube rotates clockwise around point 0 and pours out its colors at this point.
     The area filled with colors depends on the rotation/tilt angle.
-    Each of 4 colors is poured out evenly in <CT_TUBE_STEPS_POUR> steps. (see CtGlobal)
+    Each of 4 colors is poured out evenly in <CT_TUBE_STEPS_POUR> steps (see CtGlobal).
     This routine calculates each tilt angle for each step.
 
     Based on 4 triangles inside the tube: 504, 403, 302, 201.
@@ -364,14 +365,15 @@ void CtImages::calculateTiltAngles()
     qreal angleIncrement;
 
     qreal expectedArea;    // colors area at each step
-    qreal baseArea;        // area of triangles which are laid below the current angle completely
+    qreal baseArea;        // area of triangles which are completely laid below the current angle
     qreal calculatedArea;  // colors area at current angle
 
+//  Calculate angles
     for (int i = 0; i < CT_TUBE_STEPS_POUR * 4; ++i) {
 
         angleIncrement = 0.5 * CT_DEG2RAD;
         expectedArea = (CtGlobal::images().colorArea() * 4)
-                - (CtGlobal::images().colorArea() * ((qreal) i / (qreal) CT_TUBE_STEPS_POUR));
+                - (CtGlobal::images().colorArea() * (qreal (i) / qreal (CT_TUBE_STEPS_POUR)));
         if (expectedArea < 0.0) expectedArea = 0.0;
 
         do {
@@ -410,8 +412,6 @@ void CtImages::calculateTiltAngles()
 
     anglesExist = true;
     qDebug() << (CT_TUBE_STEPS_POUR * 4) + 1 << "tilt angles were calculated";
-
-    saveTiltAngles();
 }
 
 bool CtImages::loadTiltAngles()
@@ -478,7 +478,7 @@ bool CtImages::saveTiltAngles()
     // add angles
     for (int i = 0; i < CT_TUBE_STEPS_POUR * 4 + 1; i++) {
         value = QString().number(m_tiltAngles[i] * CT_RAD2DEG, 'g', 16);
-        jItem["angle"+CtGlobal::intToStr(i)] = value;
+        jItem["angle" + CtGlobal::intToStr(i)] = value;
     }
 
     jObj["tiltAngles"] = jItem;

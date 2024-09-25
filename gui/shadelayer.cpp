@@ -19,8 +19,8 @@ ShadeLayer::ShadeLayer(QQuickItem *parent) :
 
     m_drawImage.fill(0x00ffffff);
 
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-            this, SLOT(onScaleChanged()));
+    QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
+                     this, &ShadeLayer::onScaleChanged);
 
     m_timer = new QTimer(this);
 

@@ -4,36 +4,33 @@
 #include "core/usedcolors.h"
 #include "core/jctlformat.h"
 
-BoardModel::BoardModel()
+BoardModel::BoardModel(MoveItem * fromMove)
 {
-    m_tubes = new TubeModels;
-    m_parentBoard = nullptr;
-    m_parentMove = nullptr;
-    m_rootBoard = this;
-    m_moves = nullptr;
-    m_hash = 0;
-}
+    m_tubes = new TubeModels();
 
-BoardModel::BoardModel(MoveItem * move)
-{
-    BoardModel();
-    if (move) {
-        m_parentMove = move;
-        m_parentBoard = move->boardBefore();
+    if (fromMove) {
+
+        // links to previous board
+        m_parentMove = fromMove;
+        m_parentBoard = fromMove->boardBefore();
         m_rootBoard = m_parentBoard->rootBoard();
-        for (quint8 i = 0; i < m_parentBoard->tubesCount(); ++i )
-            addNewTube(m_parentBoard->m_tubes->at(i));
-        for (int i = 0; i < move->count(); ++i) {
-            m_tubes->at(move->tubeFrom())->extractColor();
-            m_tubes->at(move->tubeTo())->putColor(move->color());
+
+        // fills tubes
+        this->cloneFrom(* m_parentBoard);
+
+        // does move
+        for (int i = 0; i < fromMove->count(); ++i) {
+            m_tubes->at(fromMove->tubeFrom())->extractColor();
+            m_tubes->at(fromMove->tubeTo())->putColor(fromMove->color());
         }
+
+        // calculates hash value
         calculateHash();
     }
 }
 
 BoardModel::~BoardModel()
 {
-    clear();
     delete m_tubes;
     if (m_moves)
         delete m_moves;
@@ -48,7 +45,50 @@ void BoardModel::clear()
     m_rootBoard = nullptr;
     m_parentBoard = nullptr;
     m_parentMove = nullptr;
-    m_hash = 0;
+    m_crc32 = 0;
+}
+
+void BoardModel::cloneFrom(const BoardModel &boardToClone)
+{
+    for (int i = 0; i < boardToClone.m_tubes->size(); ++i)
+        addNewTube( *(boardToClone.m_tubes->at(i)));
+}
+
+bool BoardModel::isSolved()
+{
+    for (TubeModel *tube : *m_tubes) {
+        if (tube->state() == CT_STATE_FILLED
+                || tube->state() == CT_STATE_REGULAR)
+            return false;
+    }
+    return true;
+}
+
+TubeModel * BoardModel::tubeAt(int index) const
+{
+    if (index >= 0 && index < m_tubes->size())
+        return m_tubes->at(index);
+    return nullptr;
+}
+
+void BoardModel::addNewTube()
+{
+    TubeModel * tube = new TubeModel();
+    m_tubes->append(tube);
+}
+
+void BoardModel::addNewTube(const TubeModel &tubeToClone)
+{
+    TubeModel * tube = new TubeModel();
+    tube->assignColors(tubeToClone);
+    m_tubes->append(tube);
+}
+
+void BoardModel::addNewTube(quint32 storedTube)
+{
+    TubeModel * tube = new TubeModel();
+    tube->assignColors(storedTube);
+    m_tubes->append(tube);
 }
 
 MoveItems * BoardModel::moves()
@@ -58,6 +98,20 @@ MoveItems * BoardModel::moves()
     return m_moves;
 }
 
+MoveItem * BoardModel::addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo)
+{
+    MoveItem * move = new MoveItem(this, getMoveData(tubeFrom, tubeTo));
+    if (m_parentMove)
+        m_parentMove->addChild(move);
+    else {
+        if (!m_moves)
+            m_moves = new MoveItems;
+        m_moves->append(move);
+    }
+    return move;
+}
+
+/* unused
 int BoardModel::movesCount()
 {
     if (m_parentMove)
@@ -66,15 +120,18 @@ int BoardModel::movesCount()
         return m_moves->size();
     return 0;
 }
+*/
 
+/* unused
 bool BoardModel::hasMoves()
 {
     if (m_parentMove)
         return m_parentMove->hasChildren();
     if (m_moves)
         return !m_moves->isEmpty();
-    return 0;
+    return false;
 }
+*/
 
 MoveItem * BoardModel::currentMove()
 {
@@ -93,157 +150,113 @@ void BoardModel::deleteCurrentMove()
         m_moves->removeLast();
 }
 
-/*
-bool BoardModel::operator == (const BoardModel & other) const
+bool BoardModel::canDoMove(const TubeModel &tubeFrom, const TubeModel &tubeTo)
 {
-    if (tubesCount() != other.tubesCount())
-        return false;
-
-    bool result = true;
-    quint32 * store1 = new quint32[tubesCount()];
-    quint32 * store2 = new quint32[tubesCount()];
-
-    for (int i = 0; i < tubesCount(); ++i) {
-        store1[i] = tubeAt(i)->store();
-        store2[i] = other.tubeAt(i)->store();
-    }
-
-    int j1, j2;
-    quint32 temp1, temp2;
-
-    // sort store1 & store2
-    for (int i = 1; i < tubesCount(); ++i) {
-        temp1 = store1[i];
-        temp2 = store2[i];
-        j1 = j2 = i;
-        while ( (j1 > 0) && (store1[j1-1] < temp1) ) {
-            store1[j1] = store1[j1-1];
-            j1--;
-        }
-        while ( (j2 > 0) && (store2[j2-1] < temp2) ) {
-            store2[j2] = store2[j2-1];
-            j2--;
-        }
-        store1[j1] = temp1;
-        store2[j2] = temp2;
-    }
-
-    // compare sorted
-    j1 = 0;
-    while (result && j1 < tubesCount()) {
-        if (store1[j1] != store2[j1])
-            result = false;
-        j1++;
-    }
-
-    delete [] store1;
-    delete [] store2;
-
-    return result;
-}
-*/
-
-TubeModel * BoardModel::tubeAt(int index) const
-{
-    if (index >= 0 && index < m_tubes->size())
-        return m_tubes->at(index);
-    return nullptr;
-}
-
-TubeModel * BoardModel::addNewTube()
-{
-    TubeModel * tube = new TubeModel();
-    m_tubes->append(tube);
-    return tube;
-}
-
-TubeModel * BoardModel::addNewTube(TubeModel * tubeToClone)
-{
-    TubeModel * tube = new TubeModel();
-    tube->assignColors(tubeToClone);
-    m_tubes->append(tube);
-    return tube;
-}
-
-TubeModel * BoardModel::addNewTube(quint32 storedTube)
-{
-    TubeModel * tube = new TubeModel();
-    tube->assignColors(storedTube);
-    m_tubes->append(tube);
-    return tube;
-}
-
-bool BoardModel::isSolved()
-{
-    quint8 index = 0;
-
-    while (index < m_tubes->size()) {
-        if (m_tubes->at(index)->state() == CT_STATE_FILLED
-                || m_tubes->at(index)->state() == CT_STATE_REGULAR)
-            return false;
-        index ++;
-    }
-    return true;
-}
-
-bool BoardModel::canDoMove(int tubeFromIndex, int tubeToIndex)
-{
-    if ( tubeFromIndex < 0 || tubeFromIndex >= m_tubes->size()
-         || tubeToIndex < 0 || tubeToIndex >= m_tubes->size()
-         || tubeToIndex == tubeFromIndex)
-        return false;
-
-    return canDoMove(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
-}
-
-bool BoardModel::canDoMove(TubeModel * tubeFrom, TubeModel * tubeTo)
-{
-    if (tubeFrom && tubeTo)
-        return tubeTo->canPutColor(tubeFrom->currentColor());
+    if (&tubeFrom != &tubeTo)
+        return tubeTo.canPutColor(tubeFrom.currentColor());
     return false;
 }
 
-quint8 BoardModel::colorsToMove(int tubeFromIndex, int tubeToIndex)
-{
-    if ( tubeFromIndex < 0 || tubeFromIndex >= m_tubes->size()
-         || tubeToIndex < 0 || tubeToIndex >= m_tubes->size())
-        return 0;
-    return colorsToMove(m_tubes->at(tubeFromIndex), m_tubes->at(tubeToIndex));
-}
-
-quint8 BoardModel::colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo)
+quint8 BoardModel::colorsToMove(const TubeModel &tubeFrom, const TubeModel &tubeTo)
 {
     if (canDoMove(tubeFrom, tubeTo))
-        return qMin(tubeFrom->currentColorCount(),
-                    tubeTo->rest());
+        return qMin(tubeFrom.currentColorCount(),
+                    tubeTo.rest());
     else
         return 0;
 }
 
-quint32 BoardModel::getMoveData(int tubeFromIndex, int tubeToIndex)
+quint32 BoardModel::getMoveData(const TubeModel &tubeFrom, const TubeModel &tubeTo)
 {
     MoveData move;
-    move.fields.count = colorsToMove(tubeFromIndex, tubeToIndex);
+    move.fields.count = colorsToMove(tubeFrom, tubeTo);
     if (move.fields.count > 0) {
-        move.fields.tubeFrom = tubeFromIndex;
-        move.fields.tubeTo = tubeToIndex;
-        move.fields.color = m_tubes->at(tubeFromIndex)->currentColor();
+        move.fields.tubeFrom = m_tubes->indexOf( (TubeModel *) &tubeFrom);
+        move.fields.tubeTo = m_tubes->indexOf( (TubeModel *) &tubeTo);
+        move.fields.color = tubeFrom.currentColor();
         return move.stored;
     }
     return 0;
 }
 
-MoveItem * BoardModel::addNewMove(int tubeFromIndex, int tubeToIndex)
+quint16 BoardModel::calculateMoves()
 {
-    MoveItem * move = new MoveItem(this, tubeFromIndex, tubeToIndex);
-    if (m_parentMove)
-        m_parentMove->addChild(move);
-    else {
-        if (!m_moves)
-            m_moves = new MoveItems;
-        m_moves->append(move);
+
+    quint16 result = 0;                  // number of available moves
+    bool emptyTubeProcessed = false;     // true if one of empty tube has processed already
+
+    if (moves())
+        moves()->clear();
+
+    fillActiveColors();
+
+    for (const TubeModel * tubeTo : * m_tubes) {
+
+        if ( (tubeTo->state() == CT_STATE_EMPTY && !emptyTubeProcessed)
+             || tubeTo->state() == CT_STATE_REGULAR) {
+
+            quint8 toCount = tubeTo->currentColorCount();
+
+            for (const TubeModel * tubeFrom : * m_tubes) {
+
+                if (canDoMove(*tubeFrom, *tubeTo)) {
+
+                    quint8 fromCount = tubeFrom->currentColorCount();
+
+                    // create & add new available move
+                    MoveItem * move = addNewMove(*tubeFrom, *tubeTo);
+
+                    // --> rank the move!
+                    if (fromCount + toCount == tubeFrom->count() + tubeTo->count())
+                        // if both tubes are filled with only one color
+                        move->rank = tubeFrom->count() + tubeTo->count() - move->count();
+                    else
+                        move->rank = qMin(tubeTo->rest(),
+                                          CtGlobal::game().usedColors()->getUsed(move->color()));
+
+                    if (toCount > 0 && toCount == tubeTo->count())
+                        // if recipient tube is filled with only one color
+                        move->rank += 4;
+
+                    if (fromCount == tubeFrom->count())
+                        // if donator tube is filled with only one color
+                        move->rank += 2;
+
+                    if (fromCount > tubeTo->rest())
+                        // if after this move there are cells filled with move's color left in the donor tube
+                        move->rank -= 4;
+
+                    if (fromCount == tubeFrom->count() && tubeTo->isEmpty())
+                        //
+                        move->rank -= 5;
+                    // <-- end move ranking
+
+                    result ++;
+                }
+            }
+
+            if (tubeTo->isEmpty())
+                emptyTubeProcessed = true;
+        }
     }
-    return move;
+
+    if (result > 1)
+        moves()->sortByRank();
+
+/*
+    // --- debug
+    qDebug() << this; // out current board
+    qDebug().noquote() << "Hash" << QString::number(m_hash, 16);
+
+    qDebug() << "Found" << result << "possible moves.";
+    if (hasMoves()) {
+
+        for (int i=0; i < moves()->size(); ++i) {
+            qDebug() <<"#" << i << (moves()->at(i));
+        }
+    }
+*/
+    return result;
 }
 
 void BoardModel::randomFill(int fillTubes, int emptyTubes)
@@ -273,12 +286,12 @@ bool BoardModel::checkFilledTubes()
 {
     if (m_tubes->isEmpty())
         return false;
-    int i = 0;
-    while (i < m_tubes->size()) {
-        if (m_tubes->at(i)->isDone())
+
+    for (const TubeModel *tube : *m_tubes) {
+        if (tube->isDone())
             return false;
-        i++;
     }
+
     CtGlobal::game().jctl()->storeGame(this);
     return CtGlobal::game().jctl()->checkTubes();
 }
@@ -286,8 +299,7 @@ bool BoardModel::checkFilledTubes()
 void BoardModel::fillActiveColors()
 {
     CtGlobal::game().usedColors()->clearAllUsed();
-    for (int i = 0; i < tubesCount(); ++i) {
-//      if (!m_tubes->at(i)->isDone())
+    for (int i = 0; i < m_tubes->size(); ++i) {
         CtGlobal::game().usedColors()
                 ->incUsed(m_tubes->at(i)->currentColor(),
                           m_tubes->at(i)->currentColorCount());
@@ -296,16 +308,13 @@ void BoardModel::fillActiveColors()
 
 void BoardModel::calculateHash()
 {
-
-    ColorCells * cells = new ColorCells[m_tubes->size()];
-
+    ColorCells cells [m_tubes->size()];
     for (int i = 0; i < m_tubes->size(); ++i)
         cells[i].stored = m_tubes->at(i)->store();
 
+    // sort
     int j;
     quint32 temp;
-
-    // sort
     for (int i = 1; i < m_tubes->size(); ++i) {
         temp = cells[i].stored;
         j = i;
@@ -316,96 +325,15 @@ void BoardModel::calculateHash()
         cells[j].stored = temp;
     }
 
-    m_hash = 0xffff;
-    bool doXOR;
-
-    for (int i = 0; i < tubesCount(); ++i)
+    // CRC32 hash value
+    m_crc32 = 0xffffffff;
+    for (int i = 0; i < m_tubes->size(); ++i) {
         for (int j = 3; j >= 0; j--) {
-            m_hash ^= cells[i].items[j];
-            for (int b = 0; b < 8; b++) {
-                doXOR = ((m_hash & 1) != 0);
-                m_hash >>= 1;
-                if (doXOR)
-                    m_hash ^= 0xa001;
-            }
-        }
-
-    delete [] cells;
-}
-
-quint16 BoardModel::calculateMoves()
-{
-    TubeModel * tubeFrom;
-    TubeModel * tubeTo;
-    MoveItem  * move;
-
-    quint8 result = 0;                   // number of available moves
-    bool emptyTubeProcessed = false;     // true if one of empty tube has processed already
-
-    if (moves())
-        moves()->clear();
-
-    fillActiveColors();
-
-    for (quint8 tubeToIndex = 0; tubeToIndex < tubesCount(); ++tubeToIndex) {
-
-        tubeTo = m_tubes->at(tubeToIndex);
-        if ( (tubeTo->state() == CT_STATE_EMPTY && !emptyTubeProcessed)
-                || tubeTo->state() == CT_STATE_REGULAR) {
-
-            if (tubeTo->isEmpty())
-                emptyTubeProcessed = true;
-
-            quint8 toCount = tubeTo->currentColorCount();
-
-            for (quint8 tubeFromIndex = 0; tubeFromIndex < tubesCount(); ++tubeFromIndex) {
-
-                if (tubeFromIndex != tubeToIndex
-                        && canDoMove(tubeFromIndex, tubeToIndex)) {
-
-                    tubeFrom = m_tubes->at(tubeFromIndex);
-                    quint8 fromCount = tubeFrom->currentColorCount();
-
-                    move = addNewMove(tubeFromIndex, tubeToIndex);
-
-                    if (fromCount + toCount == tubeFrom->count() + tubeTo->count())
-                        move->rank = tubeFrom->count() + tubeTo->count() - move->count();
-                    else
-                        move->rank = qMin(tubeTo->rest(),
-                                    CtGlobal::game().usedColors()->getUsed(move->color()));
-
-                    if (toCount > 0 && toCount == tubeTo->count())
-                        move->rank += 4;
-
-                    if (fromCount == tubeFrom->count())
-                        move->rank += 2;
-
-                    if (fromCount > tubeTo->rest())
-                        move->rank -= 4;
-
-                    if (fromCount == tubeFrom->count() && tubeTo->isEmpty())
-                        move->rank -= 5;
-
-                    result ++;
-                }
-            }
+            quint8 byte = cells[i].items[j];
+            m_crc32 = CtGlobal::crc32Table( (m_crc32 ^ byte) & 0xFF) ^ (m_crc32 >> 8);
         }
     }
-
-    if (result > 1)
-        moves()->sortByRank();
-
-    // --- debug
-    qDebug() << this; // out current board
-    calculateHash();
-    qDebug().noquote() << "Hash" << QString::number(m_hash, 16);
-
-    qDebug() << "Found" << result << "possible moves.";
-    for (int i=0; i < moves()->size(); ++i) {
-        qDebug() <<"#" << i << (moves()->at(i));
-    }
-
-    return result;
+    m_crc32 ^= 0xffffffff;
 }
 
 QString BoardModel::toString() const

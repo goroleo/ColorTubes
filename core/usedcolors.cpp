@@ -16,11 +16,6 @@ UsedColors::~UsedColors()
     delete[] m_items;
 }
 
-int UsedColors::size()
-{
-    return CT_NUM_OF_COLORS;
-}
-
 void UsedColors::incUsed(quint8 colorNum)
 {
     if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
@@ -53,11 +48,13 @@ quint8 UsedColors::getUsed(quint8 colorNum)
         return 0;
 }
 
+/*
 void UsedColors::clearUsed(quint8 colorNum)
 {
     if (colorNum > 0 && colorNum <= CT_NUM_OF_COLORS)
         m_items[colorNum - 1] = 0;
 }
+*/
 
 void UsedColors::clearAllUsed()
 {
@@ -76,6 +73,7 @@ quint8 UsedColors::numberOfUsedColors()
     return c;
 }
 
+/*
 quint8 UsedColors::numberOfFilledColors()
 {
     int c = 0;
@@ -85,7 +83,9 @@ quint8 UsedColors::numberOfFilledColors()
     }
     return c;
 }
+*/
 
+/*
 quint8 UsedColors::numberOfUnusedColors()
 {
     int c = 0;
@@ -95,7 +95,9 @@ quint8 UsedColors::numberOfUnusedColors()
     }
     return c;
 }
+*/
 
+/*
 quint8 UsedColors::numberOfUsedCells()
 {
     int c = 0;
@@ -104,6 +106,7 @@ quint8 UsedColors::numberOfUsedCells()
     }
     return c;
 }
+*/
 
 quint8 UsedColors::numberOfAvailableCells()
 {
@@ -145,4 +148,3 @@ quint8 UsedColors::getRandomColor()
 
     return color;
 }
-

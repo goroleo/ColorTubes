@@ -4,6 +4,7 @@
 #include <QtCore>
 
 class BoardModel;
+class TubeModel;
 class MoveItems;
 
 struct MoveFields {
@@ -23,22 +24,21 @@ class MoveItem
 
 public:
 
-    MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo);
-    MoveItem(quint32 storedMove);
+    MoveItem(BoardModel * board, const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    MoveItem(BoardModel * board = nullptr, quint32 storedMove = 0);
+    MoveItem(quint32 storedMove = 0);
     ~MoveItem();
 
     bool         doMove();
 
-    MoveItem   * parent()      { return m_parentMove; }
-    BoardModel * boardBefore() { return m_boardBefore; }
-    BoardModel * boardAfter()  { return m_boardAfter; }
+    MoveItem   * parent()      const { return m_parentMove; }
+    BoardModel * boardBefore() const { return m_boardBefore; }
+    BoardModel * boardAfter()  const { return m_boardAfter; }
     quint8       tubeFrom()    const { return m_data.fields.tubeFrom; }
     quint8       tubeTo()      const { return m_data.fields.tubeTo; }
     quint8       color()       const { return m_data.fields.color; }
     quint8       count()       const { return m_data.fields.count; }
-    quint32      stored()      { return m_data.stored; }
-
-    qint8        rank;
+    quint32      stored()      const { return m_data.stored; }
 
     MoveItems  * children()     { return m_children; }
     int          childrenCount();
@@ -48,19 +48,19 @@ public:
     void         addChild(MoveItem * move);
     void         removeLastChild();
 
-private:
+    qint8        rank = 0;
 
+private:
     MoveData     m_data;
 
     MoveItem   * m_parentMove = nullptr;
     BoardModel * m_boardBefore = nullptr;
     BoardModel * m_boardAfter = nullptr;
     MoveItems  * m_children = nullptr;
-//    static int moves_count;
 };
 
-QDebug operator << (QDebug dbg, const MoveItem & moveItem);
-QDebug operator << (QDebug dbg, const MoveItem * moveItem);
+QDebug operator << (QDebug dbg, const MoveItem &moveItem);
+QDebug operator << (QDebug dbg, const MoveItem *moveItem);
 
 class MoveItems: public QVector<MoveItem *>
 {

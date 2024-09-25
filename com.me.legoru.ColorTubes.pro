@@ -23,6 +23,7 @@ SOURCES += \
     core/jctlformat.cpp \
     core/levelsengine.cpp \
     core/moveitem.cpp \
+    core/solver.cpp \
     core/tubemodel.cpp \
     core/usedcolors.cpp \
     gui/bottlelayer.cpp \
@@ -67,6 +68,7 @@ HEADERS += \
     core/jctlformat.h \
     core/levelsengine.h \
     core/moveitem.h \
+    core/solver.h \
     core/tubemodel.h \
     core/usedcolors.h \
     gui/bottlelayer.h \
@@ -88,6 +90,5 @@ RESOURCES += \
 QT += \
     core \
     svg \
-    quick \
-    widgets
+    quick
 

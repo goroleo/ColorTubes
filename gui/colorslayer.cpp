@@ -18,6 +18,7 @@ ColorsLayer::ColorsLayer(TubeItem * parent) :
     tubeSlices = new SliceF[6];
     colorSegments = new SliceF[6];
 
+// image
     m_drawImage = new QImage(CtGlobal::images().tubeFullWidth(),
                              CtGlobal::images().tubeFullHeight(),
                              QImage::Format_ARGB32);
@@ -27,8 +28,9 @@ ColorsLayer::ColorsLayer(TubeItem * parent) :
     setWidth(CtGlobal::images().tubeFullWidth());
     setHeight(CtGlobal::images().tubeFullHeight());
 
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-            this, SLOT(onScaleChanged()));
+// automatization
+    QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
+                     this, &ColorsLayer::onScaleChanged);
 
     QObject::connect(parent, &TubeItem::angleChanged,
             this, &ColorsLayer::onAngleChanged);
@@ -93,12 +95,7 @@ void ColorsLayer::onAngleChanged()
     }
 
 // ---- set rotation point
-    quint8 rotationVertex; // rotation vertex number
-    if (angle > 0)
-        rotationVertex = 0;
-    else
-        rotationVertex = 5;
-
+    quint8 rotationVertex = (angle > 0)? 0 : 5; // rotation vertex number
     tubeVertices[0].v = 0;
     tubeVertices[0].x = CtGlobal::images().vertex(rotationVertex).x();
     tubeVertices[0].y = CtGlobal::images().vertex(rotationVertex).y();
@@ -241,7 +238,7 @@ void ColorsLayer::nextSegment()
     // size (area) of the segment
     qreal dx0 = m_bottomLine.x2 - m_bottomLine.x1; // bottom section length
     qreal dx1 = m_topLine.x2 - m_topLine.x1;       // top section length
-    qreal dy = m_bottomLine.y - m_topLine.y;       // height
+    qreal dy  = m_bottomLine.y - m_topLine.y;      // height
     qreal sliceArea = dy * (dx0 + dx1) / 2;
 
     // checks the area

@@ -12,65 +12,55 @@ class TubeModel;
 class BoardModel
 {
 public:
-    BoardModel();
-    BoardModel(MoveItem * move);
+
+    BoardModel(MoveItem * fromMove = nullptr);
     ~BoardModel();
 
-    BoardModel  * rootBoard()   {return m_rootBoard;}
-    BoardModel  * parentBoard() {return m_parentBoard;}
-    MoveItem    * parentMove()  {return m_parentMove;}
-    MoveItem    * currentMove();
+    BoardModel  * rootBoard()   const { return m_rootBoard; }
+    BoardModel  * parentBoard() const { return m_parentBoard; }
+    MoveItem    * parentMove()  const { return m_parentMove; }
 
     void          clear();
+    void          cloneFrom(const BoardModel &boardToClone);
+    bool          isSolved();
+    int           level() const { return m_level; }
+    void          setLevel(int newLevel) { m_level = newLevel; }
 
     int           tubesCount() const { return m_tubes->size(); }
     TubeModel   * tubeAt(int index) const;
-
-    TubeModel   * addNewTube();
-    TubeModel   * addNewTube(TubeModel * tubeToClone);
-    TubeModel   * addNewTube(quint32 storedTube);
-
-    bool          isSolved();
-
-    bool          canDoMove(int tubeFromIndex, int tubeToIndex);
-    bool          canDoMove(TubeModel * tubeFrom, TubeModel * tubeTo);
-    quint8        colorsToMove(int tubeFromIndex, int tubeToIndex);
-    quint8        colorsToMove(TubeModel * tubeFrom, TubeModel * tubeTo);
-
-    quint32       getMoveData(int tubeFromIndex, int tubeToIndex);
-    MoveItem    * addNewMove(int tubeFromIndex, int tubeToIndex);
+    void          addNewTube();
+    void          addNewTube(const TubeModel &tubeToClone);
+    void          addNewTube(const quint32 storedTube);
 
     MoveItems   * moves();
-    int           movesCount();
-    bool          hasMoves();
+    MoveItem    * addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    MoveItem    * currentMove();
     void          deleteCurrentMove();
 
+    bool          canDoMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    quint8        colorsToMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    quint32       getMoveData(const TubeModel &tubeFrom, const TubeModel &tubeTo);
 
     quint16       calculateMoves();
-
     void          randomFill(int fillTubes, int emptyTubes);
 
-    int           level() {return m_level; }
-    void          setLevel(int newLevel) {m_level = newLevel;}
+    quint32       hash() const { return m_crc32; } // has to be calculated before
+    void          calculateHash();
 
-//    bool operator == (const BoardModel &other) const;
     QString       toString() const;
-    quint16       hash() {return m_hash;}
 
 private:
     BoardModel  * m_parentBoard = nullptr;
     BoardModel  * m_rootBoard = nullptr;
     MoveItem    * m_parentMove = nullptr;
 
-    TubeModels  * m_tubes;
+    TubeModels  * m_tubes = nullptr;
     MoveItems   * m_moves = nullptr;
     qint32        m_level;
-    quint16       m_hash;
+    quint32       m_crc32 = 0;  // hash value comparing to another board
 
     bool          checkFilledTubes();
     void          fillActiveColors();
-    void          calculateHash();
-
 };
 
 QDebug operator << (QDebug dbg, const BoardModel &board);

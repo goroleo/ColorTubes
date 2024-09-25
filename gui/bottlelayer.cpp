@@ -14,8 +14,8 @@ BottleLayer::BottleLayer(TubeItem * parent) :
 {
     m_tube = parent;
 
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-            this, SLOT(onScaleChanged()));
+    QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
+                     this, &BottleLayer::onScaleChanged);
 
     QObject::connect(parent, &TubeItem::angleChanged,
             this, &BottleLayer::onAngleChanged);

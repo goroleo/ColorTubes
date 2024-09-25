@@ -1,7 +1,6 @@
 ﻿#ifndef CTIMAGES_H
 #define CTIMAGES_H
 
-#include <QtGlobal>
 #include <QtSvg/QSvgRenderer>
 #include <QPixmap>
 
@@ -31,7 +30,6 @@ public:
     QPixmap   cork()        {return *m_cork;}
 
 // scaled tube's coordinates and sizes
-//    QPointF * vertices()    {return m_vertices;}
     QPointF   vertex(quint8 index) {return m_vertices[index];}
 
     qreal     tubeWidth()   {return m_tubeWidth;}
@@ -67,7 +65,7 @@ private:
     void      initialize();
     static    CtImages * m_instance;
 
-    void      scalePoints();
+    void      scaleVertices();
     QRectF    scaleRect (QRectF rect);
     void      renderImages();
 

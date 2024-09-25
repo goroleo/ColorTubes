@@ -62,28 +62,29 @@ namespace CtGlobal
     void destroy();
 
     // global singletons
-    Game & game();
-    CtIo & io();
-    CtImages & images();
-    CtPalette & palette();
+    Game       & game();
+    CtIo       & io();
+    CtImages   & images();
+    CtPalette  & palette();
 
     // game
     BoardModel * board();
-    MoveItems * moves();
+    MoveItems  * moves();
 
     // files
-    QString paletteFileName();
-    QString settingsFileName();
-    QString tempFileName();
+    QString      paletteFileName();
+    QString      settingsFileName();
+    QString      tempFileName();
 
     // colors
-    QColor paletteColor(quint8 colorIndex);
+    QColor       paletteColor(quint8 colorIndex);
 
     // service
-    quint32 colorStrToRgb(bool &ok, QString value);
-    QString colorRgbToStr(quint32 value);
-    QString intToStr(int value);
-    QString intToHex(int value);
+    quint32      crc32Table(int index);
+    quint32      colorStrToRgb(bool &ok, QString value);
+    QString      colorRgbToStr(quint32 value);
+    QString      intToStr(int value);
+    QString      intToHex(int value);
     template <typename T> int sign(T val) {
         return (T(0) < val) - (val < T(0));
     }

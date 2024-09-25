@@ -2,21 +2,26 @@
 #include "boardmodel.h"
 #include "tubemodel.h"
 
-MoveItem::MoveItem(BoardModel * board, quint8 idxTubeFrom, quint8 idxTubeTo)
+MoveItem::MoveItem(BoardModel * board, const TubeModel &tubeFrom, const TubeModel &tubeTo)
 {
-//    moves_count ++;
-    rank = 0;
     if (board) {
         m_boardBefore = board;
         m_parentMove = board->parentMove();
-        m_data.stored = board->getMoveData(idxTubeFrom, idxTubeTo);
+        m_data.stored = board->getMoveData(tubeFrom, tubeTo);
     }
+}
+
+MoveItem::MoveItem(BoardModel * board, quint32 storedMove)
+{
+    if (board) {
+        m_boardBefore = board;
+        m_parentMove = board->parentMove();
+    }
+    m_data.stored = storedMove;
 }
 
 MoveItem::MoveItem(quint32 storedMove)
 {
-//    moves_count ++;
-    rank = 0;
     m_data.stored = storedMove;
 }
 
@@ -27,7 +32,6 @@ MoveItem::~MoveItem()
     if (m_children) {
         delete m_children;
     }
-//    moves_count --;
 }
 
 bool MoveItem::doMove()
@@ -37,12 +41,18 @@ bool MoveItem::doMove()
 
     m_boardAfter = new BoardModel(this);
 
-    bool result = m_boardAfter->isSolved() || m_boardAfter->calculateMoves() > 0;
-    if (!result) {
+    // A move is considered successful if after it:
+    //  - the game is solved, or
+    //  - there are more moves on the resulting board
+    bool success = m_boardAfter->isSolved()
+            || m_boardAfter->calculateMoves() > 0;
+
+    if (!success) {
         delete m_boardAfter;
         m_boardAfter = nullptr;
     }
-    return result;
+
+    return success;
 }
 
 bool MoveItem::hasChildren()
@@ -130,7 +140,7 @@ void MoveItems::sortByRank()
     }
 }
 
-QDebug operator << (QDebug dbg, const MoveItem & moveItem)
+QDebug operator << (QDebug dbg, const MoveItem &moveItem)
 {
     dbg.nospace() << "MoveItem { "
         << "from: "    << QString::number(moveItem.tubeFrom(), 16)
@@ -142,8 +152,8 @@ QDebug operator << (QDebug dbg, const MoveItem & moveItem)
     return dbg.maybeSpace();
 }
 
-QDebug operator << (QDebug dbg, const MoveItem * moveItem)
+QDebug operator << (QDebug dbg, const MoveItem *moveItem)
 {
-    dbg.nospace() << * moveItem;
+    dbg.nospace() << *moveItem;
     return dbg.maybeSpace();
 }

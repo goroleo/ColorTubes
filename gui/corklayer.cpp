@@ -13,8 +13,8 @@ CorkLayer::CorkLayer(QQuickItem *parent) :
 {
     m_timer = new QTimer(this);
 
-    QObject::connect(&CtGlobal::images(), SIGNAL(scaleChanged(qreal)),
-            this, SLOT(onScaleChanged()));
+    QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
+                     this, &CorkLayer::onScaleChanged);
 
     connect(m_timer, &QTimer::timeout, [=](){
         nextFrame();
@@ -137,7 +137,7 @@ void CorkLayer::paintFrame()
         for (int y = 0; y < corkImage.height(); ++y) {
             pix = corkImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = round (qreal(pix >> 24) * m_alpha);
+                newAlpha = qRound (qreal(pix >> 24) * m_alpha);
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
