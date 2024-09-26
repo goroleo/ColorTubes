@@ -261,7 +261,7 @@ void GameBoard::randomFill()
     m_tubes->clear();
     CtGlobal::moves()->clear();
 
-    m_model->randomFill(9, 2);
+    m_model->randomFill(12, 2);
     for (int i = 0; i < tubesCount(); ++i) {
         TubeItem * tube = new TubeItem(this, CtGlobal::board()->tubeAt(i));
         m_tubes->append(tube);
@@ -282,6 +282,6 @@ void GameBoard::solve()
         clickTube(nullptr);
 
     SolveProcess solver;
-    solver.doSolve(m_model);
-
+//    solver.start(m_model);
+    solver.start();
 }

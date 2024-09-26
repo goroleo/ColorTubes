@@ -186,8 +186,6 @@ void TubeItem::onTubeStateChanged()
 
 void TubeItem::setClosed(bool value)
 {
-//    if (value == m_closed)
-//        return;
     if (value) {
         if (m_shade->shade() != 3)
             m_shade->setShadeAfterHide(3);
@@ -209,13 +207,13 @@ quint8 TubeItem::colorAt(quint8 index)
     return m_model->color(index);
 }
 
-bool TubeItem::canPutColor(quint8 colorNum)
+bool TubeItem::canPutColor(quint8 color)
 {
     return (currentStageId == CT_STAGE_DEFAULT
-                && m_model->canPutColor(colorNum))
+                && m_model->canPutColor(color))
 
             || (currentStageId == CT_STAGE_BUSY
-                && m_fillingColor == colorNum
+                && m_fillingColor == color
                 && m_pouringCells < m_model->rest());
 }
 
@@ -228,11 +226,6 @@ void TubeItem::moveColorTo(TubeItem * tube)
 {
     if (tube)
         flyTo(tube);
-}
-
-qreal TubeItem::scale() const
-{
-    return CtGlobal::images().scale();
 }
 
 void TubeItem::onScaleChanged()
@@ -280,14 +273,14 @@ void TubeItem::nextFrame()
 {
     if (steps > 0) {
 
-        if (currentStageId != CT_STAGE_POUR_OUT) {
-            if (!qFuzzyIsNull(m_angleIncrement))
-                setAngle(m_currentAngle + m_angleIncrement);
-        } else {
+        if (currentStageId == CT_STAGE_POUR_OUT) {
             setAngle(CtGlobal::images().tiltAngle(m_endAngleNumber + steps)
                      * CtGlobal::sign(m_currentAngle));
             if (m_recipient)
-                m_recipient->addPouringArea();
+                m_recipient->addFillArea();
+        } else {
+            if (!qFuzzyIsNull(m_angleIncrement))
+                setAngle(m_currentAngle + m_angleIncrement);
         }
 
         setCurrentPosition(m_currentPosition + m_moveIncrement);
@@ -463,7 +456,7 @@ void TubeItem::connectTube(TubeItem * tubeFrom)
     m_pouringCells += tubeFrom->m_pouringCells;
     if (currentStageId != CT_STAGE_BUSY) {
         m_fillingColor = tubeFrom->currentColor();
-        m_colors->resetPourArea();
+        m_colors->resetFillArea();
         currentStageId = CT_STAGE_BUSY;
     }
 }
@@ -489,7 +482,7 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     m_pouredTubes --;
 
     if (m_pouredTubes == 0) {
-        m_colors->addPourArea(0, 0, m_fillingColor);
+        m_colors->addFillArea(0, 0, m_fillingColor);
     }
 
     if (m_connectedTubes == 0) {
@@ -499,9 +492,9 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     }
 }
 
-void TubeItem::addPouringArea()
+void TubeItem::addFillArea()
 {
-    m_colors->addPourArea(CtGlobal::images().colorArea() / CT_TUBE_STEPS_POUR, m_fillingColor);
+    m_colors->addFillArea(CtGlobal::images().colorArea() / CT_TUBE_STEPS_POUR, m_fillingColor);
 }
 
 

@@ -14,7 +14,7 @@ static const qreal   CT_DEG2RAD          = M_PI / 180.0; // degrees to radians
 static const qreal   CT_RAD2DEG          = 180.0 / M_PI; // radians to degrees
 
 // ------------- number of colors in the game
-static const quint8  CT_NUM_OF_COLORS    = 12;           // don't forget to change palette!
+static const quint8  CT_NUMBER_OF_COLORS = 12;           // don't forget to change palette!
 
 // ------------- game modes  //  reserved for future use
 static const quint32 CT_END_GAME         = 0;
@@ -48,6 +48,14 @@ static const quint8  CT_STATE_EMPTY      = 0;            // there's no any fille
 static const quint8  CT_STATE_REGULAR    = 1;            // the tube has at least one empty cell to filling
 static const quint8  CT_STATE_FILLED     = 2;            // all 4 color cells are filled with different colors
 static const quint8  CT_STATE_DONE       = 3;            // all 4 color cells are filled with the same color
+
+// ------------- game solution results
+static const quint8  CT_SOLVER_SUCCESS   = 0;            // the game solution is found successfully
+static const quint8  CT_SOLVER_NOT_FOUND = 1;            // the game solution is not found
+static const quint8  CT_SOLVER_NO_BOARD  = 2;            // start board is undefined, nothing to do
+static const quint8  CT_SOLVER_NO_MOVES  = 3;            // start board has no any moves, nothing to do
+static const quint8  CT_SOLVER_CANCELLED = 4;            // solution process has interrupted by user
+
 
 class Game;
 class CtIo;

@@ -64,10 +64,10 @@ void ColorsLayer::refresh()
 
 void ColorsLayer::onScaleChanged()
 {
-    if (m_drawImage) {
+    if (m_painter)
         delete m_painter;
+    if (m_drawImage)
         delete m_drawImage;
-    }
 
     m_drawImage = new QImage(
                 CtGlobal::images().tubeFullWidth(),
@@ -127,9 +127,10 @@ void ColorsLayer::onAngleChanged()
         bottleLines[i].y2 = tubeVertices[i+1].y;
 
         if (qFuzzyCompare(bottleLines[i].x1, bottleLines[i].x2)) {
-            // avoid division by zero
-            bottleLines[i].k = CtGlobal::images().tubeFullWidth();
-            bottleLines[i].b = CtGlobal::images().tubeFullHeight();
+            // avoids division by zero when rotating the tube by +- 90 degrees
+            // such case will be processed further
+            bottleLines[i].k = 0;
+            bottleLines[i].b = 0;
         } else {
             bottleLines[i].k = (bottleLines[i].y2 - bottleLines[i].y1)
                     / (bottleLines[i].x2 - bottleLines[i].x1);
@@ -137,7 +138,9 @@ void ColorsLayer::onAngleChanged()
         }
     }
 
-// --- sort points by vertical. The lowest point will be tubeVertices[0]
+// --- sort points by vertical:
+    // the lowest point will be tubeVertices[0] (max Y),
+    // the highest - tubeVertices[5] (min Y)
     qint8 j;
     PointF temp;
     for (qint8 i = 1; i < 6; ++i) {
@@ -150,13 +153,16 @@ void ColorsLayer::onAngleChanged()
         tubeVertices[j] = temp;
     }
 
-    // Parent tube has to be visible. This is to avoid negative vertical coordinates after rotation.
+    // avoids negative vertical coordinates after rotation
     m_tube->setVerticalShift(tubeVertices[5].y);
 
 // --- calculate slices
     clearSlices();
-    if (tubeVertices[0].v != 0)              // rotation point must be not the lowest point
-    {
+
+    // rotation point must be not the lowest point,
+    // in other case we have nothing to draw
+    if (tubeVertices[0].v != 0) {
+
         quint8 currentVertex;
 
         // lowest point(s)
@@ -201,8 +207,8 @@ void ColorsLayer::drawColors()
             m_painter->fillRect(m_colorRect, CtGlobal::paletteColor(m_tube->colorAt(i)));
         }
 
-        m_bottomLine.y = CtGlobal::images().vertex(3).y()
-                - CtGlobal::images().colorHeight() * m_tube->model()->count()
+        // the bottom line of the empty area
+        m_bottomLine.y = CtGlobal::images().colorRect( m_tube->model()->count() ).bottom() +
                 + CtGlobal::images().shiftHeight();
         m_bottomLine.x1 = CtGlobal::images().vertex(3).x();
 
@@ -224,7 +230,6 @@ void ColorsLayer::drawColors()
 
 void ColorsLayer::nextSegment()
 {
-
     if (m_sliceIndex == 0 && m_colorIndex == 0)
         m_bottomLine = tubeSlices[0];
     else
@@ -242,17 +247,14 @@ void ColorsLayer::nextSegment()
     qreal sliceArea = dy * (dx0 + dx1) / 2;
 
     // checks the area
-    if (m_fillArea > sliceArea)
-    {
+    if (m_fillArea > sliceArea) {
 
         // whole the segment is filled by the current color
-
         addColorSegment(m_topLine);
         m_fillArea -= sliceArea;
         m_sliceIndex++;
 
-        if (m_topLine.v == 0) // is this the last segment?
-        {
+        if (m_topLine.v == 0) {  // is this the last segment?
             drawColorCell();
             clearColorSegments();
             m_colorIndex ++;
@@ -260,13 +262,13 @@ void ColorsLayer::nextSegment()
 
     } else {
 
-        // The current segment is not filled by one color,
-        // so we have to calculate size of the current color.
+        // the current segment is not filled by one color,
+        // so we have to calculate size (height) of the current color.
 
         qreal newHeight;
         if (qFuzzyIsNull(dx1))  {
-            // This is impossible, but let it be.
-            // The current segment is a triangle.
+            // this is impossible, but let it be.
+            // the current segment is a triangle.
             newHeight = 2 * m_fillArea / dx0;
 
         }  else if (qFuzzyCompare(dx0, dx1)) {
@@ -301,7 +303,7 @@ void ColorsLayer::nextSegment()
         addColorSegment(m_topLine);
         drawColorCell();
         clearColorSegments();
-        m_fillArea = 0;
+        m_fillArea = 0.0;
         m_colorIndex ++;
     }
 }
@@ -360,9 +362,17 @@ void ColorsLayer::addColorSegment(SliceF line)
 
 qreal ColorsLayer::intersectByX(quint8 vertex)
 {
-    qint8 line = 0;
-    while (line < 5)
+    // when angle = +-90 degrees we have only one intersection
+    if (tubeVertices[vertex].v == 0
+            && qFuzzyCompare(qAbs(m_tube->angle()), CT_PI2))
     {
+        return tubeVertices[vertex].x
+                - (150.5 * CtGlobal::images().scale()) // tube height from neck to bottom
+                * CtGlobal::sign(m_tube->angle());
+    }
+
+    qint8 line = 0;
+    while (line < 5) {
         if ((tubeVertices[vertex].v != line)
             && (tubeVertices[vertex].v) != line + 1)
         {
@@ -379,31 +389,31 @@ qreal ColorsLayer::intersectByX(quint8 vertex)
     return -1000;
 }
 
-void ColorsLayer::addPourArea(qreal areaIncrement, quint8 colorIndex)
+void ColorsLayer::addFillArea(qreal areaIncrement, quint8 colorIndex)
 {
-    addPourArea(areaIncrement, m_bottomLine.y * CtGlobal::images().jetWidth(), colorIndex);
+    addFillArea(areaIncrement, m_bottomLine.y * CtGlobal::images().jetWidth(), colorIndex);
 }
 
-void ColorsLayer::addPourArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex)
+void ColorsLayer::addFillArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex)
 {
-    m_pourArea += areaIncrement;
+    m_fillArea += areaIncrement;
     QColor color = CtGlobal::paletteColor(colorIndex);
     qreal colorHeight;
 
     if (jetArea > 0) {
         m_colorRect = CtGlobal::images().jetRect();
-        if (m_pourArea < jetArea) {
-            m_colorRect.setHeight(m_pourArea / m_colorRect.width());
+        if (m_fillArea < jetArea) {
+            m_colorRect.setHeight(m_fillArea / m_colorRect.width());
             m_painter->fillRect(m_colorRect, color);
             colorHeight = 0.0;
         } else {
             m_colorRect.setHeight(m_bottomLine.y);
             m_painter->fillRect(m_colorRect, color);
-            colorHeight = (m_pourArea - jetArea)
+            colorHeight = (m_fillArea - jetArea)
                     / (CtGlobal::images().colorWidth() - CtGlobal::images().jetWidth());
         }
     } else {
-        colorHeight = m_pourArea / CtGlobal::images().colorWidth();
+        colorHeight = m_fillArea / CtGlobal::images().colorWidth();
         // erasing jet rect by transparent color
         for (int y = 0; y < ceil(m_bottomLine.y - colorHeight); ++y ) {
             for (int x = floor(CtGlobal::images().jetRect().left());

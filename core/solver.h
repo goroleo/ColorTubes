@@ -10,25 +10,25 @@ class SolveProcess : public QObject
 {
     Q_OBJECT
 public:
-    explicit SolveProcess();
+    explicit SolveProcess(BoardModel *startBoard = 0);
     ~SolveProcess();
 
     void         clear();
-    void         setRootBoard(BoardModel *startBoard = 0);
-    void         doSolve(BoardModel *startBoard = 0);
+    void         setStartBoard(BoardModel *startBoard = 0);
+    void         start(BoardModel *startBoard = 0);
     void         stop();
     MoveItems  * moves() {return m_moves;}
+    quint8       result() {return m_resultId; }   // see CtGlobal::CT_SOLVER_*
 
 signals:
-    void solved();
-    void notSolved();
-    void interrupted();
+    void         finished(quint8 result);
 
 private:
     bool         m_externalBreak = false;
-    BoardModel * m_rootBoard;
+    BoardModel * m_startBoard;
     MoveItems  * m_moves;
     QVector <quint32> * m_hashes;
+    quint8       m_resultId;   // see CtGlobal::CT_SOLVER_*
 };
 
 class Solver : public QObject

@@ -43,7 +43,7 @@ Game& Game::instance()
 
 void Game::initialize()
 {
-    m_usedColors = new UsedColors; // UsedColors must be before JctlFormat
+    m_usedColors = new UsedColors;
     m_jctl = new JctlFormat;
     m_moves = new MoveItems;
     m_board = new BoardModel;
@@ -53,7 +53,7 @@ void Game::initialize()
         loaded = loadTemporary();
 
     if (!loaded)
-        load(QLatin1String(":/jctl/difficult8.jctl"));
+        load(QLatin1String(":/jctl/example3.jctl"));
 }
 
 bool Game::load(QString fileName)

@@ -96,6 +96,14 @@ void MoveItem::removeLastChild()
         m_children->removeLast();
 }
 
+void MoveItem::removeChildren()
+{
+    if (m_children) {
+        delete m_children;
+        m_children = nullptr;
+    }
+}
+
 MoveItem * MoveItems::current()
 {
     if (!isEmpty())
@@ -106,6 +114,14 @@ MoveItem * MoveItems::current()
 MoveItems::~MoveItems()
 {
     clear();
+}
+
+void MoveItems::removeFirst()
+{
+   if (!isEmpty()) {
+       delete first();
+       remove (0);
+   }
 }
 
 void MoveItems::removeLast()

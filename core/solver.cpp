@@ -4,11 +4,13 @@
 #include "boardmodel.h"
 #include "moveitem.h"
 
-SolveProcess::SolveProcess()
+SolveProcess::SolveProcess(BoardModel *startBoard)
 {
-    m_rootBoard = new BoardModel();
+    m_startBoard = new BoardModel();
     m_moves = new MoveItems();
     m_hashes = new QVector<quint32>;
+    if (startBoard)
+        setStartBoard(startBoard);
 }
 
 SolveProcess::~SolveProcess()
@@ -16,23 +18,23 @@ SolveProcess::~SolveProcess()
     clear();
     delete m_hashes;
     delete m_moves;
-    delete m_rootBoard;
+    delete m_startBoard;
 }
 
 void SolveProcess::clear()
 {
     m_moves->clear();
     m_hashes->clear();
-    m_rootBoard->clear();
+    m_startBoard->clear();
 }
 
-void SolveProcess::setRootBoard(BoardModel *startBoard)
+void SolveProcess::setStartBoard(BoardModel *startBoard)
 {
-    clear();
     if (startBoard) {
-        m_rootBoard->cloneFrom(* startBoard);
-        m_rootBoard->calculateHash();
-        m_rootBoard->calculateMoves();
+        m_startBoard->clear();
+        m_startBoard->cloneFrom(* startBoard);
+        m_startBoard->calculateHash();
+        m_startBoard->calculateMoves();
     }
 }
 
@@ -41,48 +43,53 @@ void SolveProcess::stop()
     m_externalBreak = true;
 }
 
-void SolveProcess::doSolve(BoardModel *startBoard)
+void SolveProcess::start(BoardModel *startBoard)
 {
     if (startBoard)
-        setRootBoard(startBoard);
+        setStartBoard(startBoard);
 
-    if (!m_rootBoard) {
-        qDebug() << "Start board is undefined. Nothing to solve.";
-        emit notSolved();
+    if (m_startBoard->tubesCount() == 0) {
+        qDebug() << "Start board is not defined. Nothing to solve.";
+        m_resultId = CT_SOLVER_NO_BOARD;
+        emit finished(m_resultId);
         return;
     }
 
-    MoveItem * move = m_rootBoard->currentMove();
+    MoveItem * move = m_startBoard->currentMove();
     if (!move) {
-        qDebug() << "Start board has no any moves. Solve process cannot started.";
-        emit notSolved();
+        qDebug() << "Start board has no any moves. Solve process cannot be started.";
+        m_resultId = CT_SOLVER_NO_MOVES;
+        emit finished(m_resultId);
         return;
     }
 
-    qDebug() << "Start solving with" << m_rootBoard;
+//    qDebug() << "Start solving with" << m_startBoard;
 
     m_moves->clear();
     m_hashes->clear();
     m_externalBreak = false;
-    bool boardSolved = false;
-    int  counter = 0;
+    bool solved = false;
+    int  boardsCounter = 1; // Start board has counted
+    int  movesCounter = m_startBoard->movesCount();
 
     do {
         // A move is considered successful if after it:
         //  - the game is solved, or
         //  - there are more moves on the resulting board
         bool moveSuccess = move->doMove();
-        counter ++;
+        boardsCounter ++;
 
         // Additional check of the resulting board,
         // if a similar game combination has occurred before
-        if (moveSuccess)
+        if (moveSuccess) {
             moveSuccess = !(m_hashes->contains( move->boardAfter()->hash() ));
+            movesCounter += move->boardAfter()->movesCount();
+        }
 
         if (moveSuccess) {
 
-            boardSolved = move->boardAfter()->isSolved();
-            if (!boardSolved) {
+            solved = move->boardAfter()->isSolved();
+            if (!solved) {
                 // adds board's hash to the stack
                 m_hashes->append(move->boardAfter()->hash());
                 // goes on with the highest ranked move on the new board
@@ -96,7 +103,7 @@ void SolveProcess::doSolve(BoardModel *startBoard)
 
             do {
                 // the highest ranked move failed, so remove it
-                board->deleteCurrentMove();
+                board->removeCurrentMove();
                 // and goes with the next ranked move
                 move = board->currentMove();
 
@@ -108,21 +115,38 @@ void SolveProcess::doSolve(BoardModel *startBoard)
             } while (!move && (board != nullptr));
         }
 
-    } while (!m_externalBreak && !boardSolved && move);
+    } while (!m_externalBreak && !solved && move);
 
-    qDebug() << "== Solve process is finished ==\n"
-             << "solved:" << boardSolved
-             << "| external break:" << m_externalBreak
-             << "| moves:" << counter
-             << "| hashes:" << m_hashes->size();
+    qDebug().nospace() << "== Solve process is finished ==\n"
+             << "solved: " << solved
+             << " | external break: " << m_externalBreak
+             << " | boards counted: " << boardsCounter
+             << " | moves counted: " << movesCounter
+             << " | unique boards: " << m_hashes->size();
 
-    if (boardSolved) {
+    if (solved) {
 
         if (move)
-            qDebug() << move->boardAfter();
+            qDebug() << "The final board is" << move->boardAfter();
 
+        // fill moves vector
         while (move) {
-            m_moves->prepend(new MoveItem(move->stored()));
+
+            MoveData moveData;
+            moveData.stored = move->stored();
+
+            // checks if in the next move this color moves to another tube again.
+            // the next move is already stored in m_moves and now is the first one.
+            if (!(m_moves->isEmpty())
+                    && (moveData.fields.color  == m_moves->first()->color())
+                    && (moveData.fields.count  == m_moves->first()->count())
+                    && (moveData.fields.tubeTo == m_moves->first()->tubeFrom()))
+            {
+                moveData.fields.tubeTo = m_moves->first()->tubeTo();
+                m_moves->removeFirst();
+            }
+
+            m_moves->prepend(new MoveItem(moveData.stored));
             move = move->parent();
         }
 
@@ -130,19 +154,22 @@ void SolveProcess::doSolve(BoardModel *startBoard)
         for (int i = 0; i < m_moves->size(); ++i)
             qDebug().nospace() << "Move #" << i << " - " << m_moves->at(i);
 
-        emit this->solved();
+        m_resultId = CT_SOLVER_SUCCESS;
 
-    } else {
+    } else { // the game is not solved
 
         if (m_externalBreak) {
             qDebug() << "You have cancelled your search for a solution to the game.";
-            emit this->interrupted();
+            m_resultId = CT_SOLVER_CANCELLED;
         } else {
             qDebug() << "The game solution is not found. Try to undo some previous moves.";
-            emit this->notSolved();
+            m_resultId = CT_SOLVER_NOT_FOUND;
         }
     }
 
+    // clear memory excluding StartBoard and its own moves
     m_hashes->clear();
-    m_rootBoard->clear();
+    m_startBoard->removeChildrenMoves();
+
+    emit finished(m_resultId);
 }

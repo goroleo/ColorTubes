@@ -65,7 +65,7 @@ void CorkLayer::startShow()
             m_timer->start(CT_TIMER_TICKS);
         }
     } else {
-        m_alpha = 1.1;
+        m_alphaIncrement = 2;
         nextFrame();
         paintFrame();
         update();
@@ -81,7 +81,7 @@ void CorkLayer::startHide()
             m_timer->start(CT_TIMER_TICKS);
         }
     } else {
-        m_alpha = -0.1;
+        m_alphaIncrement = -2;
         nextFrame();
         paintFrame();
         update();

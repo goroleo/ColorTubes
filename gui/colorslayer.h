@@ -25,21 +25,20 @@ private slots:
     void  onAngleChanged();
 
 private:
-    TubeItem  * m_tube;                     // parent tube for this layer
+    TubeItem  * m_tube;                      // parent tube for this layer
     void        paint(QPainter * painter) override;
 
     //  draw colors
     QImage    * m_drawImage;
     QPainter  * m_painter;
+    QRectF      m_colorRect;                 // rect of the color
+    qreal       m_fillArea;                  // currently filled area
     void        drawColors();
 
     //  fill colors from another tube
-    qreal       m_fillArea;                  // currently filled area
-    QRectF      m_colorRect;                 // rect of the color
-    qreal       m_pourArea;
-    void        resetPourArea() {m_pourArea = 0;}
-    void        addPourArea(qreal areaIncrement, quint8 colorIndex);
-    void        addPourArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex);
+    void        resetFillArea() { m_fillArea = 0.0; }
+    void        addFillArea(qreal areaIncrement, quint8 colorIndex);
+    void        addFillArea(qreal areaIncrement, qreal jetArea, quint8 colorIndex);
 
     //  rotation coordinates & routines
     struct PointF {
@@ -67,17 +66,17 @@ private:
     void        nextSegment();
     void        drawColorCell();
 
-    PointF    * tubeVertices;                      // coordinates after rotation
-    LineF     * bottleLines;                       // bottle edge lines
-    qreal       intersectByX(quint8 vertex);       // the intersection of the horizontal line from bottle vertices
+    PointF    * tubeVertices;                // coordinates after rotation
+    LineF     * bottleLines;                 // bottle edge lines
+    qreal       intersectByX(quint8 vertex); // the intersection of the horizontal line from bottle vertices
 
-    SliceF    * tubeSlices;                        // tube is sliced by horizontal lines passing through its vertices
+    SliceF    * tubeSlices;                  // tube is sliced by horizontal lines passing through its vertices
     qint8       m_slicesCount;
     qint8       m_sliceIndex;
     void        addSlice(qint8 vertex, qreal x1, qreal x2, qreal y);
     void        clearSlices();
 
-    SliceF    * colorSegments;                     // color segments coordinates
+    SliceF    * colorSegments;               // color segments coordinates
     qint8       m_segmentsCount;
     qint8       m_colorIndex;
     qreal       m_segmentArea;
@@ -86,7 +85,6 @@ private:
 
     SliceF      m_bottomLine;
     SliceF      m_topLine;
-
 };
 
 #endif // COLORSLAYER_H

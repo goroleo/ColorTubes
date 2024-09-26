@@ -357,7 +357,7 @@ bool JctlFormat::checkTubes()
         {
             return false;
         }
-    } while (color < CT_NUM_OF_COLORS);
+    } while (color < CT_NUMBER_OF_COLORS);
 
     return true;
 }

@@ -24,7 +24,7 @@ BoardModel::BoardModel(MoveItem * fromMove)
             m_tubes->at(fromMove->tubeTo())->putColor(fromMove->color());
         }
 
-        // calculates hash value
+        // calculates hash value after move has done
         calculateHash();
     }
 }
@@ -98,6 +98,15 @@ MoveItems * BoardModel::moves()
     return m_moves;
 }
 
+void BoardModel::removeChildrenMoves()
+{
+    if (moves())
+        for (MoveItem *move: *moves()) {
+            move->removeChildren();
+        }
+}
+
+
 MoveItem * BoardModel::addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo)
 {
     MoveItem * move = new MoveItem(this, getMoveData(tubeFrom, tubeTo));
@@ -111,7 +120,6 @@ MoveItem * BoardModel::addNewMove(const TubeModel &tubeFrom, const TubeModel &tu
     return move;
 }
 
-/* unused
 int BoardModel::movesCount()
 {
     if (m_parentMove)
@@ -120,9 +128,7 @@ int BoardModel::movesCount()
         return m_moves->size();
     return 0;
 }
-*/
 
-/* unused
 bool BoardModel::hasMoves()
 {
     if (m_parentMove)
@@ -131,7 +137,6 @@ bool BoardModel::hasMoves()
         return !m_moves->isEmpty();
     return false;
 }
-*/
 
 MoveItem * BoardModel::currentMove()
 {
@@ -142,7 +147,7 @@ MoveItem * BoardModel::currentMove()
     return nullptr;
 }
 
-void BoardModel::deleteCurrentMove()
+void BoardModel::removeCurrentMove()
 {
     if (m_parentMove)
         m_parentMove->removeLastChild();
@@ -181,7 +186,6 @@ quint32 BoardModel::getMoveData(const TubeModel &tubeFrom, const TubeModel &tube
 
 quint16 BoardModel::calculateMoves()
 {
-
     quint16 result = 0;                  // number of available moves
     bool emptyTubeProcessed = false;     // true if one of empty tube has processed already
 
@@ -242,7 +246,6 @@ quint16 BoardModel::calculateMoves()
 
     if (result > 1)
         moves()->sortByRank();
-
 /*
     // --- debug
     qDebug() << this; // out current board
@@ -250,7 +253,6 @@ quint16 BoardModel::calculateMoves()
 
     qDebug() << "Found" << result << "possible moves.";
     if (hasMoves()) {
-
         for (int i=0; i < moves()->size(); ++i) {
             qDebug() <<"#" << i << (moves()->at(i));
         }
@@ -308,28 +310,28 @@ void BoardModel::fillActiveColors()
 
 void BoardModel::calculateHash()
 {
-    ColorCells cells [m_tubes->size()];
+    ColorCells tubes [m_tubes->size()];
     for (int i = 0; i < m_tubes->size(); ++i)
-        cells[i].stored = m_tubes->at(i)->store();
+        tubes[i].stored = m_tubes->at(i)->store();
 
-    // sort
+    // sorts tubes data
     int j;
     quint32 temp;
     for (int i = 1; i < m_tubes->size(); ++i) {
-        temp = cells[i].stored;
+        temp = tubes[i].stored;
         j = i;
-        while ( (j > 0) && (cells[j-1].stored < temp) ) {
-            cells[j].stored = cells[j-1].stored;
+        while ( (j > 0) && (tubes[j-1].stored < temp) ) {
+            tubes[j].stored = tubes[j-1].stored;
             j--;
         }
-        cells[j].stored = temp;
+        tubes[j].stored = temp;
     }
 
     // CRC32 hash value
     m_crc32 = 0xffffffff;
     for (int i = 0; i < m_tubes->size(); ++i) {
         for (int j = 3; j >= 0; j--) {
-            quint8 byte = cells[i].items[j];
+            quint8 byte = tubes[i].items[j];
             m_crc32 = CtGlobal::crc32Table( (m_crc32 ^ byte) & 0xFF) ^ (m_crc32 >> 8);
         }
     }

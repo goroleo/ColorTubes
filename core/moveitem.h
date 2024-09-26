@@ -47,6 +47,7 @@ public:
     void         addChild(quint32 storedMove);
     void         addChild(MoveItem * move);
     void         removeLastChild();
+    void         removeChildren();
 
     qint8        rank = 0;
 
@@ -66,10 +67,11 @@ class MoveItems: public QVector<MoveItem *>
 {
 public:
     ~MoveItems();
-    void         sortByRank();
     MoveItem   * current();
+    void         removeFirst();
     void         removeLast();
     void         clear();
+    void         sortByRank();
 };
 
 #endif // MOVEITEM_H

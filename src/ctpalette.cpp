@@ -26,8 +26,8 @@ CtPalette& CtPalette::instance()
 
 void CtPalette::initialize()
 {
-    m_items = new quint32[CT_NUM_OF_COLORS];
-    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
+    m_items = new quint32[CT_NUMBER_OF_COLORS];
+    for (int i = 0; i < CT_NUMBER_OF_COLORS; i++) {
         m_items[i] = 0;
     }
     if (!load()) {
@@ -48,7 +48,7 @@ QColor CtPalette::getColor(int index)
 {
     if (index == 0) {
         return QColor((quint32) 0);
-    } else if ((index > 0) && (index <= CT_NUM_OF_COLORS)) {
+    } else if ((index > 0) && (index <= CT_NUMBER_OF_COLORS)) {
         return QColor(m_items[index - 1]);
     } else
         return nullptr;
@@ -56,7 +56,7 @@ QColor CtPalette::getColor(int index)
 
 void CtPalette::setColor(int index, quint32 rgb)
 {
-    if ((index > 0) && (index <= CT_NUM_OF_COLORS)) {
+    if ((index > 0) && (index <= CT_NUMBER_OF_COLORS)) {
         m_items[index - 1] = rgb;
     }
 }
@@ -97,7 +97,7 @@ bool CtPalette::load()
         // check count
         if (jPal.contains("count") && jPal["count"].isString())
             count = jPal["count"].toString().toInt(&result, 10);
-        result = result && count == CT_NUM_OF_COLORS;
+        result = result && count == CT_NUMBER_OF_COLORS;
 
         // process palette's colors
         int i = 0;
@@ -127,10 +127,10 @@ bool CtPalette::save()
     QJsonObject jObj;
 
     // adds count
-    jItem["count"] = CtGlobal::intToStr(CT_NUM_OF_COLORS);
+    jItem["count"] = CtGlobal::intToStr(CT_NUMBER_OF_COLORS);
 
     // adds colors
-    for (int i = 0; i < CT_NUM_OF_COLORS; i++) {
+    for (int i = 0; i < CT_NUMBER_OF_COLORS; i++) {
         jItem["color"+CtGlobal::intToStr(i+1)] = CtGlobal::colorRgbToStr(m_items[i]);
     }
     jObj["palette"] = jItem;

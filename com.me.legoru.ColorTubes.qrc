@@ -10,10 +10,11 @@
         <file>jctl/example3.jctl</file>
         <file>jctl/example4.jctl</file>
         <file>img/badge.svg</file>
-        <file>jctl/difficult8.jctl</file>
+        <file>jctl/difficult1.jctl</file>
         <file>img/tube.svg</file>
         <file>img/icon-cover.png</file>
         <file>img/flower.svg</file>
-        <file>jctl/unsolved.jctl</file>
+        <file>jctl/unsolvable1.jctl</file>
+        <file>jctl/unsolvable2.jctl</file>
     </qresource>
 </RCC>

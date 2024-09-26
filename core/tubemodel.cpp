@@ -35,9 +35,8 @@ bool TubeModel::checkDone()
         return false;
 
     for (quint8 i = 1; i < 4; ++i) {
-        if (m_colors.items[i] != m_colors.items[0]) {
+        if (m_colors.items[i] != m_colors.items[0])
             return false;
-        }
     }
     return true;
 }
@@ -77,18 +76,18 @@ quint8 TubeModel::color(quint8 index)
     return m_colors.items[index];
 }
 
-bool TubeModel::hasColor(quint8 colorNumber) const
+bool TubeModel::hasColor(quint8 color) const
 {
     for (quint8 i = 0; i < m_count; ++i) {
-        if (m_colors.items[i] == colorNumber)
+        if (m_colors.items[i] == color)
             return true;
     }
     return false;
 }
 
-bool TubeModel::canPutColor(quint8 colorNumber) const
+bool TubeModel::canPutColor(quint8 color) const
 {
-    if (colorNumber == 0)
+    if (color == 0)
         return false;
 
     switch(m_count) {
@@ -97,21 +96,21 @@ bool TubeModel::canPutColor(quint8 colorNumber) const
     case 4:
         return false;
     default:
-        return (m_colors.items[m_count - 1] == colorNumber);
+        return (m_colors.items[m_count - 1] == color);
     }
 }
 
-bool TubeModel::putColor(quint8 colorNumber)
+bool TubeModel::putColor(quint8 color)
 {
-    return putColor(colorNumber, true);
+    return putColor(color, true);
 }
 
-bool TubeModel::putColor(quint8 colorNumber, bool updateState)
+bool TubeModel::putColor(quint8 color, bool updateState)
 {
-    if ((m_count >= 4) || (colorNumber == 0))
+    if ((m_count >= 4) || (color == 0))
         return false;
 
-    m_colors.items[m_count] = colorNumber;
+    m_colors.items[m_count] = color;
     m_count ++;
 
     // update tube's state
@@ -141,7 +140,7 @@ quint8 TubeModel::extractColor()
         return 0;
 
     m_count --;
-    quint8 result = m_colors.items[m_count];
+    quint8 extractedColor = m_colors.items[m_count];
     m_colors.items[m_count] = 0;
 
     // update tube's state
@@ -153,7 +152,7 @@ quint8 TubeModel::extractColor()
     }
     if (oldState != m_state)
         emit stateChanged();
-    return result;
+    return extractedColor;
 }
 
 quint8 TubeModel::currentColorCount() const
@@ -163,16 +162,14 @@ quint8 TubeModel::currentColorCount() const
 
     quint8 result = 1;
     quint8 i = m_count - 1;
-
-    while (i > 0 && m_colors.items[i - 1] == m_colors.items[m_count - 1]) {
+    while (i > 0 && (m_colors.items[i - 1] == m_colors.items[m_count - 1])) {
         result ++;
         i--;
     }
-
     return result;
 }
 
-bool TubeModel::operator == (const TubeModel & other)
+bool TubeModel::operator == (const TubeModel &other)
 {
     return m_colors.stored == other.m_colors.stored;
 }
@@ -189,9 +186,9 @@ void TubeModel::assignColors(quint32 storedColors)
 
 void TubeModel::assignColors(const TubeModel &other)
 {
-    m_colors.stored = other.store();
-    m_count = other.count();
-    m_state = other.state();
+    m_colors.stored = other.m_colors.stored;
+    m_count = other.m_count;
+    m_state = other.m_state;
 }
 
 quint32 TubeModel::store() const

@@ -33,11 +33,11 @@ public:
     quint8 currentColor() const;
     quint8 currentColorCount() const;     // how much colors we can get from the tube on one move
     quint8 color(quint8 index);
-    bool hasColor(quint8 colorNumber) const;
+    bool hasColor(quint8 color) const;
 
     //  put color
-    bool canPutColor(quint8 colorNumber) const;
-    bool putColor(quint8 colorNumber);
+    bool canPutColor(quint8 color) const;
+    bool putColor(quint8 color);
 
     //  extract color(s)
     bool canExtractColor() const;
@@ -56,7 +56,7 @@ signals:
 
 private:
     bool checkDone();
-    bool putColor(quint8 colorNum, bool updateState);
+    bool putColor(quint8 color, bool updateState);
 
     ColorCells m_colors;
     quint8 m_state = CT_STATE_EMPTY;

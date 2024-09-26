@@ -32,16 +32,14 @@ public:
     void          addNewTube(const TubeModel &tubeToClone);
     void          addNewTube(const quint32 storedTube);
 
-    MoveItems   * moves();
-    MoveItem    * addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    quint16       calculateMoves();
+    bool          hasMoves();
+    int           movesCount();
     MoveItem    * currentMove();
-    void          deleteCurrentMove();
-
-    bool          canDoMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
-    quint8        colorsToMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    void          removeCurrentMove();
+    void          removeChildrenMoves();
     quint32       getMoveData(const TubeModel &tubeFrom, const TubeModel &tubeTo);
 
-    quint16       calculateMoves();
     void          randomFill(int fillTubes, int emptyTubes);
 
     quint32       hash() const { return m_crc32; } // has to be calculated before
@@ -58,6 +56,11 @@ private:
     MoveItems   * m_moves = nullptr;
     qint32        m_level;
     quint32       m_crc32 = 0;  // hash value comparing to another board
+
+    MoveItems   * moves();
+    MoveItem    * addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    bool          canDoMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
+    quint8        colorsToMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
 
     bool          checkFilledTubes();
     void          fillActiveColors();

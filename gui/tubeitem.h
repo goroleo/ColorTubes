@@ -38,7 +38,7 @@ public:
     void          setClosed(bool value);
 
     quint8        currentColor();
-    bool          canPutColor(quint8 colorNumber);
+    bool          canPutColor(quint8 color);
     bool          canExtractColor();
 
     void          moveColorTo(TubeItem * tube);
@@ -68,7 +68,7 @@ private:
     ShadeLayer  * m_shade;
 
 //  scale, position & rotation
-    qreal         scale() const;                           // unused?
+//    qreal         scale() const;  // use CtGlobal::images().scale()
 
     QPointF       position() { return m_regularPosition;}  // unused?
     void          setRegularPosition(QPointF newPoint);
@@ -115,7 +115,7 @@ private:
 
     void          connectTube(TubeItem * tubeFrom); // connects tubeFrom to this tube to pour colors out
     void          removeConnectedTube(TubeItem * tubeFrom);
-    void          addPouringArea();
+    void          addFillArea();
 
     quint8        m_fillingColor;           // color number
     quint8        m_pouringCells = 0;       // number of pouring color cells
