@@ -152,6 +152,7 @@ quint8 TubeModel::extractColor()
     }
     if (oldState != m_state)
         emit stateChanged();
+
     return extractedColor;
 }
 
@@ -184,11 +185,11 @@ void TubeModel::assignColors(quint32 storedColors)
     updateState(); // don't forget!
 }
 
-void TubeModel::assignColors(const TubeModel &other)
+void TubeModel::assignColors(const TubeModel &tubeFrom)
 {
-    m_colors.stored = other.m_colors.stored;
-    m_count = other.m_count;
-    m_state = other.m_state;
+    m_colors.stored = tubeFrom.m_colors.stored;
+    m_count = tubeFrom.m_count;
+    m_state = tubeFrom.m_state;
 }
 
 quint32 TubeModel::store() const

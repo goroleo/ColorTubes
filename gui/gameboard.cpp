@@ -1,5 +1,4 @@
 #include "gameboard.h"
-#include <qguiapplication.h>
 
 #include "src/ctglobal.h"
 #include "tubeitem.h"
@@ -14,19 +13,20 @@ GameBoard::GameBoard(QQuickItem *parent) :
     m_model = CtGlobal::board();
     m_tubes = new TubeItems();
 
-    for (int i=0; i < m_model->tubesCount(); ++i) {
-        TubeItem * tube = new TubeItem(this, CtGlobal::board()->tubeAt(i));
-        m_tubes->append(tube);
-    }
 
     QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
                      this, &GameBoard::onScaleChanged);
 
-    QObject::connect(qGuiApp, &QGuiApplication::applicationStateChanged,
-            this, &GameBoard::onApplicationStateChanged);
+    QObject::connect(&CtGlobal::game(), &Game::levelChanged,
+                     this, &GameBoard::onLevelChanged);
+
+    QObject::connect(&CtGlobal::game(), &Game::needToRefresh,
+                     this, &GameBoard::onRefresh);
 
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
+
+    update();
 }
 
 GameBoard::~GameBoard()
@@ -50,16 +50,6 @@ int GameBoard::indexOf(TubeItem * tube)
         return -1;
 }
 
-bool GameBoard::isSolved()
-{
-    return m_model->isSolved();
-}
-
-int GameBoard::level()
-{
-    return m_model->level();
-}
-
 int GameBoard::maxChildrenZ()
 {
     int result = 0;
@@ -81,7 +71,6 @@ void GameBoard::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeom
 void GameBoard::rescale()
 {
     // rescale and replace all tubes
-
     int cols = m_model->tubesCount() / 2 + m_model->tubesCount() % 2;
     int boardWidth = cols * (80 + spaceX) + spaceX;
     int boardHeight = 400 + 3 * spaceY;
@@ -95,16 +84,38 @@ void GameBoard::rescale()
     }
 }
 
+void GameBoard::update()
+{
+    if (!m_tubes->isEmpty())
+        qDeleteAll(m_tubes->begin(), m_tubes->end());
+    m_tubes->clear();
+
+    for (int i = 0; i < tubesCount(); ++i) {
+        TubeItem * tube = new TubeItem(this, CtGlobal::board()->tubeAt(i));
+        m_tubes->append(tube);
+    }
+    rescale();
+}
+
+void GameBoard::refresh()
+{
+    for (int i = 0; i < tubesCount(); ++i)
+        m_tubes->at(i)->refresh();
+}
+
+void GameBoard::onRefresh()
+{
+    refresh();
+}
+
+void GameBoard::onLevelChanged()
+{
+    update();
+}
+
 void GameBoard::onScaleChanged()
 {
     placeTubes();
-}
-
-void GameBoard::onApplicationStateChanged()
-{
-    if (QGuiApplication::applicationState() != Qt::ApplicationActive)
-        if (!isSolved())
-            CtGlobal::game().saveTemporary();
 }
 
 void GameBoard::placeTubes()
@@ -202,86 +213,14 @@ void GameBoard::showAvailableMoves()
     }
 }
 
-bool GameBoard::hasMoves()
+bool GameBoard::busy()
 {
-    return !(CtGlobal::game().moves()->empty());
+    return maxChildrenZ() != 0;
 }
 
-void GameBoard::undoMove()
+void GameBoard::hideSelection()
 {
-    if (CtGlobal::game().hasMoves() && maxChildrenZ() == 0) {
-
-        if (m_selectedTube)
-            clickTube(nullptr);
-
-        MoveItem * move = CtGlobal::game().moves()->current();
-        if (move) {
-            for (int i = 0; i < move->count(); ++i) {
-                m_model->tubeAt( move->tubeFrom() )->putColor(
-                            m_model->tubeAt( move->tubeTo() )->extractColor());
-            }
-            m_tubes->at(move->tubeFrom())->refresh();
-            m_tubes->at(move->tubeTo())->refresh();
-            CtGlobal::game().removeLastMove();
-            emit movesChanged();
-        }
-    }
-}
-
-void GameBoard::startAgain()
-{
-    if (maxChildrenZ() != 0)
-        return;
-
     if (m_selectedTube)
         clickTube(nullptr);
-
-    while (CtGlobal::game().hasMoves()) {
-
-        MoveItem * move = CtGlobal::game().moves()->current();
-        if (move) {
-            for (int i = 0; i < move->count(); ++i) {
-                m_model->tubeAt( move->tubeFrom() )->putColor(
-                            m_model->tubeAt( move->tubeTo() )->extractColor());
-            }
-            CtGlobal::game().removeLastMove();
-        }
-    }
-
-    for (int i = 0; i < tubesCount(); ++i)
-        m_tubes->at(i)->refresh();
-
-    emit movesChanged();
 }
 
-void GameBoard::randomFill()
-{
-    if (!m_tubes->isEmpty())
-        qDeleteAll(m_tubes->begin(), m_tubes->end());
-    m_tubes->clear();
-    CtGlobal::moves()->clear();
-
-    m_model->randomFill(12, 2);
-    for (int i = 0; i < tubesCount(); ++i) {
-        TubeItem * tube = new TubeItem(this, CtGlobal::board()->tubeAt(i));
-        m_tubes->append(tube);
-    }
-    rescale();
-    emit movesChanged();
-
-    m_model->setLevel(m_model->level()+1);
-    emit levelChanged();
-}
-
-void GameBoard::solve()
-{
-    if (maxChildrenZ() != 0)
-        return;
-
-    if (m_selectedTube)
-        clickTube(nullptr);
-
-    SolveProcess solver;
-//    solver.start(m_model);
-    solver.start();
-}

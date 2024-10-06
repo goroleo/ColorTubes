@@ -45,7 +45,7 @@ bool MoveItem::doMove()
     //  - the game is solved, or
     //  - there are more moves on the resulting board
     bool success = m_boardAfter->isSolved()
-            || m_boardAfter->calculateMoves() > 0;
+            || m_boardAfter->findMoves() > 0;
 
     if (!success) {
         delete m_boardAfter;

@@ -21,8 +21,8 @@ PKGCONFIG += \
 SOURCES += \
     core/boardmodel.cpp \
     core/jctlformat.cpp \
-    core/levelsengine.cpp \
     core/moveitem.cpp \
+    core/options.cpp \
     core/solver.cpp \
     core/tubemodel.cpp \
     core/usedcolors.cpp \
@@ -66,8 +66,8 @@ TRANSLATIONS += \
 HEADERS += \
     core/boardmodel.h \
     core/jctlformat.h \
-    core/levelsengine.h \
     core/moveitem.h \
+    core/options.h \
     core/solver.h \
     core/tubemodel.h \
     core/usedcolors.h \

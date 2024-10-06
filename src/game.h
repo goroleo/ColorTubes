@@ -2,6 +2,9 @@
 #define GAME_H
 
 #include <QObject>
+#include <QQmlEngine>
+#include <QJSEngine>
+
 
 class UsedColors;
 class JctlFormat;
@@ -10,6 +13,7 @@ class TubeModel;
 class GameBoard;
 class MoveItems;
 class MoveItem;
+class Options;
 
 /*!
  * \brief The Game singleton class
@@ -17,10 +21,12 @@ class MoveItem;
 class Game : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool hasMoves READ hasMoves NOTIFY movesChanged)
+    Q_PROPERTY(int level READ level NOTIFY levelChanged)
+
 public:
     static Game & create();
     static Game & instance();
-
     ~Game();
 
     BoardModel * boardModel() {return m_board; }
@@ -33,7 +39,8 @@ public:
     void         removeLastMove();
 
     void         setMode(int newMode);
-    int          mode() {return gameMode;}
+    int          mode() {return m_gameMode;}
+    quint32      level();
 
     bool         load(QString fileName);
     bool         loadTemporary();
@@ -41,19 +48,42 @@ public:
     bool         saveTemporary();
     void         removeTemporary();
 
+    void         checkSolved();
+
+    Q_INVOKABLE void newLevel();
+    Q_INVOKABLE void undoMove();
+    Q_INVOKABLE void startAgain();
+    Q_INVOKABLE void solve();
+
 signals:
-    void         gameLoaded();
+    void         levelChanged();
+    void         movesChanged();
+    void         needToRefresh();
+    void         solved();
+
+private slots:
+    void         onApplicationStateChanged();
 
 private:
-    explicit Game() {};
+    explicit Game(QObject* parent = nullptr) : QObject(parent) {};
     void initialize();
 
     UsedColors  * m_usedColors;
     JctlFormat  * m_jctl;
     BoardModel  * m_board;
     MoveItems   * m_moves;
-    int           gameMode;
+    Options     * m_options;
+    int           m_gameMode;
     static Game * m_instance;
 };
+
+static QObject *gameInstance(QQmlEngine *engine, QJSEngine *scriptEngine)
+  {
+      Q_UNUSED(engine)
+      Q_UNUSED(scriptEngine)
+
+      Game *game = &Game::instance();
+      return game;
+  }
 
 #endif // GAME_H

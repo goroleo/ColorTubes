@@ -11,8 +11,7 @@ class TubeItems;
 class GameBoard : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(bool hasMoves READ hasMoves NOTIFY movesChanged)
-    Q_PROPERTY(int level READ level NOTIFY levelChanged)
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
 
 public:
     explicit GameBoard(QQuickItem *parent = nullptr);
@@ -27,24 +26,19 @@ public:
 
     void         clickTube(TubeItem * tube);
     int          maxChildrenZ();
+    void         update();
+    void         refresh();
 
-    bool         isSolved();
-    int          level();
+    bool         busy();
+    Q_INVOKABLE void hideSelection();
 
 signals:
-    void         solved();
-    void         movesChanged();
-    void         levelChanged();
-
-public slots:
-    void         undoMove();
-    void         startAgain();
-    void         randomFill();
-    void         solve();
+    void         busyChanged();
 
 private slots:
     void         onScaleChanged();
-    void         onApplicationStateChanged();
+    void         onLevelChanged();
+    void         onRefresh();
 
 private:
     BoardModel * m_model;

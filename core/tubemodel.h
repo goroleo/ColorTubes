@@ -29,26 +29,26 @@ public:
     bool isEmpty() const;
     void updateState();
 
-    //  get color(s)
+    // get color(s)
     quint8 currentColor() const;
     quint8 currentColorCount() const;     // how much colors we can get from the tube on one move
     quint8 color(quint8 index);
     bool hasColor(quint8 color) const;
 
-    //  put color
+    // put color
     bool canPutColor(quint8 color) const;
     bool putColor(quint8 color);
 
-    //  extract color(s)
+    // extract color(s)
     bool canExtractColor() const;
     quint8 extractColor();
 
-    //  compare to another tube
+    // compare to another tube
     bool operator == (const TubeModel &other);
 
     // store & restore
     void assignColors(quint32 storedColors);
-    void assignColors(const TubeModel &other);
+    void assignColors(const TubeModel &tubeFrom);
     quint32 store() const;
 
 signals:

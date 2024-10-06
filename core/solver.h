@@ -16,7 +16,8 @@ public:
     void         clear();
     void         setStartBoard(BoardModel *startBoard = 0);
     void         start(BoardModel *startBoard = 0);
-    void         stop();
+    void         stop();   // point to safe interrupt the process
+
     MoveItems  * moves() {return m_moves;}
     quint8       result() {return m_resultId; }   // see CtGlobal::CT_SOLVER_*
 

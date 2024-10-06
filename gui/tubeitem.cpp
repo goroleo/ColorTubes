@@ -4,9 +4,9 @@
 #include "src/ctimages.h"
 #include "src/game.h"
 
-#include "gameboard.h"
 #include "core/tubemodel.h"
 
+#include "gameboard.h"
 #include "corklayer.h"
 #include "bottlelayer.h"
 #include "colorslayer.h"
@@ -176,11 +176,7 @@ void TubeItem::onTubeStateChanged()
 
     if (m_closed) {
         qDebug() << "Closed tube" << tubeIndex();
-        if (m_board->isSolved()) {
-            qDebug() << "!!! SOLVED !!!";
-            CtGlobal::game().removeTemporary();
-            emit m_board->solved();
-        }
+        CtGlobal::game().checkSolved();
     }
 }
 
@@ -327,6 +323,7 @@ void TubeItem::regularTube()
     setHeight(CtGlobal::images().tubeFullHeight());
     setClip(true);
     setZ(0);
+    emit m_board->busyChanged();
     m_shade->setY(CtGlobal::images().shiftHeight());
 
     if (m_board->selectedTube()
@@ -411,6 +408,8 @@ void TubeItem::flyTo(TubeItem * tubeTo)
     nextStageId = CT_STAGE_POUR_OUT;
 
     setZ(m_board->maxChildrenZ() + 1);
+    emit m_board->busyChanged();
+
     startAnimation();
 }
 
@@ -472,7 +471,7 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     for (int i = 0; i < tubeFrom->m_pouringCells; i++) {
         m_model->putColor(tubeFrom->model()->extractColor());
     }
-    emit m_board->movesChanged();
+    emit CtGlobal::game().movesChanged();
 
     m_pouringCells -= tubeFrom->m_pouringCells;
     tubeFrom->m_pouringCells = 0;

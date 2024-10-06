@@ -18,12 +18,12 @@ void CtGlobal::create()
     m_io.create();      // IO must be first
     m_palette.create(); // Palette must be after IO and before Game
     m_images.create();  // TubeImages must be after IO and before Game
-    m_game.create();
+//    m_game.create();
 }
 
 void CtGlobal::destroy()
 {
-    m_game.instance().~Game();
+//    m_game.instance().~Game(); // will be destroyed from QML
     m_images.instance().~CtImages();
     m_palette.instance().~CtPalette();
     m_io.instance().~CtIo();

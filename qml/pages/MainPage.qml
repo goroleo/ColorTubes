@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import Game 1.0
 import GameBoard 1.0
 import FlowerLayer 1.0
 import "../items/"
@@ -9,6 +10,10 @@ Page {
     id: page
     allowedOrientations: Orientation.Portrait
     property int questionNumber
+    property int level: Game.level
+    property bool hasMoves: Game.hasMoves
+
+    function showCongrats() {congratsPanel.enabled = true}
 
     Image {
         id: backgroundImage
@@ -38,23 +43,29 @@ Page {
             IconButtonItem {
                 id: btnNewGame
                 source: "qrc:/img/icon-star.svg"
-                enabled: board.hasMoves
+                enabled: hasMoves
                 onClicked: {
-                    console.log("[NewGame] button pressed")
-                    questionNumber = 1
-                    messagePanel.messageText = qsTr("#wantToStartAgain")
-                    messagePanel.buttonText = qsTr("Yes")
-                    messagePanel.enabled = true
+                    if (!board.busy) {
+                        board.hideSelection()
+                        console.log("[NewGame] button pressed")
+                        questionNumber = 1
+                        messagePanel.messageText = qsTr("#wantToStartAgain")
+                        messagePanel.buttonText = qsTr("Yes")
+                        messagePanel.enabled = true
+                    }
                 }
             }
 
             IconButtonItem {
                 id: btnUndoMove
                 source: "qrc:/img/icon-undo.svg"
-                enabled: board.hasMoves
+                enabled: hasMoves
                 onClicked: {
-                    questionNumber = 2
-                    board.undoMove()
+                    if (!board.busy) {
+                        board.hideSelection()
+                        questionNumber = 2
+                        Game.undoMove()
+                    }
                 }
             }
 
@@ -63,11 +74,14 @@ Page {
                 source: "qrc:/img/icon-dice.svg"
                 enabled: true
                 onClicked: {
-                    questionNumber = 3
-                    console.log("[Solve] button clicked")
-                    messagePanel.messageText = qsTr("#wantToSolve")
-                    messagePanel.buttonText = qsTr("#unavailable")
-                    messagePanel.enabled = true
+                    if (!board.busy) {
+                        board.hideSelection()
+                        questionNumber = 3
+                        console.log("[Solve] button clicked")
+                        messagePanel.messageText = qsTr("#wantToSolve")
+                        messagePanel.buttonText = qsTr("#unavailable")
+                        messagePanel.enabled = true
+                    }
                 }
             }
 
@@ -75,6 +89,7 @@ Page {
                 id: btnSettings
                 source: "qrc:/img/icon-gear.svg"
                 onClicked: {
+                    board.hideSelection()
                     questionNumber = 4
                     messagePanel.messageText = qsTr("#settings")
                     messagePanel.buttonText = qsTr("I see")
@@ -87,7 +102,7 @@ Page {
         Text {
             id: levelNumber
 
-            text: qsTr("#level") + " " + board.level
+            text: qsTr("#level") + " " + level
 
             width: parent.width
             anchors.top: topMenu.bottom
@@ -114,16 +129,13 @@ Page {
                     easing.type: Easing.OutBack
                 }
             }
-            onSolved: {
-                congratsPanel.enabled = true
-            }
         }
     }
 
     CongratsPanel {
         id: congratsPanel
         onClicked: {
-            board.randomFill()
+            Game.newLevel()
         }
     }
 
@@ -132,10 +144,10 @@ Page {
         onAccepted: {
             console.log("Question", questionNumber, "accepted.")
             switch (questionNumber) {
-            case 1: board.startAgain(); return;
-            case 2: board.undoMove(); return;
-            case 3: board.solve(); return;
-            case 4:
+            case 1: Game.startAgain(); return;
+            case 2: return;
+            case 3: Game.solve(); return;
+            case 4: return;
             }
         }
         onRejected: {
@@ -143,4 +155,7 @@ Page {
         }
     }
 
+    Component.onCompleted: {
+        Game.solved.connect(showCongrats)
+    }
 }

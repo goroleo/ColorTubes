@@ -34,13 +34,14 @@ public:
     MoveItem   * parent()      const { return m_parentMove; }
     BoardModel * boardBefore() const { return m_boardBefore; }
     BoardModel * boardAfter()  const { return m_boardAfter; }
+
     quint8       tubeFrom()    const { return m_data.fields.tubeFrom; }
     quint8       tubeTo()      const { return m_data.fields.tubeTo; }
     quint8       color()       const { return m_data.fields.color; }
     quint8       count()       const { return m_data.fields.count; }
     quint32      stored()      const { return m_data.stored; }
 
-    MoveItems  * children()     { return m_children; }
+    MoveItems  * children()          { return m_children; }
     int          childrenCount();
     MoveItem   * currentChild();
     bool         hasChildren();

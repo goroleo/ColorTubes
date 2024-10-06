@@ -92,19 +92,19 @@ bool CtPalette::load()
     // process palette
     bool result = jObj.contains("palette") && jObj["palette"].isObject();
     if (result) {
-        QJsonObject jPal = jObj["palette"].toObject();
+        QJsonObject jPalette = jObj["palette"].toObject();
 
         // check count
-        if (jPal.contains("count") && jPal["count"].isString())
-            count = jPal["count"].toString().toInt(&result, 10);
+        if (jPalette.contains("count") && jPalette["count"].isString())
+            count = jPalette["count"].toString().toInt(&result, 10);
         result = result && count == CT_NUMBER_OF_COLORS;
 
         // process palette's colors
         int i = 0;
         while (result && i < count) {
             key = "color" + CtGlobal::intToStr(i+1);
-            if (jPal.contains(key) && jPal[key].isString()) {
-                value = jPal[key].toString();
+            if (jPalette.contains(key) && jPalette[key].isString()) {
+                value = jPalette[key].toString();
                 if ((value.length() == 7) && value.startsWith("#"))
                     m_items[i] = CtGlobal::colorStrToRgb(result, value);
                 else
