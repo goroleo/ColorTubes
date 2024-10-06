@@ -56,7 +56,6 @@ static const quint8  CT_SOLVER_NO_BOARD  = 2;            // start board is undef
 static const quint8  CT_SOLVER_NO_MOVES  = 3;            // start board has no any moves, nothing to do
 static const quint8  CT_SOLVER_CANCELLED = 4;            // solution process has interrupted by user
 
-
 class Game;
 class CtIo;
 class CtImages;

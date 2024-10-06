@@ -321,7 +321,7 @@ bool JctlFormat::checkTubes()
 {
     if (m_tubesCount == 0 || m_tubesCount != m_storedTubes->size())
         return false;
-    CtGlobal::game().usedColors()->clearAllUsed();
+    CtGlobal::game().usedColors()->clear();
 
     // fill used colors array
     for (quint16 i = 0; i < m_tubesCount; i++) {

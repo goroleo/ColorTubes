@@ -16,13 +16,13 @@ public:
     void    setUsed(quint8 colorNum, quint8 count); // reserved for FILL_MODE also
     quint8  getUsed(quint8 colorNum);
 
-//  void    clearUsed(quint8 colorNum);             // unused routine?
-    void    clearAllUsed();
+//  void    clearUsed(quint8 colorNum);             // unused?
+    void    clear();
 
-//  quint8  numberOfFilledColors();                 // unused routine?
+//  quint8  numberOfFilledColors();                 // unused?
     quint8  numberOfUsedColors();
-//  quint8  numberOfUnusedColors();                 // unused routine?
-//  quint8  numberOfUsedCells();                    // unused routine?
+//  quint8  numberOfUnusedColors();                 // unused?
+//  quint8  numberOfUsedCells();                    // unused?
     quint8  numberOfAvailableCells();
 
     void    disableUnusedColors();
@@ -30,7 +30,6 @@ public:
 
 private:
     quint8 *m_items;
-
 };
 
 #endif // USEDCOLORS_H

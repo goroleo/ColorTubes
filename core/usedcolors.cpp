@@ -8,7 +8,7 @@
 UsedColors::UsedColors()
 {
     m_items = new quint8[CT_NUMBER_OF_COLORS];
-    clearAllUsed();
+    clear();
 }
 
 UsedColors::~UsedColors()
@@ -56,7 +56,7 @@ void UsedColors::clearUsed(quint8 colorNum)
 }
 */
 
-void UsedColors::clearAllUsed()
+void UsedColors::clear()
 {
     for (int i = 0; i < CT_NUMBER_OF_COLORS; i++) {
         m_items[i] = 0;

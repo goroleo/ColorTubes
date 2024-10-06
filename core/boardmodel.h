@@ -1,13 +1,12 @@
 #ifndef BOARDMODEL_H
 #define BOARDMODEL_H
 
-#include <QVector>
-#include <iostream>
-#include "tubemodel.h"
-#include "moveitem.h"
+#include <QtCore>
 
-class MoveItem;
 class TubeModel;
+class TubeModels;
+class MoveItem;
+class MoveItems;
 
 class BoardModel
 {
@@ -26,19 +25,19 @@ public:
     int           level() const { return m_level; }
     void          setLevel(int newLevel) { m_level = newLevel; }
 
-    int           tubesCount() const { return m_tubes->size(); }
+    int           tubesCount() const;
     TubeModel   * tubeAt(int index) const;
     void          addNewTube();
     void          addNewTube(const TubeModel &tubeToClone);
     void          addNewTube(const quint32 storedTube);
     void          addTubesFrom(const BoardModel &boardFrom);   // a.k.a. "clone board"
 
-    quint16       findMoves();          // calculating and sorting all available moves at this board
+    quint16       findMoves();           // calculates and sorts all available moves at this board
     bool          hasMoves();
     int           movesCount();
-    MoveItem    * currentMove();        // current move is the last one in the sorted moves list
+    MoveItem    * currentMove();         // current move is the last one in the sorted moves list
     void          removeCurrentMove();
-    void          removeChildrenMoves(); // removing all children moves and all boards resulted of them
+    void          removeChildrenMoves(); // removes all children moves and all boards resulted of them
     quint32       getMoveData(const TubeModel &tubeFrom, const TubeModel &tubeTo);
 
     void          randomFill(int fillTubes, int emptyTubes);

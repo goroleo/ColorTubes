@@ -33,6 +33,7 @@ public:
     bool          isSelected();
 
     void          refresh();
+    void          setZ(qreal newZ);
     void          setSelected(bool value);
     void          showAvailable(bool value);
     void          setClosed(bool value);
@@ -56,7 +57,6 @@ private:
 
     void          mousePressEvent(QMouseEvent * event);
 
-    int           tubeIndex();
     quint8        colorAt(quint8 index);
     void          setShade(int newShade);
 
@@ -80,7 +80,7 @@ private:
 
     qreal         angle() const;
     void          setAngle(qreal newAngle);
-    qreal         m_currentAngle    = 0.0;
+    qreal         m_currentAngle = 0.0;
     bool          m_closed;
 
 //  animation frames
@@ -88,7 +88,6 @@ private:
     void          nextFrame();              // calculates current frame of animation
 
     QTimer      * m_timer;
-
     int           steps;
     QPointF       m_startPoint;
     QPointF       m_endPoint;

@@ -13,23 +13,16 @@ class GameBoard : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
 
+    friend class TubeItem;
+
 public:
     explicit GameBoard(QQuickItem *parent = nullptr);
     ~GameBoard();
 
     int          tubesCount();
     int          indexOf(TubeItem * tube);
-    TubeItem   * selectedTube() { return m_selectedTube; }
-
-    bool         hasMoves();
-    void         showAvailableMoves();
-
     void         clickTube(TubeItem * tube);
-    int          maxChildrenZ();
-    void         update();
-    void         refresh();
-
-    bool         busy();
+    TubeItem   * selectedTube() { return m_selectedTube; }
     Q_INVOKABLE void hideSelection();
 
 signals:
@@ -45,9 +38,11 @@ private:
 
     void         geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
     void         mousePressEvent(QMouseEvent* event);
-    void         rescale();
-
+    int          maxZ();  // maximal Z coordinate of all children TubeItems
     void         placeTubes();
+    void         rescale();
+    void         update();
+    bool         busy();
 
     TubeItems  * m_tubes;
     TubeItem   * m_selectedTube = nullptr;

@@ -14,7 +14,7 @@ public:
     explicit     FlowerLayer(QQuickItem *parent = 0);
     ~FlowerLayer();
 
-public slots:
+private slots:
     void         onOpacityChanged();
     void         onApplicationStateChanged();
 

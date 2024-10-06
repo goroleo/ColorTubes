@@ -1,6 +1,9 @@
 #include "boardmodel.h"
+
 #include "src/ctglobal.h"
 #include "src/game.h"
+#include "core/tubemodel.h"
+#include "core/moveitem.h"
 #include "core/usedcolors.h"
 #include "core/jctlformat.h"
 #include "core/solver.h"
@@ -59,6 +62,11 @@ bool BoardModel::isSolved()
     return true;
 }
 
+int BoardModel::tubesCount() const
+{
+    return m_tubes->size();
+}
+
 TubeModel * BoardModel::tubeAt(int index) const
 {
     if (index >= 0 && index < m_tubes->size())
@@ -106,7 +114,6 @@ void BoardModel::removeChildrenMoves()
             move->removeChildren();
         }
 }
-
 
 MoveItem * BoardModel::addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo)
 {
@@ -267,7 +274,7 @@ void BoardModel::randomFill(int fillTubes, int emptyTubes)
 {
     do {
         clear();
-        CtGlobal::game().usedColors()->clearAllUsed();
+        CtGlobal::game().usedColors()->clear();
 
         m_rootBoard = this;
         for (int i = 0; i < fillTubes + emptyTubes; ++i)
@@ -304,7 +311,7 @@ bool BoardModel::checkFilledTubes()
         return false;
 
     // check if this board can be solved
-    SolveProcess solver;
+    Solver solver;
     solver.start(this);
     if (solver.result() != CT_SOLVER_SUCCESS)
         return false;
@@ -314,7 +321,7 @@ bool BoardModel::checkFilledTubes()
 
 void BoardModel::fillActiveColors()
 {
-    CtGlobal::game().usedColors()->clearAllUsed();
+    CtGlobal::game().usedColors()->clear();
     for (int i = 0; i < m_tubes->size(); ++i) {
         CtGlobal::game().usedColors()
                 ->incUsed(m_tubes->at(i)->currentColor(),

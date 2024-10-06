@@ -3,20 +3,22 @@
 
 #include "src/ctglobal.h"
 #include "src/ctio.h"
-#include "core/solver.h"
-#include "core/jctlformat.h"
-#include "core/options.h"
 #include "core/boardmodel.h"
+#include "core/tubemodel.h"
+#include "core/jctlformat.h"
 #include "core/moveitem.h"
+#include "core/options.h"
+#include "core/solver.h"
 #include "core/usedcolors.h"
 
 Game * Game::m_instance = nullptr;
 
 Game::~Game()
 {
-    if (!m_board->isSolved())
+    if (!m_board->isSolved()) {
         saveTemporary();
-    m_options->level = m_board->level();
+        m_options->level = m_board->level();
+    }
 
     delete m_usedColors;
     delete m_jctl;
@@ -63,9 +65,8 @@ void Game::initialize()
     if (CtGlobal::io().tempFileExists())
         loaded = loadTemporary();
 
-    if (!loaded) {
+    if (!loaded)
         newLevel();
-    }
 }
 
 quint32 Game::level()
@@ -79,29 +80,29 @@ void Game::newLevel()
         m_options->level = m_board->level();
         m_options->save();
     }
-    qDebug () << "Previous level:" << m_options->level;
-    quint32 newLevel = m_options->level + 1;
+    quint32 levelNumber = m_options->level + 1;
+    qDebug () << "New level:" << levelNumber;
 
     int filledTubes;
     int emptyTubes;
 
-    if (newLevel < 3) {
+    if (levelNumber < 3) {
         filledTubes = 2;
         emptyTubes = 1;
-    } else if (newLevel < 5) {
+    } else if (levelNumber < 5) {
         filledTubes = 3;
         emptyTubes = 1;
-    } else if (newLevel < 10) {
+    } else if (levelNumber < 10) {
         filledTubes = 5;
         emptyTubes = 2;
-    } else if (newLevel < 20) {
+    } else if (levelNumber < 20) {
         filledTubes = 7;
         emptyTubes = 2;
-    } else if (newLevel < 50) {
+    } else if (levelNumber < 50) {
         filledTubes = 9;
         emptyTubes = 2;
     } else {
-        if (newLevel & 1) {
+        if (levelNumber & 1) {
             filledTubes = 9;
             emptyTubes = 2;
         } else {
@@ -111,7 +112,7 @@ void Game::newLevel()
     }
 
     m_board->randomFill(filledTubes, emptyTubes);
-    m_board->setLevel(newLevel);
+    m_board->setLevel(levelNumber);
     emit levelChanged();
     m_moves->clear();
     emit movesChanged();
@@ -134,7 +135,6 @@ bool Game::load(QString fileName)
 
     if (result) {
         qDebug() << "Game loaded from" << fileName;
-        // signal to redraw GameBoard
         emit levelChanged();
         emit movesChanged();
     } else
@@ -197,7 +197,7 @@ void Game::checkSolved()
 void Game::solve()
 {
     saveTemporary();
-    SolveProcess solver;
+    Solver solver;
     solver.start(m_board);
 }
 
@@ -234,7 +234,9 @@ void Game::startAgain()
 
 void Game::onApplicationStateChanged()
 {
-    if (QGuiApplication::applicationState() != Qt::ApplicationActive)
+    if (QGuiApplication::applicationState() != Qt::ApplicationActive) {
+        m_options->save();
         if (!m_board->isSolved())
             saveTemporary();
+    }
 }

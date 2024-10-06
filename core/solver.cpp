@@ -4,7 +4,7 @@
 #include "boardmodel.h"
 #include "moveitem.h"
 
-SolveProcess::SolveProcess(BoardModel *startBoard)
+Solver::Solver(BoardModel *startBoard)
 {
     m_startBoard = new BoardModel();
     m_moves = new MoveItems();
@@ -13,7 +13,7 @@ SolveProcess::SolveProcess(BoardModel *startBoard)
         setStartBoard(startBoard);
 }
 
-SolveProcess::~SolveProcess()
+Solver::~Solver()
 {
     clear();
     delete m_hashes;
@@ -21,14 +21,14 @@ SolveProcess::~SolveProcess()
     delete m_startBoard;
 }
 
-void SolveProcess::clear()
+void Solver::clear()
 {
     m_moves->clear();
     m_hashes->clear();
     m_startBoard->clear();
 }
 
-void SolveProcess::setStartBoard(BoardModel *startBoard)
+void Solver::setStartBoard(BoardModel *startBoard)
 {
     if (startBoard) {
         m_startBoard->clear();
@@ -38,12 +38,12 @@ void SolveProcess::setStartBoard(BoardModel *startBoard)
     }
 }
 
-void SolveProcess::stop()
+void Solver::stop()
 {
     m_externalBreak = true;
 }
 
-void SolveProcess::start(BoardModel *startBoard)
+void Solver::start(BoardModel *startBoard)
 {
     if (startBoard)
         setStartBoard(startBoard);

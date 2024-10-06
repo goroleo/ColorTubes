@@ -2,9 +2,6 @@
 #define GAME_H
 
 #include <QObject>
-#include <QQmlEngine>
-#include <QJSEngine>
-
 
 class UsedColors;
 class JctlFormat;
@@ -29,10 +26,10 @@ public:
     static Game & instance();
     ~Game();
 
-    BoardModel * boardModel() {return m_board; }
-    UsedColors * usedColors() {return m_usedColors; }
-    JctlFormat * jctl()       {return m_jctl; }
-    MoveItems  * moves()      {return m_moves; }
+    BoardModel * boardModel() { return m_board; }
+    UsedColors * usedColors() { return m_usedColors; }
+    JctlFormat * jctl()       { return m_jctl; }
+    MoveItems  * moves()      { return m_moves; }
 
     MoveItem   * addNewMove(TubeModel &tubeFrom, TubeModel &tubeTo);
     bool         hasMoves();
@@ -67,6 +64,7 @@ private slots:
 private:
     explicit Game(QObject* parent = nullptr) : QObject(parent) {};
     void initialize();
+    static Game * m_instance;
 
     UsedColors  * m_usedColors;
     JctlFormat  * m_jctl;
@@ -74,16 +72,7 @@ private:
     MoveItems   * m_moves;
     Options     * m_options;
     int           m_gameMode;
-    static Game * m_instance;
 };
 
-static QObject *gameInstance(QQmlEngine *engine, QJSEngine *scriptEngine)
-  {
-      Q_UNUSED(engine)
-      Q_UNUSED(scriptEngine)
-
-      Game *game = &Game::instance();
-      return game;
-  }
 
 #endif // GAME_H

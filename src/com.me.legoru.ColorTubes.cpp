@@ -7,6 +7,13 @@
 
 using namespace Aurora;
 
+static QObject *gameInstance(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+    return &Game::instance();
+}
+
 int main(int argc, char *argv[])
 {
     qmlRegisterSingletonType <Game> ("Game", 1, 0, "Game", gameInstance);

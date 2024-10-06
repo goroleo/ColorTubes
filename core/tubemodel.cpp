@@ -170,11 +170,6 @@ quint8 TubeModel::currentColorCount() const
     return result;
 }
 
-bool TubeModel::operator == (const TubeModel &other)
-{
-    return m_colors.stored == other.m_colors.stored;
-}
-
 void TubeModel::assignColors(quint32 storedColors)
 {
     clear();
@@ -212,6 +207,7 @@ void TubeModels::removeLast()
 
 void TubeModels::clear()
 {
-    while (!isEmpty())
+    while (!isEmpty()) {
         removeLast();
+    }
 }

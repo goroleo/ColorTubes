@@ -6,20 +6,20 @@
 class BoardModel;
 class MoveItems;
 
-class SolveProcess : public QObject
+class Solver : public QObject
 {
     Q_OBJECT
 public:
-    explicit SolveProcess(BoardModel *startBoard = 0);
-    ~SolveProcess();
+    explicit Solver(BoardModel *startBoard = 0);
+    ~Solver();
 
     void         clear();
     void         setStartBoard(BoardModel *startBoard = 0);
     void         start(BoardModel *startBoard = 0);
-    void         stop();   // point to safe interrupt the process
+    void         stop();                          // point to safe interrupt the process
 
-    MoveItems  * moves() {return m_moves;}
-    quint8       result() {return m_resultId; }   // see CtGlobal::CT_SOLVER_*
+    MoveItems  * moves()  { return m_moves; }
+    quint8       result() { return m_resultId; }  // see CtGlobal::CT_SOLVER_*
 
 signals:
     void         finished(quint8 result);
@@ -32,11 +32,14 @@ private:
     quint8       m_resultId;   // see CtGlobal::CT_SOLVER_*
 };
 
-class Solver : public QObject
+/*
+// Unused. It was planned for threads but solution process completes in milliseconds
+class SolverThread : public QObject
 {
     Q_OBJECT
 public:
     void start(BoardModel *startBoard = 0);
 };
+*/
 
 #endif // SOLVER_H

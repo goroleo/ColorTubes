@@ -1,7 +1,7 @@
 #include "gameboard.h"
 
-#include "src/ctglobal.h"
 #include "tubeitem.h"
+#include "src/ctglobal.h"
 #include "src/ctimages.h"
 #include "src/game.h"
 #include "core/boardmodel.h"
@@ -12,7 +12,6 @@ GameBoard::GameBoard(QQuickItem *parent) :
 {
     m_model = CtGlobal::board();
     m_tubes = new TubeItems();
-
 
     QObject::connect(&CtGlobal::images(), &CtImages::scaleChanged,
                      this, &GameBoard::onScaleChanged);
@@ -50,13 +49,12 @@ int GameBoard::indexOf(TubeItem * tube)
         return -1;
 }
 
-int GameBoard::maxChildrenZ()
+int GameBoard::maxZ()
 {
     int result = 0;
-    for (int i = 0; i < this->children().size(); ++i) {
-        if (children().at(i)->inherits("TubeItem")
-                && result < ((TubeItem *) children().at(i))->z())
-            result = ((TubeItem *) children().at(i))->z();
+    for (TubeItem *tube : *m_tubes) {
+        if (result < tube->z())
+            result = tube->z();
     }
     return result;
 }
@@ -97,15 +95,10 @@ void GameBoard::update()
     rescale();
 }
 
-void GameBoard::refresh()
-{
-    for (int i = 0; i < tubesCount(); ++i)
-        m_tubes->at(i)->refresh();
-}
-
 void GameBoard::onRefresh()
 {
-    refresh();
+    for (TubeItem *tube : *m_tubes)
+        tube->refresh();
 }
 
 void GameBoard::onLevelChanged()
@@ -161,13 +154,13 @@ void GameBoard::clickTube(TubeItem * tube)
 {
     if (tube == nullptr) {
         if (m_selectedTube != nullptr) {
-        // qDebug() << "Disable selection 1";
+            // qDebug() << "Disable selection #1";
             m_selectedTube->setSelected(false);
             m_selectedTube = nullptr;
         }
     } else if (m_selectedTube == nullptr) {
         if (tube->canExtractColor()) {
-         // qDebug() << "New selection";
+            // qDebug() << "New selection";
             tube->setSelected(true);
             if (tube->isSelected())
                 m_selectedTube = tube;
@@ -177,15 +170,15 @@ void GameBoard::clickTube(TubeItem * tube)
     } else { // tube and selectedTube are both assigned
 
         if (tube == m_selectedTube) {
-         // qDebug() << "Disable selection 2";
+            // qDebug() << "Disable selection #2";
             m_selectedTube->setSelected(false);
             m_selectedTube = nullptr;
         } else if (tube->canPutColor(m_selectedTube->currentColor())) {
-         // qDebug() << "Put color";
+            // qDebug() << "Put color";
             m_selectedTube->moveColorTo(tube);
             m_selectedTube = nullptr;
         } else {
-         // qDebug() << "Change selection";
+            // qDebug() << "Change selection";
             m_selectedTube->setSelected(false);
             tube->setSelected(true);
             if (tube->isSelected())
@@ -194,16 +187,9 @@ void GameBoard::clickTube(TubeItem * tube)
                 m_selectedTube = nullptr;
         }
     }
-    showAvailableMoves();
-}
 
-void GameBoard::showAvailableMoves()
-{
-    TubeItem * tube;
-
-    for (int i = 0; i < tubesCount(); ++i) {
-        tube = m_tubes->at(i);
-
+    // show available moves
+    for (TubeItem *tube : *m_tubes) {
         if (m_selectedTube != nullptr
                 && m_selectedTube != tube
                 && tube->canPutColor(m_selectedTube->currentColor()))
@@ -215,12 +201,11 @@ void GameBoard::showAvailableMoves()
 
 bool GameBoard::busy()
 {
-    return maxChildrenZ() != 0;
+    return maxZ() != 0;
 }
 
 void GameBoard::hideSelection()
 {
-    if (m_selectedTube)
-        clickTube(nullptr);
+    clickTube(nullptr);
 }
 

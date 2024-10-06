@@ -16,6 +16,7 @@ TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
     QQuickItem(parent),
     m_model(tm)
 {
+
     m_board = (GameBoard *) parent;
     if (!m_model)
         m_model = new TubeModel();
@@ -67,11 +68,6 @@ void TubeItem::mousePressEvent(QMouseEvent * event)
     m_board->clickTube(this);
 }
 
-int TubeItem::tubeIndex()
-{
-    return m_board->indexOf(this);
-}
-
 void TubeItem::setRegularPosition(QPointF newPoint)
 {
     m_regularPosition = newPoint;
@@ -96,7 +92,6 @@ void TubeItem::setVerticalShift(qreal yShift)
     m_verticalShift = yShift;
     setY(m_currentPosition.y() + m_verticalShift);
 }
-
 
 bool TubeItem::isDone()
 {
@@ -128,6 +123,13 @@ bool TubeItem::isPouredIn()
 bool TubeItem::isSelected()
 {
     return currentStageId == CT_STAGE_SELECT;
+}
+
+void TubeItem::setZ(qreal newZ)
+{
+    QQuickItem::setZ(newZ);
+    if (m_board)
+        emit m_board->busyChanged();
 }
 
 void TubeItem::refresh()
@@ -175,7 +177,7 @@ void TubeItem::onTubeStateChanged()
     setClosed(m_model->isDone());
 
     if (m_closed) {
-        qDebug() << "Closed tube" << tubeIndex();
+        qDebug() << "Closed tube" << m_board->indexOf(this);
         CtGlobal::game().checkSolved();
     }
 }
@@ -323,7 +325,6 @@ void TubeItem::regularTube()
     setHeight(CtGlobal::images().tubeFullHeight());
     setClip(true);
     setZ(0);
-    emit m_board->busyChanged();
     m_shade->setY(CtGlobal::images().shiftHeight());
 
     if (m_board->selectedTube()
@@ -407,9 +408,7 @@ void TubeItem::flyTo(TubeItem * tubeTo)
     steps = CT_TUBE_STEPS_FLY;
     nextStageId = CT_STAGE_POUR_OUT;
 
-    setZ(m_board->maxChildrenZ() + 1);
-    emit m_board->busyChanged();
-
+    setZ(m_board->maxZ() + 1);
     startAnimation();
 }
 
@@ -467,7 +466,7 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     if (tubeFrom->m_recipient != this)
         return;
 
-    CtGlobal::game().addNewMove(* tubeFrom->model(), * this->model());
+    CtGlobal::game().addNewMove(*tubeFrom->model(), *this->model());
     for (int i = 0; i < tubeFrom->m_pouringCells; i++) {
         m_model->putColor(tubeFrom->model()->extractColor());
     }

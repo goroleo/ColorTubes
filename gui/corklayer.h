@@ -23,7 +23,6 @@ public:
     void     startShow();
     void     startHide();
 
-
 private slots:
     void     onScaleChanged();
 
