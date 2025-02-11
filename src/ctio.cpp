@@ -2,6 +2,7 @@
 #include "auroraapp.h"
 
 #include <QIODevice>
+#include <QDebug>
 #include <QFile>
 #include <QJsonDocument>
 
@@ -121,4 +122,3 @@ bool CtIo::saveGame(QString fName, QByteArray &buffer)
     saveFile.write(buffer);
     return true;
 }
-

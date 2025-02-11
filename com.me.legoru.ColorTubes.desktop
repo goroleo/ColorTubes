@@ -15,6 +15,7 @@ Exec=/usr/bin/com.me.legoru.ColorTubes
 OrganizationName=com.me.legoru
 ApplicationName=ColorTubes
 
-[X-Aurora-Application]
-Orientation=Portrait;PortraitInverted
-IconMode=Crop
+######### reserved for Aurora 5
+# [X-Aurora-Application]
+# Orientation=Portrait;PortraitInverted
+# IconMode=Crop

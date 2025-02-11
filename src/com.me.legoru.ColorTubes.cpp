@@ -1,3 +1,4 @@
+#include <QtQuick>
 #include "auroraapp.h"
 
 #include "src/game.h"

@@ -10,11 +10,10 @@
 #   - translation filenames have to be changed
 
 # The name of your application
-#TARGET = ColorTubes
 TARGET = com.me.legoru.ColorTubes
 
 CONFIG += \
-    auroraapp \
+    auroraapp
 
 PKGCONFIG += \
 
@@ -52,7 +51,6 @@ DISTFILES += \
     rpm/com.me.legoru.ColorTubes.changes.in \
     rpm/com.me.legoru.ColorTubes.changes.run.in \
     rpm/com.me.legoru.ColorTubes.spec \
-    rpm/com.me.legoru.ColorTubes.yaml \
     translations/*.ts \
     com.me.legoru.ColorTubes.desktop
 

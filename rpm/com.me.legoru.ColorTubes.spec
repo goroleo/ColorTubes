@@ -9,13 +9,12 @@ Name:       com.me.legoru.ColorTubes
 # << macros
 
 Summary:    ColorTubes
-Version:    0.1
+Version:    0.9
 Release:    1
 Group:      Qt/Qt
 License:    MIT
 URL:        http://example.org/
 Source0:    %{name}-%{version}.tar.bz2
-Source100:  com.me.legoru.ColorTubes.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(auroraapp)
 BuildRequires:  pkgconfig(Qt5Core)
