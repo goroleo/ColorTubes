@@ -57,6 +57,12 @@ MoveItems * CtGlobal::moves()
     return m_game.instance().moves();
 }
 
+quint32 CtGlobal::gameMode()
+{
+    return m_game.instance().mode();
+}
+
+
 QString CtGlobal::paletteFileName()
 {
     return m_io.instance().paletteFileName();

@@ -34,7 +34,6 @@ public:
 
     quint16       findMoves();           // calculates and sorts all available moves at this board
     bool          hasMoves();
-    int           movesCount();
     MoveItem    * currentMove();         // current move is the last one in the sorted moves list
     void          removeCurrentMove();
     void          removeChildrenMoves(); // removes all children moves and all boards resulted of them
@@ -42,8 +41,8 @@ public:
 
     void          randomFill(int fillTubes, int emptyTubes);
 
-    quint32       hash() const { return m_crc32; }    // call calculateHash() before use this
     void          calculateHash();
+    quint32       hash() const { return m_crc32; }    // call calculateHash() before use this
 
     QString       toString() const;
 
@@ -58,6 +57,7 @@ private:
     quint32       m_crc32 = 0;  // hash value comparing to another board
 
     MoveItems   * moves();
+//    int           movesCount();
     MoveItem    * addNewMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
     bool          canDoMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);
     quint8        colorsToMove(const TubeModel &tubeFrom, const TubeModel &tubeTo);

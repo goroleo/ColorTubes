@@ -14,41 +14,46 @@ public:
 
     ~CtImages();
 
-    qreal     scale()       {return m_scale;}
+    qreal     scale()          {return m_scale;}
 
 // scaled images of the tube
-    QPixmap   bottle()      {return *m_bottle;}
-    QPixmap   bottleBack()  {return *m_bottleBack;}
-    QPixmap   bottleFront() {return *m_bottleFront;}
+    QPixmap   bottle()         {return *m_bottle;}
+    QPixmap   bottleBack()     {return *m_bottleBack;}
+    QPixmap   bottleFront()    {return *m_bottleFront;}
 
-    QPixmap   shadeYellow() {return *m_shadeYellow;}
-    QPixmap   shadeGreen()  {return *m_shadeGreen;}
-    QPixmap   shadeBlue()   {return *m_shadeBlue;}
-    QPixmap   shadeRed()    {return *m_shadeRed;}
-    QPixmap   shadeGray()   {return *m_shadeGray;}
+    QPixmap   shadeYellow()    {return *m_shadeYellow;}
+    QPixmap   shadeGreen()     {return *m_shadeGreen;}
+    QPixmap   shadeBlue()      {return *m_shadeBlue;}
+    QPixmap   shadeRed()       {return *m_shadeRed;}
+    QPixmap   shadeGray()      {return *m_shadeGray;}
 
-    QPixmap   cork()        {return *m_cork;}
+    QPixmap   cork()           {return *m_cork;}
+    QPixmap   arrowInBody()    {return *m_arrowInBody;}
+    QPixmap   arrowOutBody()   {return *m_arrowOutBody;}
+    QPixmap   arrowInStroke()  {return *m_arrowInStroke;}
+    QPixmap   arrowOutStroke() {return *m_arrowOutStroke;}
 
 // scaled tube's coordinates and sizes
     QPointF   vertex(quint8 index) {return m_vertices[index];}
 
-    qreal     tubeWidth()   {return m_tubeWidth;}
-    qreal     tubeFullWidth() {return m_tubeFullWidth;}
+    qreal     tubeWidth()      {return m_tubeWidth;}
+    qreal     tubeFullWidth()  {return m_tubeFullWidth;}
     qreal     tubeRotationWidth() {return m_tubeRotationWidth;}
-    qreal     shiftWidth()  {return m_shiftWidth;}
-    qreal     tubeHeight()  {return m_tubeHeight;}
+    qreal     shiftWidth()     {return m_shiftWidth;}
+    qreal     tubeHeight()     {return m_tubeHeight;}
     qreal     tubeFullHeight() {return m_tubeFullHeight;}
-    qreal     shiftHeight() {return m_shiftHeight;}
+    qreal     shiftHeight()    {return m_shiftHeight;}
 
     QRectF    colorRect(quint8 index);
-    qreal     colorWidth()  {return m_colorWidth;}
-    qreal     colorHeight() {return m_colorHeight;}
-    qreal     colorArea()   {return m_colorArea;}
+    qreal     colorWidth()     {return m_colorWidth;}
+    qreal     colorHeight()    {return m_colorHeight;}
+    qreal     colorArea()      {return m_colorArea;}
 
-    qreal     jetWidth()    {return m_jetWidth;}
+    qreal     jetWidth()       {return m_jetWidth;}
     qreal     jetHeight(quint8 index)
                  {return m_vertices[3].y() - m_colorHeight * index;}
-    QRectF    jetRect()     {return m_jetRect;}
+    QRectF    jetRect()        {return m_jetRect;}
+    qreal     shiftArrow()     {return m_shiftArrow;}
 
 // angles to rotate tube
     qreal     tiltAngle(uint index);
@@ -70,7 +75,8 @@ private:
     void      renderImages();
 
     qreal     m_scale = 1.0;
-    QSvgRenderer * m_source;
+    QSvgRenderer * m_tubeSource;
+    QSvgRenderer * m_arrowSource;
 
     QPixmap   * m_bottle;
     QPixmap   * m_bottleBack;
@@ -81,6 +87,10 @@ private:
     QPixmap   * m_shadeRed;
     QPixmap   * m_shadeGray;
     QPixmap   * m_cork;
+    QPixmap   * m_arrowInBody;
+    QPixmap   * m_arrowOutBody;
+    QPixmap   * m_arrowInStroke;
+    QPixmap   * m_arrowOutStroke;
 
     QPointF   * m_vertices;   // vertices of the tube
 
@@ -97,6 +107,7 @@ private:
     qreal       m_colorArea;   // colorWidth * colorHeight
     qreal       m_jetWidth;
     QRectF      m_jetRect;
+    qreal       m_shiftArrow;
 
     qreal     * m_tiltAngles;
     bool        anglesExist = false;

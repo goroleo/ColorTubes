@@ -17,14 +17,14 @@ public:
 
     QString localFileName(QString fName);
 
-    QString paletteFileName()  {return localFileName("palette.json");}
-    QString settingsFileName() {return localFileName("settings.json");}
-    QString statsFileName()    {return localFileName("statsistics.json");}
-    QString anglesFileName()   {return localFileName("tiltangles.json");}
+    QString paletteFileName()    { return localFileName("palette.json"); }
+    QString settingsFileName()   { return localFileName("settings.json"); }
+    QString statisticsFileName() { return localFileName("statsistics.json"); }
+    QString anglesFileName()     { return localFileName("tiltangles.json"); }
 
-    QString tempFileName()     {return localFileName("tempgame.jctl");}
+    QString tempFileName()       { return localFileName("tempgame.jctl");}
     bool tempFileExists();
-    void tempFileDelete();
+    void deleteTempFile();
 
     bool loadJson(QString fName, QJsonObject &jsonObj);
     bool saveJson(QString fName, QJsonObject &jsonObj);

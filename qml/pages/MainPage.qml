@@ -1,19 +1,52 @@
 import QtQuick 2.6
+import QtGraphicalEffects 1.0
 import Sailfish.Silica 1.0
 import Game 1.0
 import GameBoard 1.0
-import FlowerLayer 1.0
 import "../items/"
 
 
 Page {
     id: page
     allowedOrientations: Orientation.Portrait
-    property int questionNumber
-    property int level: Game.level
-    property bool hasMoves: Game.hasMoves
+    property int questionNumber     // a.k.a. Question Number
 
-    function showCongrats() {congratsPanel.enabled = true}
+    function showCongratsPanel() {
+        blur.enabled = true
+        congratsPanel.enabled = true
+    }
+
+    function showMessagePanel() {
+        if (!board.busy) {
+            board.hideSelection()
+            blur.enabled = true
+            messagePanel.enabled = true
+            console.log("Message panel shows the question", questionNumber)
+        } else {
+            console.log("Game board is busy now. Cannot show the message.")
+        }
+    }
+
+    function promptToStartAssistMode() {
+        questionNumber = 5
+        messagePanel.messageText = qsTr("#wantToStartAssistMode")
+        messagePanel.buttonText = qsTr("Yes")
+        showMessagePanel()
+    }
+
+    function solutionIsNotFound() {
+        questionNumber = 6
+        messagePanel.messageText = qsTr("#solutionIsNotFound")
+        messagePanel.buttonText = qsTr("Ok")
+        showMessagePanel()
+    }
+
+    function promptToEndAssistMode() {
+        questionNumber = 7
+        messagePanel.messageText = qsTr("#wantToEndAssistMode")
+        messagePanel.buttonText = qsTr("Yes")
+        showMessagePanel()
+    }
 
     Image {
         id: backgroundImage
@@ -27,13 +60,12 @@ Page {
         id: gamePanel
         width: parent.width
         height: parent.height
-        opacity: enabled ? 1.0 : 0.0
         color: "#00000000"
 
         Row {
             id: topMenu
             width: parent.width - Theme.horizontalPageMargin * 2
-            height: btnNewGame.height
+            height: btnStartAgain.height
             anchors.left: parent.left
             anchors.leftMargin: Theme.horizontalPageMargin
             anchors.top: parent.top
@@ -41,30 +73,30 @@ Page {
             spacing: (width - (Theme.iconSizeMedium * 4)) / 3
 
             IconButtonItem {
-                id: btnNewGame
+                id: btnStartAgain
                 source: "qrc:/img/icon-star.svg"
-                enabled: hasMoves
+                enabled: Game.movesMade
                 onClicked: {
-                    if (!board.busy) {
-                        board.hideSelection()
-                        console.log("[NewGame] button pressed")
-                        questionNumber = 1
-                        messagePanel.messageText = qsTr("#wantToStartAgain")
-                        messagePanel.buttonText = qsTr("Yes")
-                        messagePanel.enabled = true
-                    }
+                    console.log("[StartAgain] button clicked.")
+                    questionNumber = 1
+                    messagePanel.messageText = qsTr("#wantToStartAgain")
+                    messagePanel.buttonText = qsTr("Yes")
+                    showMessagePanel()
                 }
             }
 
             IconButtonItem {
                 id: btnUndoMove
                 source: "qrc:/img/icon-undo.svg"
-                enabled: hasMoves
+                enabled: Game.movesMade
                 onClicked: {
+                    console.log("[Undo] button clicked.")
                     if (!board.busy) {
                         board.hideSelection()
-                        questionNumber = 2
                         Game.undoMove()
+                        Game.refreshNeeded();
+                    } else {
+                        console.log("Game board is busy now. Cannot undo the move.")
                     }
                 }
             }
@@ -72,29 +104,26 @@ Page {
             IconButtonItem {
                 id: btnSolve
                 source: "qrc:/img/icon-dice.svg"
-                enabled: true
+                enabled: !Game.isAssistMode
                 onClicked: {
+                    console.log("[Solve] button clicked.")
                     if (!board.busy) {
                         board.hideSelection()
-                        questionNumber = 3
-                        console.log("[Solve] button clicked")
-                        messagePanel.messageText = qsTr("#wantToSolve")
-                        messagePanel.buttonText = qsTr("#unavailable")
-                        messagePanel.enabled = true
+                        Game.solve()
+                    } else {
+                        console.log("Game board is busy now. Cannot start solving process.")
                     }
                 }
             }
 
             IconButtonItem {
-                id: btnSettings
+                id: btnSetings
                 source: "qrc:/img/icon-gear.svg"
                 onClicked: {
+                    console.log("[Settings] button clicked.")
                     board.hideSelection()
-                    questionNumber = 4
-                    messagePanel.messageText = qsTr("#settings")
-                    messagePanel.buttonText = qsTr("I see")
-                    messagePanel.enabled = true
-                    console.log("[Settings] button clicked")
+                    blur.enabled = true
+                    aboutPanel.enabled = true
                 }
             }
         }
@@ -102,7 +131,7 @@ Page {
         Text {
             id: levelNumber
 
-            text: qsTr("#level") + " " + level
+            text: qsTr("#level") + " " + Game.level
 
             width: parent.width
             anchors.top: topMenu.bottom
@@ -122,11 +151,20 @@ Page {
             anchors.bottom: parent.bottom
             width: parent.width
             enabled: true
-            opacity: enabled ? 1.0 : 0.0
-            Behavior on opacity {
+        }
+
+        FastBlur {
+            id: blur
+            anchors.fill: board
+            source: board
+            cached: false
+            enabled: false
+            visible: enabled
+            radius: enabled ? 64.0 : 0.0
+            Behavior on radius {
                 NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutBack
+                    duration: 20
+                    easing.type: Easing.Linear
                 }
             }
         }
@@ -135,27 +173,51 @@ Page {
     CongratsPanel {
         id: congratsPanel
         onClicked: {
-            Game.newLevel()
+            if (!board.busy) {
+                congratsPanel.enabled = false
+                blur.enabled = false
+                Game.newLevel()
+            } else {
+                console.log("Game board is busy now. Cannot close the panel.")
+            }
         }
     }
 
     MessagePanel {
         id: messagePanel
         onAccepted: {
+            blur.enabled = false
             console.log("Question", questionNumber, "accepted.")
             switch (questionNumber) {
-            case 1: Game.startAgain(); return;
-            case 2: return;
-            case 3: Game.solve(); return;
-            case 4: return;
+            case 1: Game.startAgain(); break;      // Restart button
+            case 5: Game.startAssistMode(); break; // Assist mode
+            case 7: Game.endAssistMode(); break;   // Assist mode error
+            default: break;
             }
+            Game.refreshNeeded();
         }
         onRejected: {
-            console.log("Rejected")
+            blur.enabled = false
+            console.log("Question", questionNumber, "rejected")
+            switch (questionNumber) {
+            case 5: Game.endAssistMode(); break;
+            default: break;
+            }
+            Game.refreshNeeded();
         }
     }
 
+    AboutPanel {
+        id: aboutPanel
+        onClosed:
+            blur.enabled = false;
+
+    }
+
     Component.onCompleted: {
-        Game.solved.connect(showCongrats)
+        Game.levelDone.connect(showCongratsPanel)
+        Game.solverSuccess.connect(promptToStartAssistMode)
+        Game.solverError.connect(solutionIsNotFound)
+        Game.assistModeError.connect(promptToEndAssistMode)
     }
 }

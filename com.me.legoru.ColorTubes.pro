@@ -26,6 +26,7 @@ SOURCES += \
     core/solver.cpp \
     core/tubemodel.cpp \
     core/usedcolors.cpp \
+    gui/arrowitem.cpp \
     gui/bottlelayer.cpp \
     gui/colorslayer.cpp \
     gui/corklayer.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
 DISTFILES += \
     qml/com.me.legoru.ColorTubes.qml \
     qml/cover/CoverPage.qml \
+    qml/items/AboutPanel.qml \
     qml/items/CongratsPanel.qml \
     qml/items/IconButtonItem.qml \
     qml/items/MessagePanel.qml \
@@ -61,7 +63,8 @@ CONFIG += \
 
 TRANSLATIONS += \
     translations/com.me.legoru.ColorTubes.ts \
-    translations/com.me.legoru.ColorTubes-ru.ts
+    translations/com.me.legoru.ColorTubes-ru.ts \ 
+    translations/com.me.legoru.ColorTubes-tr.ts 
 
 HEADERS += \
     core/boardmodel.h \
@@ -71,6 +74,7 @@ HEADERS += \
     core/solver.h \
     core/tubemodel.h \
     core/usedcolors.h \
+    gui/arrowitem.h \
     gui/bottlelayer.h \
     gui/colorslayer.h \
     gui/corklayer.h \

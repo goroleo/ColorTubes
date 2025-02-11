@@ -18,8 +18,9 @@ class Options;
 class Game : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool hasMoves READ hasMoves NOTIFY movesChanged)
+    Q_PROPERTY(bool movesMade READ movesMade NOTIFY movesChanged)
     Q_PROPERTY(int level READ level NOTIFY levelChanged)
+    Q_PROPERTY(bool isAssistMode READ isAssistMode NOTIFY modeChanged)
 
 public:
     static Game & create();
@@ -31,32 +32,41 @@ public:
     JctlFormat * jctl()       { return m_jctl; }
     MoveItems  * moves()      { return m_moves; }
 
-    MoveItem   * addNewMove(TubeModel &tubeFrom, TubeModel &tubeTo);
-    bool         hasMoves();
-    void         removeLastMove();
-
-    void         setMode(int newMode);
-    int          mode() {return m_gameMode;}
-    quint32      level();
-
     bool         load(QString fileName);
     bool         loadTemporary();
     bool         save(QString fileName);
     bool         saveTemporary();
     void         removeTemporary();
 
+    quint32      mode() { return m_gameMode; }
+    bool         isAssistMode();
+    quint32      level();
+
     void         checkSolved();
+
+    void         addMove(MoveItem * move);
+    bool         movesMade();
+    void         removeLastMove();
+    MoveItem   * currentMove();
+    MoveItem   * nextMove();
 
     Q_INVOKABLE void newLevel();
     Q_INVOKABLE void undoMove();
     Q_INVOKABLE void startAgain();
     Q_INVOKABLE void solve();
+    Q_INVOKABLE void startAssistMode();
+    Q_INVOKABLE void endAssistMode();
 
 signals:
     void         levelChanged();
     void         movesChanged();
-    void         needToRefresh();
-    void         solved();
+    void         modeChanged();
+    void         refreshNeeded();
+    void         levelDone();
+
+    void         solverSuccess();
+    void         solverError();
+    void         assistModeError();
 
 private slots:
     void         onApplicationStateChanged();
@@ -71,7 +81,8 @@ private:
     BoardModel  * m_board;
     MoveItems   * m_moves;
     Options     * m_options;
-    int           m_gameMode;
+    quint32       m_gameMode;
+    quint16       m_movesDone;
 };
 
 

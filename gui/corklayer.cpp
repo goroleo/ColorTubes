@@ -60,12 +60,12 @@ void CorkLayer::startShow()
 {
     m_visible = true;
     if (m_animated) {
-        m_alphaIncrement = 1.0 / qreal(CT_CORK_STEPS_INC);
+        m_opacityIncrement = 1.0 / qreal(CT_CORK_STEPS_INC);
         if (!m_timer->isActive()) {
             m_timer->start(CT_TIMER_TICKS);
         }
     } else {
-        m_alphaIncrement = 2;
+        m_opacityIncrement = 2;
         nextFrame();
         paintFrame();
         update();
@@ -76,12 +76,12 @@ void CorkLayer::startHide()
 {
     m_visible = false;
     if (m_animated) {
-        m_alphaIncrement = -1.0 / qreal(CT_CORK_STEPS_DEC);
+        m_opacityIncrement = -1.0 / qreal(CT_CORK_STEPS_DEC);
         if (!m_timer->isActive()) {
             m_timer->start(CT_TIMER_TICKS);
         }
     } else {
-        m_alphaIncrement = -2;
+        m_opacityIncrement = -2;
         nextFrame();
         paintFrame();
         update();
@@ -109,22 +109,22 @@ void CorkLayer::paint(QPainter * painter)
 
 void CorkLayer::nextFrame()
 {
-    m_alpha += m_alphaIncrement;
+    m_opacity += m_opacityIncrement;
 
     if (m_visible) {
-        if (m_alpha > 1) {
-            m_alpha = 1.0;
+        if (m_opacity > 1) {
+            m_opacity = 1.0;
             m_timer->stop();
         }
     } else {
-        if (m_alpha < 0) {
-            m_alpha = 0.0;
+        if (m_opacity < 0) {
+            m_opacity = 0.0;
             m_timer->stop();
         }
     }
 
     m_currentY = - CtGlobal::images().shiftHeight()
-            + CtGlobal::images().shiftHeight() * 2 * exp(-0.5 * (1 - m_alpha));
+            + CtGlobal::images().shiftHeight() * 2 * exp(-0.5 * (1 - m_opacity));
 }
 
 void CorkLayer::paintFrame()
@@ -137,7 +137,7 @@ void CorkLayer::paintFrame()
         for (int y = 0; y < corkImage.height(); ++y) {
             pix = corkImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = qRound (qreal(pix >> 24) * m_alpha);
+                newAlpha = qRound (qreal(pix >> 24) * m_opacity);
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }

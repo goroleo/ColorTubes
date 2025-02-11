@@ -10,12 +10,6 @@
 
 CtImages * CtImages::m_instance = nullptr;
 
-/*
-
-  Qt 5.6 is not supported SVG transparency masks. So we have to render them manually.
-
- */
-
 CtImages::CtImages(QObject *parent) :
     QObject(parent)
 {
@@ -23,7 +17,8 @@ CtImages::CtImages(QObject *parent) :
 
 CtImages::~CtImages()
 {
-    delete m_source;
+    delete m_tubeSource;
+    delete m_arrowSource;
     delete m_bottle;
     delete m_bottleFront;
     delete m_bottleBack;
@@ -33,6 +28,10 @@ CtImages::~CtImages()
     delete m_shadeRed;
     delete m_shadeGray;
     delete m_cork;
+    delete m_arrowInBody;
+    delete m_arrowOutBody;
+    delete m_arrowInStroke;
+    delete m_arrowOutStroke;
     delete m_vertices;
     delete [] m_tiltAngles;
     qDebug() << "Images destroyed";
@@ -55,7 +54,8 @@ CtImages& CtImages::instance()
 
 void CtImages::initialize()
 {
-    m_source = new QSvgRenderer(QLatin1String(":/img/tube.svg"));
+    m_tubeSource = new QSvgRenderer(QLatin1String(":/img/tube.svg"));
+    m_arrowSource = new QSvgRenderer(QLatin1String(":/img/arrows.svg"));
 
     m_bottle = new QPixmap;
     m_bottleFront = new QPixmap;
@@ -66,6 +66,10 @@ void CtImages::initialize()
     m_shadeRed = new QPixmap;
     m_shadeGray = new QPixmap;
     m_cork = new QPixmap;
+    m_arrowInBody = new QPixmap;
+    m_arrowOutBody = new QPixmap;
+    m_arrowInStroke = new QPixmap;
+    m_arrowOutStroke = new QPixmap;
     m_vertices = new QPointF[6];
 
     m_tiltAngles = new qreal[(CT_TUBE_STEPS_POUR * 4) + 1];
@@ -105,11 +109,11 @@ void CtImages::scaleVertices()
         (see /img/tube.svg)
 */
 
-    m_vertices[0] = QPointF(60.0, 15.5) * m_scale;
-    m_vertices[1] = QPointF(66.0, 26.0) * m_scale;
+    m_vertices[0] = QPointF(60.0, 15.5)  * m_scale;
+    m_vertices[1] = QPointF(66.0, 26.0)  * m_scale;
     m_vertices[2] = QPointF(66.0, 166.0) * m_scale;
     m_vertices[3] = QPointF(14.0, 166.0) * m_scale;
-    m_vertices[4] = QPointF(14.0, 26.0) * m_scale;
+    m_vertices[4] = QPointF(14.0, 26.0)  * m_scale;
     m_vertices[5] = QPointF(20.0, 15.5) * m_scale;
 
     m_tubeWidth   = 80.0 * m_scale;
@@ -129,11 +133,14 @@ void CtImages::scaleVertices()
     m_jetRect     = QRectF(
                 m_vertices[3].x() + (m_colorWidth - m_jetWidth) / 2,
                 0, m_jetWidth, 0);
+
+    m_shiftArrow  = 40.0 * m_scale;
 }
 
 QRectF CtImages::scaleRect(QRectF rect)
 {
-    return QRectF(rect.topLeft() * m_scale, rect.size() * m_scale);
+    return QRectF(rect.topLeft() * m_scale,
+                  rect.size() * m_scale);
 }
 
 QRectF CtImages::colorRect(quint8 index)
@@ -146,17 +153,20 @@ QRectF CtImages::colorRect(quint8 index)
 
 void CtImages::renderImages()
 {
-    QRectF elementRect; // rect of the every element in SVG
-    QPointF startPoint; // top left point of the elementRect
 
-    QImage image(m_source->defaultSize().rwidth() * m_scale,
-                 m_source->defaultSize().rheight() * m_scale,
+    // Qt 5.6 is not supported SVG transparency masks. So we have to render them manually.
+
+    QRectF elementRect;   // rect of the every element in SVGs
+    QPointF startPoint;   // top left point of the elementRect
+
+    QImage tubeImage(m_tubeSource->defaultSize().rwidth() * m_scale,
+                 m_tubeSource->defaultSize().rheight() * m_scale,
                  QImage::Format_ARGB32);
-    QPainter painter(&image);
-    image.fill(0x00ffffff);
+    QPainter tubePainter(&tubeImage);
+    tubeImage.fill(0x00ffffff);
 
 //----------------- shine
-    elementRect = m_source->boundsOnElement(QLatin1String("shine"));
+    elementRect = m_tubeSource->boundsOnElement(QLatin1String("shine"));
     elementRect = scaleRect(elementRect);
     startPoint = elementRect.topLeft();
     elementRect.moveTo(0, 0);
@@ -164,11 +174,11 @@ void CtImages::renderImages()
     QImage shineImage (elementRect.width(), elementRect.height(), QImage::Format_ARGB32);
     shineImage.fill(0x00ffffff);
     QPainter shinePainter(&shineImage);
-    m_source->render(&shinePainter, QLatin1String("shine"), elementRect);
+    m_tubeSource->render(&shinePainter, QLatin1String("shine"), elementRect);
 
     qreal part;            // part of the image's height/width
     QRgb pix;              // current pixel
-    int alpha, newAlpha;   // alpha values of the pixel
+    int alpha, newAlpha;   // opacity values of the pixel (alpha-channel)
 
     // transparency mask
     for (int y = 0; y < shineImage.height(); ++y) {
@@ -189,10 +199,10 @@ void CtImages::renderImages()
             }
         }
     }
-    painter.drawImage(startPoint, shineImage);
+    tubePainter.drawImage(startPoint, shineImage);
 
 //----------------- side
-    elementRect = m_source->boundsOnElement(QLatin1String("side"));
+    elementRect = m_tubeSource->boundsOnElement(QLatin1String("side"));
     elementRect = scaleRect(elementRect);
     startPoint = elementRect.topLeft();
     elementRect.moveTo(0, 0);
@@ -200,7 +210,7 @@ void CtImages::renderImages()
     QImage sideImage (elementRect.width(), elementRect.height(), QImage::Format_ARGB32);
     sideImage.fill(0x00ffffff);
     QPainter sidePainter(&sideImage);
-    m_source->render(&sidePainter, QLatin1String("side"), elementRect);
+    m_tubeSource->render(&sidePainter, QLatin1String("side"), elementRect);
 
     // transparency mask
     for (int x = 0; x < sideImage.width(); ++x) {
@@ -219,63 +229,98 @@ void CtImages::renderImages()
             }
         }
     }
-    painter.drawImage(startPoint, sideImage);
+    tubePainter.drawImage(startPoint, sideImage);
 
 //----------------- bottle
-    elementRect = m_source->boundsOnElement(QLatin1String("bottle"));
+    elementRect = m_tubeSource->boundsOnElement(QLatin1String("bottle"));
     elementRect = scaleRect(elementRect);
-    m_source->render(&painter, QLatin1String("bottle"), elementRect);
-    m_bottle->convertFromImage(image);
+    m_tubeSource->render(&tubePainter, QLatin1String("bottle"), elementRect);
+    m_bottle->convertFromImage(tubeImage);
 
     // back side
-    elementRect = image.rect();
+    elementRect = tubeImage.rect();
     elementRect.setHeight(m_vertices[0].y());
     *m_bottleBack = m_bottle->copy(elementRect.toRect());
 
     // front side
-    elementRect = image.rect();
+    elementRect = tubeImage.rect();
     elementRect.adjust(0, m_vertices[0].y(), 0, 0);
     *m_bottleFront = m_bottle->copy(elementRect.toRect());
 
-//----------------- shades
-    image.fill(0x00ffffff);
-    elementRect  = m_source->boundsOnElement(QLatin1String("shade_yellow"));
+//----------------- tube's shades
+    tubeImage.fill(0x00ffffff);
+    elementRect  = m_tubeSource->boundsOnElement(QLatin1String("shade_yellow"));
     elementRect = scaleRect(elementRect);
-    m_source->render(&painter, QLatin1String("shade_yellow"), elementRect);
-    m_shadeYellow->convertFromImage(image);
+    m_tubeSource->render(&tubePainter, QLatin1String("shade_yellow"), elementRect);
+    m_shadeYellow->convertFromImage(tubeImage);
 
-    image.fill(0x00ffffff);
-    elementRect  = m_source->boundsOnElement(QLatin1String("shade_green"));
+    tubeImage.fill(0x00ffffff);
+    elementRect  = m_tubeSource->boundsOnElement(QLatin1String("shade_green"));
     elementRect = scaleRect(elementRect);
-    m_source->render(&painter, QLatin1String("shade_green"), elementRect);
-    m_shadeGreen->convertFromImage(image);
+    m_tubeSource->render(&tubePainter, QLatin1String("shade_green"), elementRect);
+    m_shadeGreen->convertFromImage(tubeImage);
 
-    image.fill(0x00ffffff);
-    elementRect  = m_source->boundsOnElement(QLatin1String("shade_blue"));
+    tubeImage.fill(0x00ffffff);
+    elementRect  = m_tubeSource->boundsOnElement(QLatin1String("shade_blue"));
     elementRect = scaleRect(elementRect);
-    m_source->render(&painter, QLatin1String("shade_blue"), elementRect);
-    m_shadeBlue->convertFromImage(image);
+    m_tubeSource->render(&tubePainter, QLatin1String("shade_blue"), elementRect);
+    m_shadeBlue->convertFromImage(tubeImage);
 
-    image.fill(0x00ffffff);
-    elementRect  = m_source->boundsOnElement(QLatin1String("shade_red"));
+    tubeImage.fill(0x00ffffff);
+    elementRect  = m_tubeSource->boundsOnElement(QLatin1String("shade_red"));
     elementRect = scaleRect(elementRect);
-    m_source->render(&painter, QLatin1String("shade_red"), elementRect);
-    m_shadeRed->convertFromImage(image);
+    m_tubeSource->render(&tubePainter, QLatin1String("shade_red"), elementRect);
+    m_shadeRed->convertFromImage(tubeImage);
 
-    image.fill(0x00ffffff);
-    elementRect  = m_source->boundsOnElement(QLatin1String("shade_gray"));
+    tubeImage.fill(0x00ffffff);
+    elementRect  = m_tubeSource->boundsOnElement(QLatin1String("shade_gray"));
     elementRect = scaleRect(elementRect);
-    m_source->render(&painter, QLatin1String("shade_gray"), elementRect);
-    m_shadeGray->convertFromImage(image);
+    m_tubeSource->render(&tubePainter, QLatin1String("shade_gray"), elementRect);
+    m_shadeGray->convertFromImage(tubeImage);
 
 //----------------- cork
-    elementRect  = m_source->boundsOnElement(QLatin1String("cork"));
+    elementRect  = m_tubeSource->boundsOnElement(QLatin1String("cork"));
     elementRect = scaleRect(elementRect);
     QImage corkImage(m_bottle->width(), elementRect.bottom()+1, QImage::Format_ARGB32);
     corkImage.fill(0x00ffffff);
     QPainter corkPainter(&corkImage);
-    m_source->render(&corkPainter, QLatin1String("cork"), elementRect);
+    m_tubeSource->render(&corkPainter, QLatin1String("cork"), elementRect);
     m_cork->convertFromImage(corkImage);
+
+//----------------- arrow In
+    // body
+    QImage arrowImage(m_arrowSource->defaultSize().rwidth() * m_scale,
+                      m_arrowSource->defaultSize().rheight() * m_scale,
+                      QImage::Format_ARGB32);
+    arrowImage.fill(0x00ffffff);
+    QPainter arrowPainter(&arrowImage);
+
+    elementRect = m_arrowSource->boundsOnElement(QLatin1String("body_in"));
+    elementRect = scaleRect(elementRect);
+    m_arrowSource->render(&arrowPainter, QLatin1String("body_in"), elementRect);
+    m_arrowInBody->convertFromImage(arrowImage);
+
+    // stroke
+    arrowImage.fill(0x00ffffff);
+    elementRect = m_arrowSource->boundsOnElement(QLatin1String("stroke_in"));
+    elementRect = scaleRect(elementRect);
+    m_arrowSource->render(&arrowPainter, QLatin1String("stroke_in"), elementRect);
+    m_arrowInStroke->convertFromImage(arrowImage);
+
+//----------------- arrow Out
+    // body
+    arrowImage.fill(0x00ffffff);
+    elementRect = m_arrowSource->boundsOnElement(QLatin1String("body_out"));
+    elementRect = scaleRect(elementRect);
+    m_arrowSource->render(&arrowPainter, QLatin1String("body_out"), elementRect);
+    m_arrowOutBody->convertFromImage(arrowImage);
+
+    // stroke
+    arrowImage.fill(0x00ffffff);
+    elementRect = m_arrowSource->boundsOnElement(QLatin1String("stroke_out"));
+    elementRect = scaleRect(elementRect);
+    m_arrowSource->render(&arrowPainter, QLatin1String("stroke_out"), elementRect);
+    m_arrowOutStroke->convertFromImage(arrowImage);
 }
 
 qreal CtImages::tiltAngle(uint index)

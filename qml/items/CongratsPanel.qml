@@ -67,7 +67,6 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            congratsPanel.enabled = false
             congratsPanel.clicked()
         }
     }

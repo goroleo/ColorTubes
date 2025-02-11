@@ -7,6 +7,7 @@ class BoardModel;
 class MoveItems;
 class TubeItem;
 class TubeItems;
+class ArrowItem;
 
 class GameBoard : public QQuickItem
 {
@@ -19,11 +20,13 @@ public:
     explicit GameBoard(QQuickItem *parent = nullptr);
     ~GameBoard();
 
-    int          tubesCount();
     int          indexOf(TubeItem * tube);
     void         clickTube(TubeItem * tube);
     TubeItem   * selectedTube() { return m_selectedTube; }
+
     Q_INVOKABLE void hideSelection();
+    void         showMove();
+    void         hideMove();
 
 signals:
     void         busyChanged();
@@ -32,23 +35,33 @@ private slots:
     void         onScaleChanged();
     void         onLevelChanged();
     void         onRefresh();
+    void         onArrowInShown();
+    void         onArrowOutShown();
+    void         onApplicationStateChanged();
 
 private:
     BoardModel * m_model;
 
     void         geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
     void         mousePressEvent(QMouseEvent* event);
-    int          maxZ();  // maximal Z coordinate of all children TubeItems
     void         placeTubes();
     void         rescale();
     void         update();
-    bool         busy();
+    void         newMove(TubeItem *from, TubeItem *to);
 
     TubeItems  * m_tubes;
     TubeItem   * m_selectedTube = nullptr;
 
+    ArrowItem  * m_arrowIn;
+    ArrowItem  * m_arrowOut;
+
     qreal        spaceX = 5.0;
     qreal        spaceY = 100.0;
+
+    int          maxChildrenZ();  // maximal Z coordinate of all children TubeItems
+    void         childrenZChanged();
+    bool         busy() { return m_busy; };
+    bool         m_busy;
 };
 
 #endif // GAMEBOARD_H

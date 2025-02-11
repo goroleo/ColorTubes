@@ -128,6 +128,7 @@ MoveItem * BoardModel::addNewMove(const TubeModel &tubeFrom, const TubeModel &tu
     return move;
 }
 
+/*
 int BoardModel::movesCount()
 {
     if (m_parentMove)
@@ -136,6 +137,7 @@ int BoardModel::movesCount()
         return m_moves->size();
     return 0;
 }
+*/
 
 bool BoardModel::hasMoves()
 {
@@ -254,18 +256,6 @@ quint16 BoardModel::findMoves()
 
     if (result > 1)
         moves()->sortByRank();
-/*
-    // --- debug
-    qDebug() << this; // out current board
-    qDebug().noquote() << "Hash" << QString::number(m_hash, 16);
-
-    qDebug() << "Found" << result << "possible moves.";
-    if (hasMoves()) {
-        for (int i=0; i < moves()->size(); ++i) {
-            qDebug() <<"#" << i << moves()->at(i);
-        }
-    }
-*/
 
     return result;
 }

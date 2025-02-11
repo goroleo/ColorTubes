@@ -25,13 +25,13 @@ bool Options::load()
     if (!CtGlobal::io().loadJson(CtGlobal::settingsFileName(), jObj))
         return false;
 
-    bool result = jObj.contains("Settings") && jObj["Settings"].isObject();
+    bool result = jObj.contains("settings") && jObj["settings"].isObject();
     if (result) {
-        QJsonObject jSettings = jObj["Settings"].toObject();
+        QJsonObject jSettings = jObj["settings"].toObject();
 
         // level
-        if (jSettings.contains("LastLevel") && jSettings["LastLevel"].isString())
-            level = jSettings["LastLevel"].toString().toInt(&result, 10);
+        if (jSettings.contains("lastLevel") && jSettings["lastLevel"].isString())
+            level = jSettings["lastLevel"].toString().toInt(&result, 10);
         result = level > 0;
     }
 
@@ -47,9 +47,9 @@ bool Options::save()
     QJsonObject jObj;
 
     // adds Level
-    jItem["LastLevel"] = CtGlobal::intToStr(level);
+    jItem["lastLevel"] = CtGlobal::intToStr(level);
 
-    jObj["Settings"] = jItem;
+    jObj["settings"] = jItem;
 
     // save
     qDebug() << "Settings saves to" << CtGlobal::settingsFileName();

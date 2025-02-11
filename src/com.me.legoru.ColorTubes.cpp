@@ -1,6 +1,5 @@
 #include "auroraapp.h"
 
-#include "ctglobal.h"
 #include "src/game.h"
 #include "gui/gameboard.h"
 #include "gui/flowerlayer.h"

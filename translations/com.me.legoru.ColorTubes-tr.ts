@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr">
 <context>
+    <name>AboutPanel</name>
+    <message>
+        <source>#ColorTubes</source>
+        <translation>Renkli tüpler</translation>
+    </message>
+    <message>
+        <source>#aboutText1</source>
+        <translation>AuroraOS 4 için Renkli tüpler</translation>
+    </message>
+    <message>
+        <source>#aboutText2</source>
+        <translation>Her türlü yorum, soru ve önerileriniz için: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>#aboutText3</source>
+        <translation>(Uygulama ayarları burada olacak)</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Tamam</translation>
+    </message>
+</context>
+<context>
     <name>CongratsPanel</name>
     <message>
         <source>#victory</source>
@@ -11,7 +34,7 @@
 <context>
     <name>CoverPage</name>
     <message>
-        <source>Color Tubes</source>
+        <source>#ColorTubes</source>
         <translation>Renkli tüpler</translation>
     </message>
 </context>
@@ -26,24 +49,24 @@
         <translation>Evet</translation>
     </message>
     <message>
-        <source>#wantToSolve</source>
-        <translation>Oyuna bir çözüm bulmaya çalışacağım ama biraz zaman alabilir.&lt;br&gt;Aramaya başlamak istiyor musunuz?</translation>
-    </message>
-    <message>
-        <source>#unavailable</source>
-        <translation>Sonra olacak</translation>
-    </message>
-    <message>
-        <source>#settings</source>
-        <translation>Uygulama ayarları burada olacaktır.</translation>
-    </message>
-    <message>
-        <source>I see</source>
-        <translation>Anlıyorum</translation>
-    </message>
-    <message>
         <source>#level</source>
         <translation>Seviye</translation>
+    </message>
+    <message>
+        <source>#wantToStartAssistMode</source>
+        <translation>Çözüm arayışı başarıyla tamamlandı.&lt;br&gt;Asistan moduna geçmek ister misiniz?</translation>
+    </message>
+    <message>
+        <source>#solutionIsNotFound</source>
+        <translation>Oyun çözümü bulunamadı.&lt;br&gt;Önceki hamlelerinizi geri almayı deneyin veya bu seviyeye tekrar başlayın.</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Tamam</translation>
+    </message>
+    <message>
+        <source>#wantToEndAssistMode</source>
+        <translation>Asistan size başka bir tüp seçmenizi teklif eder. Ancak reddedebilir ve asistan olmadan oyuna devam edebilirsiniz.&lt;br&gt;Asistan modunu sonlandırmak istiyor musunuz?</translation>
     </message>
 </context>
 <context>

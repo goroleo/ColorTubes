@@ -73,8 +73,8 @@ void Solver::start(BoardModel *startBoard)
 
     bool solved = false;
     MoveItem * move = m_startBoard->currentMove();
-    int  boardsCounter = 1; // Start board is already counted
-    int  movesCounter = m_startBoard->movesCount();
+    // int  boardsCounter = 1; // Start board is already counted
+    // int  movesCounter = m_startBoard->movesCount();
 
     // doing solve
     do {
@@ -83,13 +83,13 @@ void Solver::start(BoardModel *startBoard)
         //  - the game is solved, or
         //  - there are more moves on the resulting board
         bool moveSuccess = move->doMove();
-        boardsCounter ++;
+        // boardsCounter ++;
 
         // additional check of the resulting board,
         // if a similar game combination has occurred before
         if (moveSuccess) {
             moveSuccess = !(m_hashes->contains( move->boardAfter()->hash() ));
-            movesCounter += move->boardAfter()->movesCount();
+            // movesCounter += move->boardAfter()->movesCount();
         }
 
         if (moveSuccess) {
@@ -134,7 +134,7 @@ void Solver::start(BoardModel *startBoard)
 
     if (solved) {
 
-        qDebug() << "The board is solved!";
+        qDebug() << "The solution has found!";
 
 //        if (move)
 //            qDebug() << "The final board is" << move->boardAfter();

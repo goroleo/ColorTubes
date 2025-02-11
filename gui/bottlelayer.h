@@ -37,8 +37,8 @@ private:
     TubeItem * m_tube;  // parent tube for this layer
 
     qreal    m_startY = 0;
-    quint8   m_source_id = CT_BOTTLE_NONE;
-    QPixmap  m_drawPixMap;
+    quint8   m_sourceId = CT_BOTTLE_NONE;
+    QPixmap  m_drawPixmap;
 };
 
 #endif // BOTTLELAYER_H

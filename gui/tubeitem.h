@@ -9,6 +9,7 @@ class ColorsLayer;
 class ShadeLayer;
 class TubeModel;
 class GameBoard;
+class ArrowItem;
 
 class TubeItem : public QQuickItem
 {
@@ -37,6 +38,8 @@ public:
     void          setSelected(bool value);
     void          showAvailable(bool value);
     void          setClosed(bool value);
+    void          setShadeBlinked(bool value);
+    void          hideShadeImmediately();
 
     quint8        currentColor();
     bool          canPutColor(quint8 color);
@@ -67,9 +70,7 @@ private:
     BottleLayer * m_back;
     ShadeLayer  * m_shade;
 
-//  scale, position & rotation
-//    qreal         scale() const;  // use CtGlobal::images().scale()
-
+//  position & rotation
     QPointF       position() { return m_regularPosition;}  // unused?
     void          setRegularPosition(QPointF newPoint);
     void          setCurrentPosition(QPointF newPoint);
@@ -88,7 +89,7 @@ private:
     void          nextFrame();              // calculates current frame of animation
 
     QTimer      * m_timer;
-    int           steps;
+    int           m_steps;
     QPointF       m_startPoint;
     QPointF       m_endPoint;
     QPointF       m_moveIncrement;
@@ -120,6 +121,12 @@ private:
     quint8        m_pouringCells = 0;       // number of pouring color cells
     quint8        m_connectedTubes = 0;     // number of tubes which will be pour colors into this tube
     quint8        m_pouredTubes = 0;        // number of tubes which are pours colors into this tube
+
+//  arrows variables/procedures
+    ArrowItem   * m_arrow = nullptr;
+    void          connectArrow(ArrowItem * arrow);
+    void          removeArrow();
+
 };
 
 class TubeItems: public QVector<TubeItem*>{};

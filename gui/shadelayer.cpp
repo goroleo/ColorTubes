@@ -40,8 +40,8 @@ void ShadeLayer::startShow()
 {
     if (m_animated) {
         m_visible = true;
-        m_pulse = false;
-        m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+        m_blinken = false;
+        m_opacityIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
         m_timer->start(CT_TIMER_TICKS);
     } else
         showImmediately();
@@ -51,8 +51,8 @@ void ShadeLayer::startHide()
 {
     if (m_animated) {
         m_visible = false;
-        m_pulse = false;
-        m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
+        m_blinken = false;
+        m_opacityIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
         m_timer->start(CT_TIMER_TICKS);
     } else
         hideImmediately();
@@ -60,18 +60,22 @@ void ShadeLayer::startHide()
 
 void ShadeLayer::showImmediately()
 {
+    if (m_timer->isActive())
+        m_timer->stop();
     m_visible = true;
-    m_pulse = false;
-    m_alpha = 1.0;
+    m_blinken = false;
+    m_opacity = 1.0;
     paintFrame();
     update();
 }
 
 void ShadeLayer::hideImmediately()
 {
+    if (m_timer->isActive())
+        m_timer->stop();
     m_visible = false;
-    m_pulse = false;
-    m_alpha = 0.0;
+    m_blinken = false;
+    m_opacity = 0.0;
     paintFrame();
     update();
     if (m_shadeAfterHiding > 0) {
@@ -81,46 +85,51 @@ void ShadeLayer::hideImmediately()
     }
 }
 
-void ShadeLayer::startPulse()
+void ShadeLayer::startBlink()
 {
     if (m_animated) {
-        m_pulse = true;
+        m_blinken = true;
+        m_blinkStopped = false;
         m_visible = true;
-        m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
-        m_timer->start(CT_TIMER_TICKS * 3);
-        emit pulseChanged(m_pulse);
+        m_opacityIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+        m_timer->start(CT_TIMER_BLINK_TICKS);
     }
 }
 
-void ShadeLayer::stopPulse()
+void ShadeLayer::stopBlink()
 {
-    m_pulse = false;
-    m_visible = false;
-    m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
-    m_timer->start(CT_TIMER_TICKS);
-    emit pulseChanged(m_pulse);
+    if (m_blinken) {
+        m_blinkStopped = true;
+        m_visible = false;
+        m_opacityIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
+        m_timer->start(CT_TIMER_TICKS);
+    }
 }
 
 void ShadeLayer::nextFrame()
 {
-    m_alpha += m_alphaIncrement;
+    m_opacity += m_opacityIncrement;
 
     if (m_visible) {
-        if (m_alpha > 1) {
-            m_alpha = 1.0;
-            if (m_pulse) {
+        if (m_opacity > 1) {
+            m_opacity = 1.0;
+            if (m_blinken) {
                 m_visible = false;
-                m_alphaIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
+                m_opacityIncrement = -1.0 / qreal(CT_SHADE_STEPS_DEC);
             } else {
                 m_timer->stop();
             }
         }
     } else {
-        if (m_alpha < 0) {
-            m_alpha = 0.0;
-            if (m_pulse) {
-                m_visible = true;
-                m_alphaIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+        if (m_opacity < 0) {
+            m_opacity = 0.0;
+            if (m_blinken) {
+                if (!m_blinkStopped) {
+                    m_visible = true;
+                    m_opacityIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
+                } else {
+                    m_blinken = false;
+                }
             } else {
                 m_timer->stop();
 
@@ -143,7 +152,7 @@ void ShadeLayer::paintFrame()
         for (int y = 0; y < m_shadeImage.height(); ++y) {
             pix = m_shadeImage.pixel(x, y);
             if ((pix >> 24) > 0) {
-                newAlpha = qRound (qreal(pix >> 24) * m_alpha);
+                newAlpha = qRound (qreal(pix >> 24) * m_opacity);
                 m_drawImage.setPixel(x, y, ((newAlpha & 0xff) << 24) | (pix & 0xffffff));
             }
         }
@@ -184,15 +193,13 @@ bool ShadeLayer::isVisible()
     return m_visible;
 }
 
-bool ShadeLayer::pulse()
+bool ShadeLayer::isBlinked()
 {
-    return m_pulse;
+    return m_blinken;
 }
 
 void ShadeLayer::setShade(int newShadeNumber)
 {
-//    if (m_shadeNumber == newShadeNumber)
-//        return;
     m_shadeNumber = newShadeNumber;
     switch (m_shadeNumber)
     {
@@ -229,14 +236,14 @@ void ShadeLayer::setShadeAfterHide(int newShadeNumber)
     }
 }
 
-void ShadeLayer::setPulse(bool value)
+void ShadeLayer::setBlinked(bool value)
 {
-    if (m_pulse != value) {
-        if (value)
-            startPulse();
-        else
-            stopPulse();
-        emit pulseChanged(value);
+    if (m_blinken != value) {
+        if (value) {
+            m_opacity = 0.0;
+            startBlink();
+        } else
+            stopBlink();
     }
 }
 

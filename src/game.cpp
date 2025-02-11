@@ -69,6 +69,73 @@ void Game::initialize()
         newLevel();
 }
 
+void Game::onApplicationStateChanged()
+{
+    if (QGuiApplication::applicationState() != Qt::ApplicationActive) {
+        m_options->save();
+        if (!m_board->isSolved())
+            saveTemporary();
+    }
+}
+
+bool Game::load(QString fileName)
+{
+    m_gameMode = CT_PLAY_MODE;
+
+    QByteArray buffer;
+    bool result;
+
+    result = CtGlobal::io().loadGame(fileName, buffer);
+
+    if (result)
+        result = m_jctl->read(buffer);
+
+    if (result) {
+        m_jctl->restoreGame(m_board);
+        m_gameMode = m_jctl->gameMode();
+        m_jctl->restoreMoves(m_moves);
+        m_movesDone = m_jctl->movesDone();
+    }
+
+    if (result) {
+        qDebug() << "Game loaded from" << fileName;
+        emit levelChanged();
+        emit movesChanged();
+    } else
+        qDebug() << "Game is not loaded." << fileName;
+
+    return result;
+}
+
+bool Game::loadTemporary()
+{
+    return load(CtGlobal::tempFileName());
+}
+
+bool Game::save(QString fileName)
+{
+    QByteArray buffer;
+    m_jctl->storeGame(CT_PLAY_MODE);
+    m_jctl->storeMoves(m_movesDone);
+    m_jctl->write(buffer, 2);
+    return CtGlobal::io().saveGame(fileName, buffer);
+}
+
+bool Game::saveTemporary()
+{
+    return save(CtGlobal::tempFileName());
+}
+
+void Game::removeTemporary()
+{
+    CtGlobal::io().deleteTempFile();
+}
+
+bool Game::isAssistMode()
+{
+    return m_gameMode == CT_ASSIST_MODE;
+}
+
 quint32 Game::level()
 {
     return m_board->level();
@@ -76,6 +143,9 @@ quint32 Game::level()
 
 void Game::newLevel()
 {
+    m_gameMode = CT_PLAY_MODE;
+    emit modeChanged();
+
     if (m_board->tubesCount() > 0) {
         m_options->level = m_board->level();
         m_options->save();
@@ -115,74 +185,109 @@ void Game::newLevel()
     m_board->setLevel(levelNumber);
     emit levelChanged();
     m_moves->clear();
+    m_movesDone = 0;
     emit movesChanged();
-}
+    saveTemporary();
 
-bool Game::load(QString fileName)
-{
-    QByteArray buffer;
-    bool result;
-
-    result = CtGlobal::io().loadGame(fileName, buffer);
-
-    if (result)
-        result = m_jctl->read(buffer);
-
-    if (result) {
-        m_jctl->restoreGame(m_board);
-        m_jctl->restoreMoves(m_moves);
+    if (levelNumber == 1) {
+        Solver solver;
+        solver.start(m_board);
+        for (int i = 0; i < solver.moves()->size(); ++i)
+            m_moves->append(new MoveItem(solver.moves()->at(i)->stored()));
+        solver.clear();
+        startAssistMode();
     }
-
-    if (result) {
-        qDebug() << "Game loaded from" << fileName;
-        emit levelChanged();
-        emit movesChanged();
-    } else
-        qDebug() << "Game is not loaded." << fileName;
-
-    return result;
 }
 
-bool Game::loadTemporary()
+
+MoveItem * Game::currentMove()
 {
-    return load(CtGlobal::tempFileName());
+    if (m_gameMode == CT_PLAY_MODE) {
+        return m_moves->current();
+    }
+    if (m_gameMode == CT_ASSIST_MODE
+            && m_movesDone > 0
+            && m_movesDone <= m_moves->size()) {
+        return m_moves->at(m_movesDone - 1);
+    }
+    return nullptr;
 }
 
-bool Game::save(QString fileName)
+MoveItem * Game::nextMove()
 {
-    QByteArray buffer;
-    m_gameMode = CT_PLAY_MODE;
-    m_jctl->storeGame();
-    m_jctl->storeMoves();
-    m_jctl->write(buffer, 2);
-    return CtGlobal::io().saveGame(fileName, buffer);
+    if (m_gameMode == CT_ASSIST_MODE
+            && m_movesDone < m_moves->size()) {
+        return m_moves->at(m_movesDone);
+    }
+    return nullptr;
 }
 
-bool Game::saveTemporary()
+bool Game::movesMade()
 {
-    return save(CtGlobal::tempFileName());
-}
-
-void Game::removeTemporary()
-{
-    CtGlobal::io().tempFileDelete();
-}
-
-bool Game::hasMoves()
-{
-    return !m_moves->empty();
+    return m_movesDone > 0;
 }
 
 void Game::removeLastMove()
 {
-    m_moves->removeLast();
+    if (m_gameMode == CT_PLAY_MODE)
+        m_moves->removeLast();
+    m_movesDone --;
 }
 
-MoveItem * Game::addNewMove(TubeModel &tubeFrom, TubeModel &tubeTo)
+void Game::addMove(MoveItem * move)
 {
-    MoveItem * move = new MoveItem(m_board->getMoveData(tubeFrom, tubeTo));
-    m_moves->append(move);
-    return move;
+    if (!move)
+        return;
+
+    if (m_gameMode == CT_ASSIST_MODE) {
+        if (m_movesDone < m_moves->size()
+                && move->stored() == m_moves->at(m_movesDone)->stored())
+            m_movesDone ++;
+        else
+            endAssistMode();
+    }
+
+    if (m_gameMode == CT_PLAY_MODE) {
+        m_moves->append(move);
+        m_movesDone ++;
+    }
+
+    if (m_movesDone == 1) emit movesChanged();
+}
+
+void Game::undoMove()
+{
+    MoveItem * move = currentMove();
+    if (move) {
+        for (int i = 0; i < move->count(); ++i) {
+            m_board->tubeAt( move->tubeFrom() )->putColor(
+                        m_board->tubeAt( move->tubeTo() )->extractColor());
+        }
+        if (m_gameMode == CT_PLAY_MODE)
+            removeLastMove();
+        else if (m_gameMode == CT_ASSIST_MODE)
+            m_movesDone --;
+
+        if (m_movesDone == 0) emit movesChanged();
+    }
+}
+
+void Game::startAgain()
+{
+    while (movesMade()) {
+        MoveItem * move = currentMove();
+        if (move) {
+            for (int i = 0; i < move->count(); ++i) {
+                m_board->tubeAt( move->tubeFrom() )->putColor(
+                            m_board->tubeAt( move->tubeTo() )->extractColor());
+            }
+            if (m_gameMode == CT_PLAY_MODE)
+                removeLastMove();
+            else if (m_gameMode == CT_ASSIST_MODE)
+                m_movesDone --;
+        }
+    }
+    emit movesChanged();
 }
 
 void Game::checkSolved()
@@ -190,53 +295,42 @@ void Game::checkSolved()
     if (m_board->isSolved()) {
         qDebug() << "!!! SOLVED !!!";
         removeTemporary();
-        emit solved();
+        emit levelDone();
     }
 }
 
 void Game::solve()
 {
     saveTemporary();
+    if (m_gameMode == CT_ASSIST_MODE)
+        endAssistMode();
+
     Solver solver;
     solver.start(m_board);
-}
 
-void Game::undoMove()
-{
-    MoveItem * move = moves()->current();
-    if (move) {
-        for (int i = 0; i < move->count(); ++i) {
-            m_board->tubeAt( move->tubeFrom() )->putColor(
-                        m_board->tubeAt( move->tubeTo() )->extractColor());
-        }
-        removeLastMove();
-        emit movesChanged();
-        emit needToRefresh();
+    if (solver.result() == CT_SOLVER_SUCCESS) {
+        // need to store solved moves!
+        for (int i = 0; i < solver.moves()->size(); ++i)
+            m_moves->append(new MoveItem(solver.moves()->at(i)->stored()));
+        solver.clear();
+        emit solverSuccess();
+    } else {
+        emit solverError();
     }
 }
 
-void Game::startAgain()
+void Game::startAssistMode()
 {
-    while (hasMoves()) {
-        MoveItem * move = moves()->current();
-        if (move) {
-            for (int i = 0; i < move->count(); ++i) {
-                m_board->tubeAt( move->tubeFrom() )->putColor(
-                            m_board->tubeAt( move->tubeTo() )->extractColor());
-            }
-            removeLastMove();
-        }
-    }
+    // all calculated moves will be stored before!
+    m_gameMode = CT_ASSIST_MODE;
+    emit modeChanged();
+}
 
+void Game::endAssistMode()
+{
+    m_gameMode = CT_PLAY_MODE;
+    emit modeChanged();
+    while (m_moves->size() > m_movesDone)
+        m_moves->removeLast();
     emit movesChanged();
-    emit needToRefresh();
-}
-
-void Game::onApplicationStateChanged()
-{
-    if (QGuiApplication::applicationState() != Qt::ApplicationActive) {
-        m_options->save();
-        if (!m_board->isSolved())
-            saveTemporary();
-    }
 }

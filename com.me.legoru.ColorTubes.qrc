@@ -1,20 +1,14 @@
 <RCC>
     <qresource prefix="/">
+        <file>img/arrows.svg</file>
+        <file>img/badge.svg</file>
         <file>img/bg.png</file>
+        <file>img/flower.svg</file>
+        <file>img/icon-cover.png</file>
         <file>img/icon-dice.svg</file>
         <file>img/icon-gear.svg</file>
         <file>img/icon-star.svg</file>
         <file>img/icon-undo.svg</file>
-        <file>jctl/example1.jctl</file>
-        <file>jctl/example2.jctl</file>
-        <file>jctl/example3.jctl</file>
-        <file>jctl/example4.jctl</file>
-        <file>img/badge.svg</file>
         <file>img/tube.svg</file>
-        <file>img/icon-cover.png</file>
-        <file>img/flower.svg</file>
-        <file>jctl/unsolvable1.jctl</file>
-        <file>jctl/unsolvable2.jctl</file>
-        <file>jctl/difficult1.jctl</file>
     </qresource>
 </RCC>

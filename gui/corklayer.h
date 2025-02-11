@@ -36,8 +36,8 @@ private:
 
     QImage   m_drawImage;
     bool     m_visible = false;
-    qreal    m_alpha = 0.0;
-    qreal    m_alphaIncrement;
+    qreal    m_opacity = 0.0;
+    qreal    m_opacityIncrement;
     qreal    m_currentY = 0;
     bool     m_animated = false;
 };

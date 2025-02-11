@@ -29,7 +29,7 @@ public:
     quint8  getRandomColor();
 
 private:
-    quint8 *m_items;
+    quint8 * m_items;
 };
 
 #endif // USEDCOLORS_H

@@ -11,6 +11,7 @@
 #include "bottlelayer.h"
 #include "colorslayer.h"
 #include "shadelayer.h"
+#include "arrowitem.h"
 
 TubeItem::TubeItem(QQuickItem * parent, TubeModel * tm) :
     QQuickItem(parent),
@@ -128,8 +129,7 @@ bool TubeItem::isSelected()
 void TubeItem::setZ(qreal newZ)
 {
     QQuickItem::setZ(newZ);
-    if (m_board)
-        emit m_board->busyChanged();
+    m_board->childrenZChanged();
 }
 
 void TubeItem::refresh()
@@ -142,10 +142,7 @@ void TubeItem::setShade(int newShade)
 {
     if (m_shade->shade() == newShade || isFlyed())
         return;
-
     m_shade->setShade(newShade);
-    if (newShade != 0)
-        m_shade->startShow();
 }
 
 void TubeItem::setSelected(bool value)
@@ -193,6 +190,16 @@ void TubeItem::setClosed(bool value)
     }
     m_cork->setVisible(value);
     m_closed = value;
+}
+
+void TubeItem::setShadeBlinked(bool value)
+{
+    m_shade->setBlinked(value);
+}
+
+void TubeItem::hideShadeImmediately()
+{
+    m_shade->hideImmediately();
 }
 
 quint8 TubeItem::currentColor()
@@ -261,18 +268,18 @@ void TubeItem::startAnimation() {
     if (m_timer->isActive())
         m_timer->stop();
 
-    m_moveIncrement.setX( (m_endPoint.x() - m_startPoint.x()) / steps);
-    m_moveIncrement.setY( (m_endPoint.y() - m_startPoint.y()) / steps);
-    m_angleIncrement = ( m_endAngle - m_startAngle ) / steps;
+    m_moveIncrement.setX( (m_endPoint.x() - m_startPoint.x()) / m_steps);
+    m_moveIncrement.setY( (m_endPoint.y() - m_startPoint.y()) / m_steps);
+    m_angleIncrement = ( m_endAngle - m_startAngle ) / m_steps;
     m_timer->start(CT_TIMER_TICKS);
 }
 
 void TubeItem::nextFrame()
 {
-    if (steps > 0) {
+    if (m_steps > 0) {
 
         if (currentStageId == CT_STAGE_POUR_OUT) {
-            setAngle(CtGlobal::images().tiltAngle(m_endAngleNumber + steps)
+            setAngle(CtGlobal::images().tiltAngle(m_endAngleNumber + m_steps)
                      * CtGlobal::sign(m_currentAngle));
             if (m_recipient)
                 m_recipient->addFillArea();
@@ -282,10 +289,10 @@ void TubeItem::nextFrame()
         }
 
         setCurrentPosition(m_currentPosition + m_moveIncrement);
-        steps --;
+        m_steps --;
 
     } else {
-        steps = 0;
+        m_steps = 0;
         m_timer->stop();
 
         if (!qFuzzyIsNull(m_angleIncrement))
@@ -323,13 +330,15 @@ void TubeItem::regularTube()
 
     setWidth(CtGlobal::images().tubeWidth());
     setHeight(CtGlobal::images().tubeFullHeight());
+    m_shade->setY(CtGlobal::images().shiftHeight());
     setClip(true);
     setZ(0);
-    m_shade->setY(CtGlobal::images().shiftHeight());
 
-    if (m_board->selectedTube()
-            && canPutColor(m_board->selectedTube()->currentColor()))
-        showAvailable(true);
+    if (CtGlobal::gameMode() == CT_PLAY_MODE) {
+        if (m_board->selectedTube()
+                && canPutColor(m_board->selectedTube()->currentColor()))
+            showAvailable(true);
+    }
 }
 
 void TubeItem::moveUp()
@@ -343,7 +352,7 @@ void TubeItem::moveUp()
                          m_regularPosition.y() - CtGlobal::images().shiftHeight());
     m_startAngle = 0.0;
     m_endAngle = 0.0;
-    steps = CT_TUBE_STEPS_UP;
+    m_steps = CT_TUBE_STEPS_UP;
 
     nextStageId = CT_STAGE_SELECT;
     startAnimation();
@@ -358,7 +367,7 @@ void TubeItem::moveDown()
     m_endPoint = m_regularPosition;
     m_startAngle = m_currentAngle;
     m_endAngle = 0.0;
-    steps = CT_TUBE_STEPS_DOWN;
+    m_steps = CT_TUBE_STEPS_DOWN;
 
     nextStageId = CT_STAGE_DEFAULT;
     startAnimation();
@@ -405,10 +414,10 @@ void TubeItem::flyTo(TubeItem * tubeTo)
                          tubeTo->m_currentPosition.y()
                              - CtGlobal::images().shiftHeight() * 2);
 
-    steps = CT_TUBE_STEPS_FLY;
+    m_steps = CT_TUBE_STEPS_FLY;
     nextStageId = CT_STAGE_POUR_OUT;
 
-    setZ(m_board->maxZ() + 1);
+    setZ(m_board->maxChildrenZ() + 1);
     startAnimation();
 }
 
@@ -425,7 +434,7 @@ void TubeItem::pourOut()
     m_endAngle = CtGlobal::images().tiltAngle(m_endAngleNumber)
             * CtGlobal::sign(m_currentAngle);
 
-    steps = CT_TUBE_STEPS_POUR * m_pouringCells;
+    m_steps = CT_TUBE_STEPS_POUR * m_pouringCells;
 
     nextStageId = CT_STAGE_BACK;
     startAnimation();
@@ -440,7 +449,7 @@ void TubeItem::flyBack()
     m_endPoint = m_regularPosition;
     m_startAngle = m_currentAngle;
     m_endAngle = 0.0;
-    steps = CT_TUBE_STEPS_BACK;
+    m_steps = CT_TUBE_STEPS_BACK;
 
     nextStageId = CT_STAGE_DEFAULT;
     startAnimation();
@@ -466,11 +475,10 @@ void TubeItem::removeConnectedTube(TubeItem * tubeFrom)
     if (tubeFrom->m_recipient != this)
         return;
 
-    CtGlobal::game().addNewMove(*tubeFrom->model(), *this->model());
+    m_board->newMove(tubeFrom, this);
     for (int i = 0; i < tubeFrom->m_pouringCells; i++) {
         m_model->putColor(tubeFrom->model()->extractColor());
     }
-    emit CtGlobal::game().movesChanged();
 
     m_pouringCells -= tubeFrom->m_pouringCells;
     tubeFrom->m_pouringCells = 0;
@@ -495,5 +503,30 @@ void TubeItem::addFillArea()
     m_colors->addFillArea(CtGlobal::images().colorArea() / CT_TUBE_STEPS_POUR, m_fillingColor);
 }
 
+void TubeItem::connectArrow(ArrowItem * arrow)
+{
+    if (arrow) {
+        m_arrow = arrow;
+        m_arrow->setConnectedTube(this);
+        m_arrow->setX(m_regularPosition.x());
+        m_arrow->setY(m_regularPosition.y() - CtGlobal::images().shiftArrow());
+        m_arrow->setVisible(false);
+        m_shade->setBlinked(false);
+        if (m_arrow == m_board->m_arrowOut)
+            m_shade->setShade(1);
+        else if (m_arrow == m_board->m_arrowIn)
+            m_shade->setShade(2);
+    }
+}
 
+void TubeItem::removeArrow()
+{
+    if (m_arrow) {
+        m_shade->setShade(0);
+        m_shade->setBlinked(false);
+        m_arrow->setVisible(false);
+        m_arrow->setConnectedTube(nullptr);
+        m_arrow = nullptr;
+    }
+}
 

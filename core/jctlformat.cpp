@@ -344,15 +344,25 @@ bool JctlFormat::checkTubes()
 
 void JctlFormat::storeGame()
 {
-    storeGame(CtGlobal::board());
+    storeGame(CtGlobal::board(), CtGlobal::game().mode());
+}
+
+void JctlFormat::storeGame(quint32 gameMode)
+{
+    storeGame(CtGlobal::board(), gameMode);
 }
 
 void JctlFormat::storeGame(BoardModel * boardModel)
 {
+    storeGame(boardModel, CtGlobal::game().mode());
+}
+
+void JctlFormat::storeGame(BoardModel * boardModel, quint32 gameMode)
+{
     if (!boardModel)
         return;
 
-    m_gameMode = CtGlobal::game().mode();
+    m_gameMode = gameMode;
     m_level = boardModel->level();
 
     m_tubesCount = boardModel->tubesCount();
@@ -360,23 +370,29 @@ void JctlFormat::storeGame(BoardModel * boardModel)
     m_storedTubes->clear();
     for (quint16 i = 0; i < m_tubesCount; i++)
         m_storedTubes->append(boardModel->tubeAt(i)->store());
-
-    m_movesCount = 0;
-    m_movesDone = 0;
-    m_storedMoves->clear();
 }
 
 void JctlFormat::storeMoves()
 {
-    storeMoves(CtGlobal::moves());
+    storeMoves(CtGlobal::moves(), CtGlobal::moves()->size());
+}
+
+void JctlFormat::storeMoves(quint16 movesCount)
+{
+    storeMoves(CtGlobal::moves(), movesCount);
 }
 
 void JctlFormat::storeMoves(MoveItems * moves)
 {
+    storeMoves(moves, moves->size());
+}
+
+void JctlFormat::storeMoves(MoveItems * moves, quint16 movesCount)
+{
     if (!moves)
         return;
 
-    m_movesCount = moves->size();
+    m_movesCount = movesCount;
     m_movesDone = 0;
     m_storedMoves->clear();
     for (quint16 i = 0; i < m_movesCount; i++)

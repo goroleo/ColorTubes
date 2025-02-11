@@ -44,6 +44,9 @@ Notes:
        be staying empty after fills the rest.
        In any other case EmptyTubesCount must be zero.
 
+       But I decide not to use manual fill mode in mobile version of
+       this game.
+
     3) MovesCount is the count of all stored MOVES, done or calculated.
 
     4) MovesDone works when the game is in the ASSIST_MODE. In this
@@ -60,9 +63,10 @@ Notes:
 
     7) CRC ver.1 was stupid alot, so in ver.2 it was replaced with the
        16-bit Modbus RTU checksum algorithm.
-       In ver.3 I going to replace Modbus CRC with CRC32 algorithm. Just
-       because Solver uses CRC32 to hash GameBoards (modbus ), and it would be a
-       shame to use that table only once. :)
+
+       In ver.3 I replaced Modbus CRC with CRC32 algorithm. Just because
+       Solver uses CRC32 to hash GameBoards (16-bit modbus doesn't fit),
+       and it would be a shame to use that table only once. :)
 
     8) JCTL ver.2 and JCTL ver.3 are absolutely the same format, they
        differ only in the CRC field.
@@ -77,14 +81,23 @@ public:
     ~JctlFormat();
 
     void storeGame();
+    void storeGame(quint32 gameMode);
     void storeGame(BoardModel *boardModel);
+    void storeGame(BoardModel *boardModel, quint32 gameMode);
+
     void storeMoves();
+    void storeMoves(quint16 movesCount);
     void storeMoves(MoveItems *moves);
+    void storeMoves(MoveItems *moves, quint16 movesCount);
+
     void restoreGame();
     void restoreGame(BoardModel *boardModel);
     void restoreMoves();
     void restoreMoves(MoveItems *moves);
+
     int  level() {return m_level;}
+    int  gameMode() {return m_gameMode;}
+    int  movesDone() {return m_movesDone;}
 
     bool read(QByteArray &bufferFrom);
     bool write(QByteArray &bufferTo);

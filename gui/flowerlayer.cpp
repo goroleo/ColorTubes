@@ -22,7 +22,6 @@ FlowerLayer::FlowerLayer(QQuickItem * parent) :
 
 FlowerLayer::~FlowerLayer()
 {
-    disconnectFromSvg();
     if (m_painter)
         delete m_painter;
     if (m_drawImage)

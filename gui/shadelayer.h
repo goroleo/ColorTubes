@@ -17,24 +17,21 @@ public:
 
     bool        isVisible();
     int         shade();
-    bool        pulse();
+    bool        isBlinked();
 
     void        startShow();
     void        startHide();
-    void        hideImmediately();
     void        showImmediately();
-    void        startPulse();
-    void        stopPulse();
+    void        hideImmediately();
+    void        startBlink();
+    void        stopBlink();
 
     void        setShade(int newShadeNumber);
     void        setShadeAfterHide(int newShadeNumber);
 
-    void        setPulse(bool value);
+    void        setBlinked(bool value);
     void        setAnimated(bool value);
     bool        isAnimated() {return m_animated;}
-
-signals:
-    void        pulseChanged(const bool newPulse);
 
 private slots:
     void        onScaleChanged();
@@ -47,10 +44,11 @@ private:
     quint8      m_shadeNumber = 0;
     quint8      m_shadeAfterHiding = 0;
     bool        m_visible = false;
-    bool        m_pulse = false;
+    bool        m_blinken = false;  // in the name of the Secretary of States )
+    bool        m_blinkStopped = false;
 
-    qreal       m_alpha = 0;
-    qreal       m_alphaIncrement;
+    qreal       m_opacity = 0.0;
+    qreal       m_opacityIncrement;
     QTimer    * m_timer;
 
     QImage      m_shadeImage;

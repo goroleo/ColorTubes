@@ -31,7 +31,7 @@ CtIo & CtIo::instance()
 void CtIo::initialize()
 {
 /*
-    // Aurora's predefined dirs
+    // Aurora's predefined pathes
     qDebug() << "app filesDir(false)" << Aurora::Application::filesDir(false).path();
     qDebug() << "app filesDir(true)"  << Aurora::Application::filesDir(true).path();
     qDebug() << "app cacheDir(false)" << Aurora::Application::cacheDir(false).path();
@@ -65,7 +65,7 @@ bool CtIo::tempFileExists()
     return QFile::exists(tempFileName());
 }
 
-void CtIo::tempFileDelete()
+void CtIo::deleteTempFile()
 {
     if (tempFileExists())
         QFile::remove(tempFileName());

@@ -41,10 +41,11 @@ ColorsLayer::ColorsLayer(TubeItem * parent) :
 
 ColorsLayer::~ColorsLayer()
 {
-    if (m_drawImage) {
+    if (m_painter)
         delete m_painter;
+    if (m_drawImage)
         delete m_drawImage;
-    }
+
     delete [] tubeVertices;
     delete [] bottleLines;
     delete [] tubeSlices;

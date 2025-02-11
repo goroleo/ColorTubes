@@ -2,14 +2,10 @@
 import Sailfish.Silica 1.0
 
 Rectangle {
-    id: msgPanel
+    id: aboutPanel
 
-    signal accepted
-    signal rejected
+    signal closed
 
-    property string caption: qsTr("#ColorTubes")
-    property string messageText: qsTr("#someMessage")
-    property string buttonText: qsTr("Ok")
     property color dialogColor: "#1c1127"
 
     width: parent.width
@@ -28,9 +24,9 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            console.log("Message panel pressed. Answer is negative.")
-            msgPanel.enabled = false
-            msgPanel.rejected()
+            console.log("About panel pressed.")
+            aboutPanel.enabled = false
+            aboutPanel.closed()
         }
     }
 
@@ -80,7 +76,7 @@ Rectangle {
 
                     Text {
                         id: msgCaptionText
-                        text: caption
+                        text: qsTr("#ColorTubes")
                         color: Theme.highlightColor
                         anchors.centerIn: parent
                         font.family: Theme.fontFamilyHeading
@@ -111,20 +107,52 @@ Rectangle {
                             btnCloseIcon.highlighted = pressed;
                         }
                         onClicked: {
-                            console.log("Close button pressed. Answer is negative.")
-                            msgPanel.enabled = false
-                            msgPanel.rejected()
+                            console.log("Close button pressed.")
+                            aboutPanel.enabled = false
+                            aboutPanel.closed()
                         }
                     }
                 }
             }
 
-            Text {
+            Rectangle {
                 id: msgTextArea
                 width: parent.width
-                text: messageText
-                color: Theme.lightPrimaryColor
-                wrapMode: Text.WordWrap
+                height: abText.height
+                color: dialogColor
+
+                Column {
+                    id: abText
+                    width: parent.width
+                    spacing: Theme.paddingLarge
+
+                    Text {
+                        id: abText1
+                        text: qsTr("#aboutText1")
+                        wrapMode: Text.WordWrap
+                        color: Theme.lightPrimaryColor
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                    }
+                    Text {
+                        id: abText2
+                        text: qsTr("#aboutText2")
+                        wrapMode: Text.WordWrap
+                        color: Theme.rgba(Theme.lightPrimaryColor, 0.75)
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        font.pointSize: Theme.fontSizeTinyBase
+                    }
+                    Text {
+                        id: abText3
+                        text: qsTr("#aboutText3")
+                        wrapMode: Text.WordWrap
+                        color: Theme.rgba(Theme.lightPrimaryColor, 0.75)
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        font.pointSize: Theme.fontSizeTinyBase
+                    }
+                }
             }
 
             Button {
@@ -133,13 +161,13 @@ Rectangle {
                 anchors.leftMargin: Theme.horizontalPageMargin
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
-                text: buttonText
+                text: qsTr("Ok")
                 color: Theme.darkPrimaryColor
                 backgroundColor: Theme.highlightBackgroundColor
                 onClicked: {
-                    console.log("Message button pressed. Answer is positive.")
-                    msgPanel.enabled = false
-                    msgPanel.accepted()
+                    console.log("Message button pressed")
+                    aboutPanel.enabled = false
+                    aboutPanel.closed()
                 }
             }
         }
