@@ -9,7 +9,6 @@
 #   - icon definition filename in desktop file must be changed
 #   - translation filenames have to be changed
 
-# The name of your application
 TARGET = com.me.legoru.ColorTubes
 
 CONFIG += \
@@ -41,7 +40,7 @@ SOURCES += \
     src/game.cpp
 
 DISTFILES += \
-    rpm/$${TARGET}.spec \
+    rpm/com.me.legoru.ColorTubes.spec \
     qml/com.me.legoru.ColorTubes.qml \
     qml/cover/CoverPage.qml \
     qml/items/AboutPanel.qml \
