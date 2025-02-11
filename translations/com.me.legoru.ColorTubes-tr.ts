@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>#aboutText1</source>
-        <translation>AuroraOS 4 için Renkli tüpler</translation>
+        <translation>Aurora OS için Renkli tüpler</translation>
     </message>
     <message>
         <source>#aboutText2</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>#aboutText3</source>
-        <translation>(Uygulama ayarları burada olacak)</translation>
+        <translation>© Lionet Entertainment, 2025</translation>
     </message>
     <message>
         <source>Ok</source>

@@ -41,6 +41,7 @@ SOURCES += \
     src/game.cpp
 
 DISTFILES += \
+    rpm/$${TARGET}.spec \
     qml/com.me.legoru.ColorTubes.qml \
     qml/cover/CoverPage.qml \
     qml/items/AboutPanel.qml \
@@ -48,9 +49,6 @@ DISTFILES += \
     qml/items/IconButtonItem.qml \
     qml/items/MessagePanel.qml \
     qml/pages/MainPage.qml \
-    rpm/com.me.legoru.ColorTubes.changes.in \
-    rpm/com.me.legoru.ColorTubes.changes.run.in \
-    rpm/com.me.legoru.ColorTubes.spec \
     translations/*.ts \
     com.me.legoru.ColorTubes.desktop
 

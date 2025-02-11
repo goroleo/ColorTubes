@@ -13,15 +13,15 @@
     </message>
     <message>
         <source>#aboutText1</source>
-        <translation>Цветные пробирки для AuroraOS 4</translation>
+        <translation>Цветные пробирки для AuroraOS</translation>
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Любые замечания, вопросы и пожелания: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Замечания, вопросы и пожелания: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
     </message>
     <message>
         <source>#aboutText3</source>
-        <translation>Поддержать проект:&lt;br&gt;2204 2402 0059 5207 (Ozon)</translation>
+        <translation>© Lionet Entertainment, 2025</translation>
     </message>
 </context>
 <context>

@@ -2,20 +2,26 @@
 Type=Application
 X-Nemo-Application-Type=silica-qt5
 Icon=com.me.legoru.ColorTubes
+Exec=/usr/bin/com.me.legoru.ColorTubes
 Name=Color Tubes
 Name[en]=Color Tubes
 Name[ru]=Цветные пробирки
 Name[tr]=Renkli tüpler
 
-Exec=/usr/bin/com.me.legoru.ColorTubes
-# Exec=/usr/bin/sailjail -p ColorTubes.desktop /usr/bin/ColorTubes
-
+########################################################
+#           for AuroraOS 4
 [X-Sailjail]
-# Permissions=Audio;Calendar;Documents;Email;Music;UserDirs
+Permissions=
 OrganizationName=com.me.legoru
 ApplicationName=ColorTubes
 
-######### reserved for Aurora 5
+########################################################
+#           for AuroraOS 5
+# [X-Application]
+# Permissions=
+# OrganizationName=com.me.legoru
+# ApplicationName=ColorTubes
+
 # [X-Aurora-Application]
 # Orientation=Portrait;PortraitInverted
 # IconMode=Crop

@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>#aboutText1</source>
-        <translation>ColorTubes for Aurora OS 4</translation>
+        <translation>ColorTubes for Aurora OS</translation>
     </message>
     <message>
         <source>#aboutText2</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>#aboutText3</source>
-        <translation>(Application settings will be here)</translation>
+        <translation>© Lionet Entertainment, 2025</translation>
     </message>
 </context>
 <context>
