@@ -92,7 +92,7 @@ void ShadeLayer::startBlink()
         m_blinkStopped = false;
         m_visible = true;
         m_opacityIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
-        m_timer->start(CT_TIMER_BLINK_TICKS);
+        m_timer->start(CT_BLINK_TICKS);
     }
 }
 

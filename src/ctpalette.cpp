@@ -70,12 +70,13 @@ void CtPalette::setDefault()
     m_items[3]  = 0xff8eaf00;
     m_items[4]  = 0xff737f8c;
     m_items[5]  = 0xff067606;
-    m_items[6]  = 0xff3632de;
+    m_items[6]  = 0xff3934f9;
     m_items[7]  = 0xfff36d00;
     m_items[8]  = 0xffaf008f;
     m_items[9]  = 0xffe60f04;
     m_items[10] = 0xffff7abc;
     m_items[11] = 0xffffeb04;
+//    m_items[12] = 0xff34538b;
 }
 
 bool CtPalette::load()

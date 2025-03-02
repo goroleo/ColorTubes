@@ -14,7 +14,7 @@ Rectangle {
     Behavior on opacity {
         NumberAnimation {
             duration: 200
-            easing.type: Easing.InOutQuad
+            easing.type: Easing.Linear
         }
     }
 
@@ -31,13 +31,13 @@ Rectangle {
         height: ( width / badge.sourceSize.width ) * badge.sourceSize.height
         anchors.centerIn: parent
 
-        scale: parent.enabled ? 1.0 : 0.0
-        Behavior on scale {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutBack
-            }
-        }
+//        scale: parent.enabled ? 1.0 : 0.0
+//        Behavior on scale {
+//            NumberAnimation {
+//                duration: 200
+//                easing.type: Easing.InOutQuad
+//            }
+//        }
 
         Image {
             id: badge

@@ -78,7 +78,10 @@ void GameBoard::childrenZChanged()
     m_busy = (maxChildrenZ() != 0);
     if (oldBusy != m_busy) {
         emit busyChanged();
-        if (!m_busy) showMove();
+        if (!m_busy) {
+            showMove();
+            CtGlobal::game().checkSolved();
+        }
     }
 }
 

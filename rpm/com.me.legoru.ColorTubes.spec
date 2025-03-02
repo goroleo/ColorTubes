@@ -2,7 +2,7 @@ Name:       com.me.legoru.ColorTubes
 
 Summary:    ColorTubes
 Version:    0.9
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    MIT
 URL:        https://github.com/goroleo/ColorTubes
@@ -15,7 +15,7 @@ BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 
 %description
-Color sorting game for Aurora OS
+Color sort game for Aurora OS
 
 %prep
 %autosetup

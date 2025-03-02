@@ -75,7 +75,7 @@ Page {
             IconButtonItem {
                 id: btnStartAgain
                 source: "qrc:/img/icon-star.svg"
-                enabled: Game.movesMade
+                enabled: Game.movesMade && !(Game.level == 1)
                 onClicked: {
                     console.log("[StartAgain] button clicked.")
                     questionNumber = 1
@@ -119,6 +119,7 @@ Page {
             IconButtonItem {
                 id: btnSetings
                 source: "qrc:/img/icon-gear.svg"
+                enabled: ! (Game.level == 1)
                 onClicked: {
                     console.log("[Settings] button clicked.")
                     board.hideSelection()

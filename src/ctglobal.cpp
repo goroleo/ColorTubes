@@ -15,9 +15,9 @@ extern CtPalette m_palette;
 
 void CtGlobal::create()
 {
-    m_io.create();      // IO must be first
-    m_palette.create(); // Palette must be after IO and before Game
-    m_images.create();  // TubeImages must be after IO and before Game
+    m_io.create();
+    m_palette.create();
+    m_images.create();
 }
 
 void CtGlobal::destroy()

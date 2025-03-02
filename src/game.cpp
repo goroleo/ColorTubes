@@ -67,6 +67,15 @@ void Game::initialize()
 
     if (!loaded)
         newLevel();
+
+    if (level() == 1) {
+        Solver solver;
+        solver.start(m_board);
+        for (int i = 0; i < solver.moves()->size(); ++i)
+            m_moves->append(new MoveItem(solver.moves()->at(i)->stored()));
+        solver.clear();
+        startAssistMode();
+    }
 }
 
 void Game::onApplicationStateChanged()
@@ -172,6 +181,11 @@ void Game::newLevel()
         filledTubes = 9;
         emptyTubes = 2;
     } else {
+//        qDebug() << "level" << levelNumber << "% 50" << (levelNumber % 50) << "& 1" << (levelNumber & 1);
+//        if ((levelNumber % 50) == 0) {
+//            filledTubes = 13;
+//            emptyTubes = 2;
+//        } else
         if (levelNumber & 1) {
             filledTubes = 9;
             emptyTubes = 2;
@@ -188,15 +202,6 @@ void Game::newLevel()
     m_movesDone = 0;
     emit movesChanged();
     saveTemporary();
-
-    if (levelNumber == 1) {
-        Solver solver;
-        solver.start(m_board);
-        for (int i = 0; i < solver.moves()->size(); ++i)
-            m_moves->append(new MoveItem(solver.moves()->at(i)->stored()));
-        solver.clear();
-        startAssistMode();
-    }
 }
 
 
