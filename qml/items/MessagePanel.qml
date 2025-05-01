@@ -11,6 +11,7 @@ Rectangle {
     property string messageText: qsTr("#someMessage")
     property string buttonText: qsTr("Ok")
     property color dialogColor: "#1c1127"
+    readonly property int dialogWidth: Math.min(width, height)
 
     width: parent.width
     height: parent.height
@@ -38,7 +39,7 @@ Rectangle {
         id: msgBox
 
         radius: Theme.horizontalPageMargin
-        width: parent.width - Theme.paddingLarge * 2
+        width: dialogWidth - Theme.paddingLarge * 2
         height: Theme.horizontalPageMargin * 2 + Theme.paddingLarge * 4
                 + msgButton.height + msgTextArea.height + msgCaptionArea.height
         anchors.centerIn: parent

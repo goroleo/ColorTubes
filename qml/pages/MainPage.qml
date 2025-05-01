@@ -8,7 +8,7 @@ import "../items/"
 
 Page {
     id: page
-    allowedOrientations: Orientation.Portrait
+    allowedOrientations: Orientation.All
     property int questionNumber     // a.k.a. Question Number
 
     function showCongratsPanel() {
@@ -64,13 +64,11 @@ Page {
 
         Row {
             id: topMenu
-            width: parent.width - Theme.horizontalPageMargin * 2
+            anchors.horizontalCenter: parent.horizontalCenter
             height: btnStartAgain.height
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.horizontalPageMargin
             anchors.top: parent.top
             anchors.topMargin: Theme.paddingLarge
-            spacing: (width - (Theme.iconSizeMedium * 4)) / 3
+            spacing: 100 // Theme.iconSizeMedium * 4 + 100 * 3 < width
 
             IconButtonItem {
                 id: btnStartAgain
@@ -149,7 +147,8 @@ Page {
             id: board
             anchors.top: levelNumber.bottom
             anchors.bottom: parent.bottom
-            width: parent.width
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: isLandscape ? parent.height : parent.width
             enabled: true
         }
 
