@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QJsonDocument>
+#include <QStandardPaths>
 
 CtIo * CtIo::m_instance = nullptr;
 
