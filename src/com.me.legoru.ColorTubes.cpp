@@ -1,11 +1,18 @@
 #include <QtQuick>
-#include "auroraapp.h"
+
+#ifdef SAILFISH_OS
+    #include <sailfishapp.h>
+#else
+    #include "auroraapp.h"
+#endif
 
 #include "src/game.h"
 #include "gui/gameboard.h"
 #include "gui/flowerlayer.h"
 
+#ifndef SAILFISH_OS
 using namespace Aurora;
+#endif
 
 static QObject *gameInstance(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
@@ -20,12 +27,23 @@ int main(int argc, char *argv[])
     qmlRegisterType <GameBoard> ("GameBoard", 1, 0, "GameBoard");
     qmlRegisterType <FlowerLayer> ("FlowerLayer", 1, 0, "FlowerLayer");
 
-    QScopedPointer<QGuiApplication> app(Application::application(argc, argv));
+    #ifdef SAILFISH_OS
+        QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    #else
+        QScopedPointer<QGuiApplication> app(Application::application(argc, argv));
+    #endif
+
     app->setApplicationName("ColorTubes");
     app->setOrganizationName("com.me.legoru");
 
-    QScopedPointer<QQuickView> view(Application::createView());
-    view->setSource(Application::pathToMainQml());
+    #ifdef SAILFISH_OS
+        QScopedPointer<QQuickView> view(SailfishApp::createView());
+        view->setSource(SailfishApp::pathToMainQml());
+    #else
+        QScopedPointer<QQuickView> view(Application::createView());
+        view->setSource(Application::pathToMainQml());
+    #endif
+
     view->showFullScreen();
     return app->exec();
 }

@@ -1,5 +1,9 @@
 #include "ctio.h"
-#include "auroraapp.h"
+#ifdef SAILFISH_OS
+    #include <sailfishapp.h>
+#else
+    #include "auroraapp.h"
+#endif
 
 #include <QIODevice>
 #include <QDebug>
@@ -47,7 +51,11 @@ void CtIo::initialize()
     qDebug() << "static org pathTo(\"\")" << Aurora::Application::organizationPathTo("").path();
 
 */
-    m_dir = Aurora::Application::filesDir(false);
+    #ifdef SAILFISH_OS
+        m_dir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    #else
+       m_dir = Aurora::Application::filesDir(false);
+    #endif
 
     if (!m_dir.exists()) {
         m_dir.mkpath(m_dir.path());

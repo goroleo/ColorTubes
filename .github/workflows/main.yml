@@ -1,0 +1,102 @@
+name: Color Tubes build
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+env:
+  RELEASE: 4.2.0.21
+
+jobs:
+#  build-test:
+#    name: Build & Run tests
+#    runs-on: ubuntu-24.04
+#
+#    steps:
+#      - uses: actions/checkout@v2                                 # checkout the repo
+#
+#      - name: Install qmltestrunner                               # install required qmltestrunner packages
+#        run: |
+#          sudo apt-get update -y
+#          sudo apt-get install -y qtdeclarative5-dev-tools qml-module-qtquick-localstorage
+#          sudo apt-get install -y qml-module-qtquick-controls qml-module-qttest qt5-qmake
+#          sudo apt-get install -y libqt5test5 qtbase5-dev qtdeclarative5-dev
+#
+#      - name: Run QML / C++ Tests
+#        run: |
+#          set -x
+#          # cd test/qml
+#          # ./runTests.sh
+#          # ./fixJunit.sh
+#          # cd ..
+#          cd test/cpp
+#          # sudo timedatectl set-timezone Europe/Berlin
+#          ./runTests.sh
+#          ./fixJunit.sh
+#
+#      - name: Test Report
+#        uses: dorny/test-reporter@v1.9.1
+#        if: success() || failure()                                # run this step even if previous step failed
+#        with:
+#          name: QML/C++ Tests                                     # Name of the check run which will be created
+#          path: test/qml/*.xml,test/cpp/*.xml                     # Path to test results
+#          reporter: jest-junit                                    # Format of test results - because junit cannot be generated
+
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Prepare
+        run: mkdir output
+
+      - name: Build armv7hl
+        run: docker run --rm --privileged -v $PWD:/share coderus/sailfishos-platform-sdk:$RELEASE /bin/bash -c "
+          cd /home/mersdk ;
+          mkdir -p build ;
+          cd build ;
+          cp -r /share/* . ;
+          mb2 -t SailfishOS-$RELEASE-armv7hl build ;
+          sudo cp -r RPMS/*.rpm /share/output"
+
+      - name: Build i486
+        run: docker run --rm --privileged -v $PWD:/share coderus/sailfishos-platform-sdk:$RELEASE /bin/bash -c "
+          cd /home/mersdk ;
+          mkdir -p build ;
+          cd build ;
+          cp -r /share/* . ;
+          mb2 -t SailfishOS-$RELEASE-i486 build ;
+          sudo cp -r RPMS/*.rpm /share/output"
+
+      - name: Build aarch64
+        run: docker run --rm --privileged -v $PWD:/share coderus/sailfishos-platform-sdk:$RELEASE /bin/bash -c "
+          cd /home/mersdk ;
+          mkdir -p build ;
+          cd build ;
+          cp -r /share/* . ;
+          mb2 -t SailfishOS-$RELEASE-aarch64 build ;
+          sudo cp -r RPMS/*.rpm /share/output"
+
+      - name: Upload build result
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-rpms
+          path: output
+
+      - name: Create release
+        if: contains(github.ref, 'release')
+        run: |
+          set -x
+          assets=()
+          for asset in output/*.rpm; do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
