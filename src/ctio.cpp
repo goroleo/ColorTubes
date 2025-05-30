@@ -1,6 +1,7 @@
 #include "ctio.h"
 #ifdef SAILFISH_OS
     #include <sailfishapp.h>
+    #include <QStandardPaths>
 #else
     #include "auroraapp.h"
 #endif
@@ -9,7 +10,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QJsonDocument>
-#include <QStandardPaths>
 
 CtIo * CtIo::m_instance = nullptr;
 
