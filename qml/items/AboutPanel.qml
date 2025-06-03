@@ -152,6 +152,15 @@ Rectangle {
                         width: parent.width
                         font.pointSize: Theme.fontSizeTinyBase
                     }
+                    Text {
+                        id: abText4
+                        text: qsTr("#aboutText4")
+                        wrapMode: Text.WordWrap
+                        color: Theme.rgba(Theme.lightPrimaryColor, 0.75)
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        font.pointSize: Theme.fontSizeTinyBase
+                    }
                 }
             }
 

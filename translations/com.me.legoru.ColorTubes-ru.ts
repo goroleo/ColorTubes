@@ -23,6 +23,10 @@
         <source>#aboutText3</source>
         <translation>© Lionet Entertainment, 2025</translation>
     </message>
+    <message>
+        <source>#aboutText4</source>
+        <translation type="unfinished">Sailfish OS Adaption: Andreas Wüst</translation>
+    </message>
 </context>
 <context>
     <name>CongratsPanel</name>

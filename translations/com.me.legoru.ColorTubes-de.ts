@@ -17,18 +17,22 @@
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Any issues, requests or suggests: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Für Fehler, Anfragen oder Vorschläge: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
     </message>
     <message>
         <source>#aboutText3</source>
         <translation>© Lionet Entertainment, 2025</translation>
+    </message>
+    <message>
+        <source>#aboutText4</source>
+        <translation>Sailfish OS Anpassungen: Andreas Wüst</translation>
     </message>
 </context>
 <context>
     <name>CongratsPanel</name>
     <message>
         <source>#victory</source>
-        <translation>Victory!</translation>
+        <translation>Gewonnen!</translation>
     </message>
 </context>
 <context>
@@ -42,11 +46,11 @@
     <name>MainPage</name>
     <message>
         <source>#wantToStartAgain</source>
-        <translation>Do you want to start this level again?</translation>
+        <translation>Möchtest du den Level noch einmal von vorne beginnen?</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Yes</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>#level</source>
@@ -54,11 +58,11 @@
     </message>
     <message>
         <source>#wantToStartAssistMode</source>
-        <translation>Solution search completed successfully.&lt;br&gt;Do you want to switch to assistant mode?</translation>
+        <translation>Lösungssuche erfolgreich beendet.&lt;br&gt;Möchtest du in den assistierten Modus wechseln?</translation>
     </message>
     <message>
         <source>#solutionIsNotFound</source>
-        <translation>The game solution was not found.&lt;br&gt;Try to undo some previous moves or start this level over again.</translation>
+        <translation>Kein Lösung für das Spiel gefunden.&lt;br&gt;Versuche ein paar Züge rückgängig zu machen oder beginne den Level von vorne.</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -66,7 +70,7 @@
     </message>
     <message>
         <source>#wantToEndAssistMode</source>
-        <translation>The assistant offers you to choose another tube. However, you can refuse and continue the game without the assistant.&lt;br&gt;Do you want to end the assistant mode?</translation>
+        <translation>Der assistierte Modus bietet dir die nächste Glasröhre zur Auswahl an. Du kannst die Auswahl jedoch ablehnen und weiterspielen, ohne Hilfe.&lt;br&gt;Möchtest du den assistierten Modus beenden?</translation>
     </message>
 </context>
 <context>
