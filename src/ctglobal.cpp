@@ -62,6 +62,10 @@ quint32 CtGlobal::gameMode()
     return m_game.instance().mode();
 }
 
+bool CtGlobal::isLightTheme()
+{
+    return m_game.instance().isLightTheme();
+}
 
 QString CtGlobal::paletteFileName()
 {

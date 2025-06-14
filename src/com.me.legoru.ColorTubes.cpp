@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     app->setOrganizationName("com.me.legoru");
 
     QScopedPointer<QQuickView> view(Application::createView());
+    view->rootContext()->setContextProperty("version", APP_VERSION);
     view->setSource(Application::pathToMainQml());
     view->showFullScreen();
     return app->exec();

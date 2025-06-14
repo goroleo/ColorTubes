@@ -9,8 +9,8 @@ FlowerLayer::FlowerLayer(QQuickItem * parent) :
 {
     m_source = new QSvgRenderer(QLatin1String(":/img/flower.svg"));
 
-    QObject::connect(qGuiApp, &QGuiApplication::applicationStateChanged,
-            this, &FlowerLayer::onApplicationStateChanged);
+//    QObject::connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+//            this, &FlowerLayer::onApplicationStateChanged);
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, [=](){
@@ -68,6 +68,8 @@ void FlowerLayer::setOpacity(qreal newOpacity)
         return;
     m_opacity = newOpacity;
     applyOpacity();
+    if (m_frameImage)
+        paintFrame();
 }
 
 void FlowerLayer::applyOpacity()
@@ -99,26 +101,34 @@ void FlowerLayer::applyOpacity()
 
 void FlowerLayer::onParentOpacityChanged()
 {
+/*
     if (parentItem() && !qFuzzyIsNull(parentItem()->opacity())) {
+        setOpacity(parentItem()->opacity());
         if (!m_timer->isActive())
             m_timer->start(CT_FLOWER_TICKS);
     } else {
         m_timer->stop();
     }
+*/
+
+//    if (parentItem())
+//        setOpacity(parentItem()->opacity());
 }
 
+/*
 void FlowerLayer::onApplicationStateChanged()
 {
     if (QGuiApplication::applicationState() == Qt::ApplicationActive) {
         if (!qFuzzyIsNull(m_opacity)
                 && (parentItem() && !qFuzzyIsNull(parentItem()->opacity()))
                 && !m_timer->isActive()) {
-            m_timer->start(CT_FLOWER_TICKS);
+//            m_timer->start(CT_FLOWER_TICKS);
         }
     } else {
-        m_timer->stop();
+//        m_timer->stop();
     }
 }
+*/
 
 void FlowerLayer::paint(QPainter * painter)
 {
@@ -138,9 +148,9 @@ void FlowerLayer::paintFrame()
 {
     m_frameImage->fill(0);
 
-    qreal parentOpacity = parentItem() ? parentItem()->opacity() : 0.0;
-    if (qFuzzyIsNull(parentOpacity))
-        return;
+//    qreal parentOpacity = parentItem() ? parentItem()->opacity() : 0.0;
+//    if (qFuzzyIsNull(parentOpacity))
+//        return;
 
     for (int x = 0; x < m_bounds.width(); ++x)
         for (int y = 0; y < m_bounds.height(); ++y) {
@@ -154,11 +164,13 @@ void FlowerLayer::paintFrame()
                     && (sourceY >= 0 && sourceY < m_sourceSize)) {
 
                 quint32 pix = m_sourceImage->pixel(sourceX, sourceY);
-                quint8 alpha = (pix >> 24) & 0xff;
-                if (alpha > 0) {
-                    pix = (pix & 0xffffff) | (qRound(parentOpacity * qreal(alpha)) << 24);
-                    m_frameImage->setPixel(x, y, pix);
-                }
+                m_frameImage->setPixel(x, y, pix);
+
+//                quint8 alpha = (pix >> 24) & 0xff;
+//                if (alpha > 0) {
+//                    pix = (pix & 0xffffff) | (qRound(parentOpacity * qreal(alpha)) << 24);
+//                    m_frameImage->setPixel(x, y, pix);
+//                }
             }
         }
 }

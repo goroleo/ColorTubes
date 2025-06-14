@@ -40,6 +40,7 @@ SOURCES += \
     src/game.cpp
 
 DISTFILES += \
+    qml/pages/SettingsPage.qml \
     rpm/com.me.legoru.ColorTubes.spec \
     qml/com.me.legoru.ColorTubes.qml \
     qml/cover/CoverPage.qml \
@@ -91,3 +92,6 @@ QT += \
     svg \
     quick
 
+APP_VERSION=$$VERSION-$$RELEASE
+unix:DEFINES += APP_VERSION=\\\"$$APP_VERSION\\\"
+win32:DEFINES += APP_VERSION=\"$$APP_VERSION\"

@@ -20,7 +20,7 @@ public:
 
 private slots:
     void         onParentOpacityChanged();
-    void         onApplicationStateChanged();
+//    void         onApplicationStateChanged();
 
 private:
     QSvgRenderer * m_source;
@@ -32,7 +32,7 @@ private:
     void         setOpacity(qreal newOpacity);
     void         applyOpacity();
 
-    qreal        m_angle;
+    qreal        m_angle=0.0;
     qreal        m_sectorAngle = CT_DEG2RAD * 20.0;
 
     void         nextFrame();
@@ -44,8 +44,8 @@ private:
     int          m_sourceCenter;
     QRect        m_bounds;
     QPoint       m_shift;
-    qreal        m_sin;
-    qreal        m_cos;
+    qreal        m_sin = qSin(m_angle);
+    qreal        m_cos = qCos(m_angle);
     bool         m_parentConnected = false;
 };
 

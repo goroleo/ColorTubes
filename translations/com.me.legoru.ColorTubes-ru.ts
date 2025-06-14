@@ -17,11 +17,15 @@
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Замечания, вопросы и пожелания: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Замечания, вопросы и пожелания: legoru@mail.ru</translation>
     </message>
     <message>
         <source>#aboutText3</source>
         <translation>© Lionet Entertainment, 2025</translation>
+    </message>
+    <message>
+        <source>#version</source>
+        <translation>Версия</translation>
     </message>
 </context>
 <context>
@@ -54,7 +58,7 @@
     </message>
     <message>
         <source>#wantToStartAssistMode</source>
-        <translation>Поиск решения успешно завершён.&lt;br&gt;Вы хотите перейти в режим помощника?</translation>
+        <translation>Есть решение игры.&lt;br&gt;Вы хотите перейти в режим помощника?</translation>
     </message>
     <message>
         <source>#solutionIsNotFound</source>
@@ -82,6 +86,73 @@
     <message>
         <source>#ColorTubes</source>
         <translation>Цветные пробирки</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>#wantToResetGamePlay</source>
+        <translation>Вы хотите сбросить игровой прогресс и начать игру с первого уровня?&lt;br&gt;Эту операцию будет невозможно отметить.</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <source>Game settings</source>
+        <translation>Настройки игры</translation>
+    </message>
+    <message>
+        <source>Screen orientation</source>
+        <translation>Ориентация экрана</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation>Как в системе</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>Портретный режим</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>Ландшафтный режим</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation>Внешний вид</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Тёмный</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Светлый</translation>
+    </message>
+    <message>
+        <source>Others</source>
+        <translation>Разное</translation>
+    </message>
+    <message>
+        <source>Reset gameplay...</source>
+        <translation>Сбросить игровой процесс...</translation>
+    </message>
+    <message>
+        <source>About...</source>
+        <translation>О программе...</translation>
+    </message>
+    <message>
+        <source>Undo button</source>
+        <translation>Кнопка Назад отменяет...</translation>
+    </message>
+    <message>
+        <source>#oneMove</source>
+        <translation>один ход</translation>
+    </message>
+    <message>
+        <source>#untilSolve</source>
+        <translation>несколько ходов до решаемой позиции</translation>
     </message>
 </context>
 </TS>

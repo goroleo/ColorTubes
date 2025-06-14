@@ -69,10 +69,13 @@ private:
 
     void      initialize();
     static    CtImages * m_instance;
+    void      onThemeChanged();
 
     void      scaleVertices();
     QRectF    scaleRect (QRectF rect);
     void      renderImages();
+
+    bool      m_busy = false;
 
     qreal     m_scale = 1.0;
     QSvgRenderer * m_tubeSource;

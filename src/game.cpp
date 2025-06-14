@@ -3,6 +3,7 @@
 
 #include "src/ctglobal.h"
 #include "src/ctio.h"
+#include "src/ctimages.h"
 #include "core/boardmodel.h"
 #include "core/tubemodel.h"
 #include "core/jctlformat.h"
@@ -10,6 +11,7 @@
 #include "core/options.h"
 #include "core/solver.h"
 #include "core/usedcolors.h"
+#include "ctpalette.h"
 
 Game * Game::m_instance = nullptr;
 
@@ -44,8 +46,8 @@ Game& Game::instance()
     if (m_instance == nullptr) {
         qDebug() << "Creating game.";
         m_instance = new Game();
-        CtGlobal::create();
         m_instance->initialize();
+        CtGlobal::create();
     }
     return *m_instance;
 }
@@ -181,11 +183,10 @@ void Game::newLevel()
         filledTubes = 9;
         emptyTubes = 2;
     } else {
-//        qDebug() << "level" << levelNumber << "% 50" << (levelNumber % 50) << "& 1" << (levelNumber & 1);
-//        if ((levelNumber % 50) == 0) {
-//            filledTubes = 13;
-//            emptyTubes = 2;
-//        } else
+        if ((levelNumber % 20) == 0) {
+            filledTubes = 13;
+            emptyTubes = 2;
+        } else
         if (levelNumber & 1) {
             filledTubes = 9;
             emptyTubes = 2;
@@ -203,7 +204,6 @@ void Game::newLevel()
     emit movesChanged();
     saveTemporary();
 }
-
 
 MoveItem * Game::currentMove()
 {
@@ -277,9 +277,24 @@ void Game::undoMove()
     }
 }
 
+void Game::undoUntilSolvable()
+{
+    Solver solver;
+    solver.start(m_board);
+    int counter = 0;
+
+    do {
+        undoMove();
+        counter ++;
+        solver.start(m_board);
+    } while (solver.result() != CT_SOLVER_SUCCESS);
+
+    qDebug() << counter << "move(s) where undone";
+}
+
 void Game::startAgain()
 {
-    while (movesMade()) {
+    while (m_movesDone > 0) {
         MoveItem * move = currentMove();
         if (move) {
             for (int i = 0; i < move->count(); ++i) {
@@ -326,7 +341,7 @@ void Game::solve()
 
 void Game::startAssistMode()
 {
-    // all calculated moves will be stored before!
+    // all calculated moves have to be stored before!
     m_gameMode = CT_ASSIST_MODE;
     emit modeChanged();
 }
@@ -339,3 +354,92 @@ void Game::endAssistMode()
         m_moves->removeLast();
     emit movesChanged();
 }
+
+bool Game::isLightTheme()
+{
+    return (m_options->theme == 0 && m_lightTheme) || m_options->theme == 2;
+}
+
+void Game::setLightTheme(bool lightTheme)
+{
+    if (m_lightTheme == lightTheme)
+        return;
+    m_lightTheme = lightTheme;
+    CtGlobal::palette().setDefault();
+    emit themeChanged();
+    emit refreshNeeded();
+}
+
+bool Game::isSystemTheme()
+{
+    return m_options->theme == 0;
+}
+
+void Game::setTheme(int mode)
+{
+    qDebug() << "Set theme:" << mode;
+
+    if (mode == 0 || mode == 2)
+        m_options->theme = mode;
+    else
+        m_options->theme = 1;
+
+    m_options->save();
+    emit themeChanged();
+    emit refreshNeeded();
+}
+
+bool Game::isSystemOrientation()
+{
+    return m_options->orientation == 0;
+}
+
+bool Game::isPortraitOrientation()
+{
+    return m_options->orientation == 1;
+}
+
+void Game::setOrientation(int mode)
+{
+    if (mode == 0 || mode == 2)
+        m_options->orientation = mode;
+    else
+        m_options->orientation = 1;
+
+    m_options->save();
+    qDebug() << "set orientation:" << m_options->orientation;
+    emit orientationChanged();
+    emit refreshNeeded();
+}
+
+void Game::setUndoMode(int mode)
+{
+    if (m_options->undoMode == quint32(mode))
+        return;
+
+    if (mode == 1)
+        m_options->undoMode = 1;
+    else
+        m_options->undoMode = 0;
+
+    m_options->save();
+    qDebug() << "set undoMode:" << m_options->undoMode;
+    emit undoModeChanged();
+}
+
+bool Game::isUndoUntilSolvable()
+{
+    return m_options->undoMode == 1;
+}
+
+void Game::resetGameplay()
+{
+    removeTemporary();
+    m_board->clear();
+    m_options->level = 0;
+    m_options->save();
+    newLevel();
+    qDebug() << "The game will start from the first level";
+    emit refreshNeeded();
+}
+

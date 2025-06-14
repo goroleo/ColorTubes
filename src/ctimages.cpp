@@ -4,9 +4,11 @@
 #include <QPainter>
 #include <QDebug>
 #include <QJsonObject>
+#include <QGuiApplication>
 
 #include "ctglobal.h"
 #include "ctio.h"
+#include "game.h"
 
 CtImages * CtImages::m_instance = nullptr;
 
@@ -75,6 +77,9 @@ void CtImages::initialize()
     m_tiltAngles = new qreal[(CT_TUBE_STEPS_POUR * 4) + 1];
     anglesExist = false;
 
+    QObject::connect(&CtGlobal::game(), &Game::themeChanged,
+                     this, &CtImages::onThemeChanged);
+
     scaleVertices();
     renderImages();
 }
@@ -82,10 +87,15 @@ void CtImages::initialize()
 void CtImages::setScale(qreal value)
 {
     if (!qFuzzyCompare(m_scale, value)) {
+        while (m_busy)
+            QGuiApplication::processEvents();
+
+        m_busy = true;
         m_scale = value;
         scaleVertices();
         renderImages();
         emit scaleChanged(m_scale);
+        m_busy = false;
     }
     if (!anglesExist)
         if (!loadTiltAngles()) {
@@ -149,6 +159,11 @@ QRectF CtImages::colorRect(quint8 index)
             m_vertices[3].y() - m_colorHeight * (index+1),
             m_colorWidth,
             m_colorHeight);
+}
+
+void CtImages::onThemeChanged()
+{
+    renderImages();
 }
 
 void CtImages::renderImages()

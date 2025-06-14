@@ -103,8 +103,10 @@ void GameBoard::rescale()
 
     if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(CtGlobal::images().scale(), newScale)) {
         CtGlobal::images().setScale(newScale);
+        showMove();
     } else {
         placeTubes();
+        showMove();
     }
 }
 
@@ -206,7 +208,8 @@ void GameBoard::clickTube(TubeItem * tube)
                         m_arrowIn->connectedTube()->setShadeBlinked(true);
                     m_arrowIn->startBlink();
                 } else {
-                    emit CtGlobal::game().assistModeError();
+                    if (CtGlobal::game().level() != 1)
+                        emit CtGlobal::game().assistModeError();
                     return;
                 }
             }
@@ -237,7 +240,8 @@ void GameBoard::clickTube(TubeItem * tube)
                         m_arrowOut->connectedTube()->hideShadeImmediately();
                     hideMove();
                 } else {
-                    emit CtGlobal::game().assistModeError();
+                    if (CtGlobal::game().level() != 1)
+                        emit CtGlobal::game().assistModeError();
                     return;
                 }
             }
@@ -254,7 +258,8 @@ void GameBoard::clickTube(TubeItem * tube)
                         m_arrowIn->connectedTube()->setShadeBlinked(true);
                     m_arrowIn->startBlink();
                 } else {
-                    emit CtGlobal::game().assistModeError();
+                    if (CtGlobal::game().level() != 1)
+                        emit CtGlobal::game().assistModeError();
                     return;
                 }
             }
