@@ -1,15 +1,15 @@
 # ColorTubes
-for AuroraOS 4 & AuroraOS 5
+The one of classic games made for AuroraOS 4 & AuroraOS 5
 
 # version 0.9 release 5
 Settings page:
 * Portrait/Landscape/System mode
 * Dark/Light/System theme
 * Undo button: the ability to undo several moves until a solution is possible
-* Button to reset gamplay and start again from the first level
+* Button to reset gameplay and start again from the first level
+
+Minor update of animation
 
 # Compiling
-Все различие в компиляции для А4 и А5 - только в файле .desktop.
-Раскомментируйте соответствующую секцию, я их подисал.
-
-
+A .desktop file is differ only when compiling for AuroraOS 4 and AuroraOS 5. 
+You just need to uncomment the proper section.
