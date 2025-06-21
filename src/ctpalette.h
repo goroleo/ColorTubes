@@ -16,6 +16,7 @@ public:
     void   setColor(int index, quint32 rgb);
 
     void   setDefault();
+    void   setDefault(bool lightTheme);
     bool   load();
     bool   save();
 

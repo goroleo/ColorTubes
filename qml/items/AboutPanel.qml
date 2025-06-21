@@ -1,12 +1,15 @@
 ﻿import QtQuick 2.6
 import Sailfish.Silica 1.0
+import Game 1.0
 
 Rectangle {
     id: aboutPanel
 
     signal closed
 
-    property color dialogColor: "#1c1127"
+    property color dialogColor: Game.isLightTheme? "#e3eed8" : "#1c1127"
+    property color textColor: Game.isLightTheme? Theme.darkPrimaryColor : Theme.lightPrimaryColor
+    readonly property int dialogWidth: Math.min(width, height)
 
     width: parent.width
     height: parent.height
@@ -34,13 +37,13 @@ Rectangle {
         id: msgBox
 
         radius: Theme.horizontalPageMargin
-        width: parent.width - Theme.paddingLarge * 2
+        width: dialogWidth - Theme.paddingLarge * 2
         height: Theme.horizontalPageMargin * 2 + Theme.paddingLarge * 4
                 + msgButton.height + msgTextArea.height + msgCaptionArea.height
         anchors.centerIn: parent
         gradient: Gradient {
             GradientStop { position: 0.0; color: Theme.highlightBackgroundColor }
-            GradientStop { position: Theme.paddingLarge * 3 / height; color: dialogColor }
+            GradientStop { position: Theme.paddingLarge / msgBox.height; color: dialogColor }
             GradientStop { position: 1.0; color: dialogColor }
         }
 
@@ -97,7 +100,7 @@ Rectangle {
                         source: "image://theme/icon-m-cancel"
                         anchors.centerIn: parent
                         opacity: enabled? 1.0 : Theme.opacityLow
-                        color: Theme.lightPrimaryColor
+                        color: textColor
                         highlightColor: Theme.highlightColor
                     }
 
@@ -130,15 +133,25 @@ Rectangle {
                         id: abText1
                         text: qsTr("#aboutText1")
                         wrapMode: Text.WordWrap
-                        color: Theme.lightPrimaryColor
+                        color: textColor
                         horizontalAlignment: Text.AlignHCenter
                         width: parent.width
                     }
                     Text {
+                        id: verText
+                        text: qsTr("#version") + " " + version
+                        wrapMode: Text.WordWrap
+                        color: Theme.rgba(textColor, 0.75)
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        font.pointSize: Theme.fontSizeTinyBase
+                    }
+
+                    Text {
                         id: abText2
                         text: qsTr("#aboutText2")
                         wrapMode: Text.WordWrap
-                        color: Theme.rgba(Theme.lightPrimaryColor, 0.75)
+                        color: Theme.rgba(textColor, 0.75)
                         horizontalAlignment: Text.AlignHCenter
                         width: parent.width
                         font.pointSize: Theme.fontSizeTinyBase
@@ -147,7 +160,7 @@ Rectangle {
                         id: abText3
                         text: qsTr("#aboutText3")
                         wrapMode: Text.WordWrap
-                        color: Theme.rgba(Theme.lightPrimaryColor, 0.75)
+                        color: Theme.rgba(textColor, 0.75)
                         horizontalAlignment: Text.AlignHCenter
                         width: parent.width
                         font.pointSize: Theme.fontSizeTinyBase
@@ -171,7 +184,8 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 text: qsTr("Ok")
-                color: Theme.darkPrimaryColor
+                color: Game.isLightTheme? Theme.lightPrimaryColor : Theme.darkPrimaryColor
+//                color: Theme.darkPrimaryColor
                 backgroundColor: Theme.highlightBackgroundColor
                 onClicked: {
                     console.log("Message button pressed")

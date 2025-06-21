@@ -175,7 +175,7 @@ void TubeItem::onTubeStateChanged()
 
     if (m_closed) {
         qDebug() << "Closed tube" << m_board->indexOf(this);
-        CtGlobal::game().checkSolved();
+//      CtGlobal::game().checkSolved();
     }
 }
 

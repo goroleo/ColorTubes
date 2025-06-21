@@ -13,7 +13,6 @@ class GameBoard : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
-
     friend class TubeItem;
 
 public:
@@ -62,6 +61,7 @@ private:
     void         childrenZChanged();
     bool         busy() { return m_busy; };
     bool         m_busy;
+
 };
 
 #endif // GAMEBOARD_H

@@ -147,7 +147,7 @@ void ArrowItem::startBlink()
     m_visible = true;
     m_strokeOpacity = 0.0;
     m_opacityIncrement = 1.0 / qreal(CT_SHADE_STEPS_INC);
-    m_strokeTimer->start(CT_TIMER_BLINK_TICKS);
+    m_strokeTimer->start(CT_BLINK_TICKS);
 }
 
 void ArrowItem::stopBlink()

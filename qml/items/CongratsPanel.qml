@@ -6,6 +6,8 @@ Rectangle {
     id: congratsPanel
     signal clicked
 
+    readonly property int dialogWidth: Math.min(width, height)
+
     width: parent.width
     height: parent.height
     color: Theme.rgba(Theme.highlightBackgroundColor, 0.2)
@@ -14,20 +16,20 @@ Rectangle {
     Behavior on opacity {
         NumberAnimation {
             duration: 200
-            easing.type: Easing.InOutQuad
+            easing.type: Easing.Linear
         }
     }
 
     FlowerLayer {
         id: congratsFlower
         anchors.fill: parent
-        opacity: 0.5
+        opacity: 0.8
     }
 
     Rectangle {
         id: congratsText
         color: "#00000000"
-        width: parent.width
+        width: dialogWidth
         height: ( width / badge.sourceSize.width ) * badge.sourceSize.height
         anchors.centerIn: parent
 
@@ -35,7 +37,7 @@ Rectangle {
         Behavior on scale {
             NumberAnimation {
                 duration: 200
-                easing.type: Easing.OutBack
+                easing.type: Easing.InOutQuad
             }
         }
 

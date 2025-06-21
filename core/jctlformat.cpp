@@ -125,7 +125,7 @@ quint32 JctlFormat::crcVersion3(QByteArray &buffer, quint32 length)
 
 bool JctlFormat::write(QByteArray &bufferTo)
 {
-    return write(bufferTo, 2);
+    return write(bufferTo, 3);
 }
 
 bool JctlFormat::write(QByteArray &bufferTo, quint32 formatVersion)
@@ -258,7 +258,9 @@ bool JctlFormat::read(QByteArray &bufferFrom)
                 m_movesDone = 0;
             }
         }
-        result = m_fileSize == size();
+        result = ((m_gameMode == CT_PLAY_MODE)
+                  || (m_gameMode == CT_ASSIST_MODE))
+                && (m_fileSize == size());
     }
 
     if (result) {

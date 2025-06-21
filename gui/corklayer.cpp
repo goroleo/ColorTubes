@@ -99,6 +99,8 @@ void CorkLayer::onScaleChanged()
 
     m_drawImage.fill(0x00ffffff);
     paintFrame();
+    m_currentY = - CtGlobal::images().shiftHeight()
+            + CtGlobal::images().shiftHeight() * 2 * exp(-0.5 * (1 - m_opacity));
     update();
 }
 

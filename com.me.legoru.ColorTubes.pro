@@ -12,7 +12,7 @@
 TARGET = com.me.legoru.ColorTubes
 
 CONFIG += \
-    sailfishapp
+    auroraapp
 
 PKGCONFIG += \
 
@@ -40,6 +40,7 @@ SOURCES += \
     src/game.cpp
 
 DISTFILES += \
+    qml/pages/SettingsPage.qml \
     rpm/com.me.legoru.ColorTubes.spec \
     qml/com.me.legoru.ColorTubes.qml \
     qml/cover/CoverPage.qml \
@@ -51,17 +52,15 @@ DISTFILES += \
     translations/*.ts \
     com.me.legoru.ColorTubes.desktop
 
-SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
+AURORAAPP_ICONS = 86x86 108x108 128x128 172x172
 
 CONFIG += \
-    sailfishapp_i18n
+    auroraapp_i18n
 
 TRANSLATIONS += \
     translations/com.me.legoru.ColorTubes.ts \
     translations/com.me.legoru.ColorTubes-ru.ts \ 
-    translations/com.me.legoru.ColorTubes-tr.ts \
-    translations/com.me.legoru.ColorTubes-de.ts \
-    translations/com.me.legoru.ColorTubes-en.ts
+    translations/com.me.legoru.ColorTubes-tr.ts 
 
 HEADERS += \
     core/boardmodel.h \
@@ -94,3 +93,7 @@ QT += \
     quick
 
 DEFINES += SAILFISH_OS
+
+APP_VERSION=$$VERSION-$$RELEASE
+unix:DEFINES += APP_VERSION=\\\"$$APP_VERSION\\\"
+win32:DEFINES += APP_VERSION=\"$$APP_VERSION\"

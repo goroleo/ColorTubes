@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
         QScopedPointer<QQuickView> view(Application::createView());
         view->setSource(Application::pathToMainQml());
     #endif
+    view->rootContext()->setContextProperty("version", APP_VERSION);
 
     view->showFullScreen();
     return app->exec();

@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Замечания, вопросы и пожелания: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Замечания, вопросы и пожелания: legoru@mail.ru</translation>
     </message>
     <message>
         <source>#aboutText3</source>
@@ -26,6 +26,10 @@
     <message>
         <source>#aboutText4</source>
         <translation type="unfinished">Sailfish OS Adaption: Andreas Wüst</translation>
+    </message>
+    <message>
+        <source>#version</source>
+        <translation>Версия</translation>
     </message>
 </context>
 <context>

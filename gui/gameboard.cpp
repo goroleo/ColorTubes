@@ -78,7 +78,10 @@ void GameBoard::childrenZChanged()
     m_busy = (maxChildrenZ() != 0);
     if (oldBusy != m_busy) {
         emit busyChanged();
-        if (!m_busy) showMove();
+        if (!m_busy) {
+            showMove();
+            CtGlobal::game().checkSolved();
+        }
     }
 }
 
@@ -100,8 +103,10 @@ void GameBoard::rescale()
 
     if (!qFuzzyIsNull(newScale) && !qFuzzyCompare(CtGlobal::images().scale(), newScale)) {
         CtGlobal::images().setScale(newScale);
+        showMove();
     } else {
         placeTubes();
+        showMove();
     }
 }
 
@@ -203,7 +208,8 @@ void GameBoard::clickTube(TubeItem * tube)
                         m_arrowIn->connectedTube()->setShadeBlinked(true);
                     m_arrowIn->startBlink();
                 } else {
-                    emit CtGlobal::game().assistModeError();
+                    if (CtGlobal::game().level() != 1)
+                        emit CtGlobal::game().assistModeError();
                     return;
                 }
             }
@@ -234,7 +240,8 @@ void GameBoard::clickTube(TubeItem * tube)
                         m_arrowOut->connectedTube()->hideShadeImmediately();
                     hideMove();
                 } else {
-                    emit CtGlobal::game().assistModeError();
+                    if (CtGlobal::game().level() != 1)
+                        emit CtGlobal::game().assistModeError();
                     return;
                 }
             }
@@ -251,7 +258,8 @@ void GameBoard::clickTube(TubeItem * tube)
                         m_arrowIn->connectedTube()->setShadeBlinked(true);
                     m_arrowIn->startBlink();
                 } else {
-                    emit CtGlobal::game().assistModeError();
+                    if (CtGlobal::game().level() != 1)
+                        emit CtGlobal::game().assistModeError();
                     return;
                 }
             }

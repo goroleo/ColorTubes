@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Her türlü yorum, soru ve önerileriniz için: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Her türlü yorum, soru ve önerileriniz için: legoru@mail.ru</translation>
     </message>
     <message>
         <source>#aboutText3</source>
@@ -22,6 +22,10 @@
     <message>
         <source>Ok</source>
         <translation>Tamam</translation>
+    </message>
+    <message>
+        <source>#version</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>#aboutText4</source>
@@ -86,6 +90,73 @@
     <message>
         <source>Ok</source>
         <translation>Tamam</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>#wantToResetGamePlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Evet</translation>
+    </message>
+    <message>
+        <source>Game settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset gameplay...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undo button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>#oneMove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>#untilSolve</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

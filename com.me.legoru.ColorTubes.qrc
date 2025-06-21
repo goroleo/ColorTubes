@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>img/arrows.svg</file>
         <file>img/badge.svg</file>
-        <file>img/bg.png</file>
+        <file>img/bg-dark.png</file>
         <file>img/flower.svg</file>
         <file>img/icon-cover.png</file>
         <file>img/icon-dice.svg</file>
@@ -10,5 +10,6 @@
         <file>img/icon-star.svg</file>
         <file>img/icon-undo.svg</file>
         <file>img/tube.svg</file>
+        <file>img/bg-light.png</file>
     </qresource>
 </RCC>

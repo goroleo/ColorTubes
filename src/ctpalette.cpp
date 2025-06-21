@@ -6,6 +6,7 @@
 
 #include "ctglobal.h"
 #include "ctio.h"
+#include "game.h"
 
 CtPalette * CtPalette::m_instance = nullptr;
 
@@ -63,23 +64,49 @@ void CtPalette::setColor(int index, quint32 rgb)
 
 void CtPalette::setDefault()
 {
-    qDebug() << "Using default palette.";
-    m_items[0]  = 0xff38ff4d;
-    m_items[1]  = 0xff1dd3f4;
-    m_items[2]  = 0xff884822;
-    m_items[3]  = 0xff8eaf00;
-    m_items[4]  = 0xff737f8c;
-    m_items[5]  = 0xff067606;
-    m_items[6]  = 0xff3632de;
-    m_items[7]  = 0xfff36d00;
-    m_items[8]  = 0xffaf008f;
-    m_items[9]  = 0xffe60f04;
-    m_items[10] = 0xffff7abc;
-    m_items[11] = 0xffffeb04;
+    setDefault(CtGlobal::game().isLightTheme());
+}
+
+void CtPalette::setDefault(bool lightTheme)
+{
+    if (lightTheme) {
+        qDebug() << "Using light theme palette.";
+        m_items[0]  = 0xff4aaf50;
+        m_items[1]  = 0xff1ebcef;
+        m_items[2]  = 0xff915133;
+        m_items[3]  = 0xffb4cc04;
+        m_items[4]  = 0xffadabac;
+        m_items[5]  = 0xff007762;
+        m_items[6]  = 0xff0072ba;
+        m_items[7]  = 0xffef8700;
+        m_items[8]  = 0xff943e90;
+        m_items[9]  = 0xffd51317;
+        m_items[10] = 0xffee7bae;
+        m_items[11] = 0xffffdd00;
+        m_items[12] = 0xffcc66ff;
+    } else {
+        qDebug() << "Using dark theme palette.";
+        m_items[0]  = 0xff38ff4d;
+        m_items[1]  = 0xff1dd3f4;
+        m_items[2]  = 0xff884822;
+        m_items[3]  = 0xff8eaf00;
+        m_items[4]  = 0xff737f8c;
+        m_items[5]  = 0xff067606;
+        m_items[6]  = 0xff3934f9;
+        m_items[7]  = 0xfff36d00;
+        m_items[8]  = 0xffaf008f;
+        m_items[9]  = 0xffe60f04;
+        m_items[10] = 0xffff7abc;
+        m_items[11] = 0xffffeb04;
+        m_items[12] = 0xffcc66ff;
+    }
 }
 
 bool CtPalette::load()
 {
+
+    /*
+
     QJsonObject jObj;
 
     if (!CtGlobal::io().loadJson(CtGlobal::paletteFileName(), jObj))
@@ -118,10 +145,17 @@ bool CtPalette::load()
     if (result)
         qDebug() << "Palette loaded from" << CtGlobal::paletteFileName();
     return result;
+
+    */
+
+    return false;
 }
 
 bool CtPalette::save()
 {
+    /* no need to save
+
+
     // creates json
     QJsonObject jItem;
     QJsonObject jObj;
@@ -138,5 +172,9 @@ bool CtPalette::save()
     // save
     qDebug() << "Palette saves to" << CtGlobal::paletteFileName();
     return CtGlobal::io().saveJson(CtGlobal::paletteFileName(), jObj);
+
+    */
+
+    return true;
 }
 

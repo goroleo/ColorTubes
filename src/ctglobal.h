@@ -14,29 +14,33 @@ static const qreal   CT_DEG2RAD          = M_PI / 180.0; // degrees to radians
 static const qreal   CT_RAD2DEG          = 180.0 / M_PI; // radians to degrees
 
 // ------------- number of colors in the game
-static const quint8  CT_NUMBER_OF_COLORS = 12;           // don't forget to change palette!
+static const quint8  CT_NUMBER_OF_COLORS = 13;           // don't forget to change palette!
 
 // ------------- game modes  //  PLAY and ASSIST modes are using in this app only
-static const quint32 CT_END_GAME         = 0;
-static const quint32 CT_FILL_MODE        = 100;
+// static const quint32 CT_END_GAME      = 0;
+static const quint32 CT_FILL_MODE        = 100;          // unsupported here. It was used at PC version when MANUAL FILL was realized
 static const quint32 CT_PLAY_MODE        = 200;
 static const quint32 CT_ASSIST_MODE      = 300;
-static const quint32 CT_BUSY_MODE        = 400;
+// static const quint32 CT_BUSY_MODE     = 400;          // use GameBoard::busy() instead
 
 // ------------- tubes animation settings
-static const quint8  CT_TIMER_TICKS      = 5;            // ticks interval in milliseconds
-static const quint8  CT_TIMER_BLINK_TICKS = 10;          // ticks when blinking
+static const quint8  CT_TIMER_TICKS      = 10;           // ticks interval in milliseconds
+static const quint8  CT_BLINK_TICKS      = 30;           // timer ticks when blinking
 static const quint8  CT_TUBE_STEPS_UP    = 3;            // steps to move tube up
 static const quint8  CT_TUBE_STEPS_DOWN  = 5;            // steps to move tube down
 static const quint8  CT_TUBE_STEPS_FLY   = 10;           // steps to fly/move tube to another tube
 static const quint8  CT_TUBE_STEPS_POUR  = 18;           // steps to pour out one color cell
-static const quint8  CT_TUBE_STEPS_BACK  = 15;           // steps to fly/move tube back to its place
-static const quint8  CT_SHADE_STEPS_INC  = 10;           // steps to opacity increment when shade layer appears
+static const quint8  CT_TUBE_STEPS_BACK  = 10;           // steps to fly/move tube back to its place
+static const quint8  CT_SHADE_STEPS_INC  = 20;           // steps to opacity increment when shade layer appears
 static const quint8  CT_SHADE_STEPS_DEC  = 15;           // steps to opacity decrement when shade layer disappears
-static const quint8  CT_CORK_STEPS_INC   = 9;            // steps to opacity increment when cork layer appears
-static const quint8  CT_CORK_STEPS_DEC   = 9;            // steps to opacity decrement when cork layer disappears
-static const quint8  CT_ARROW_STEPS_INC  = 9;            // steps to opacity increment when arrow appears
-static const quint8  CT_ARROW_STEPS_DEC  = 7;            // steps to opacity decrement when arrow disappears
+static const quint8  CT_CORK_STEPS_INC   = 10;           // steps to opacity increment when cork layer appears
+static const quint8  CT_CORK_STEPS_DEC   = 8;            // steps to opacity decrement when cork layer disappears
+static const quint8  CT_ARROW_STEPS_INC  = 6;            // steps to opacity increment when arrow appears
+static const quint8  CT_ARROW_STEPS_DEC  = 5;            // steps to opacity decrement when arrow disappears
+
+// ------------- flower (CongratsPanel) animation settings
+static const quint8  CT_FLOWER_TICKS     = 10;               // ticks when flower rotates
+static const qreal   CT_FLOWER_ANGLE_INC = 2.0 * CT_DEG2RAD; // flower angle rotation per one tick
 
 // ------------- tubes animation stages
 static const quint8  CT_STAGE_DEFAULT    = 0;            // tube is at its regular position
@@ -89,6 +93,7 @@ namespace CtGlobal
 
     // colors
     QColor       paletteColor(quint8 colorIndex);
+    bool         isLightTheme();
 
     // service
     quint32      crc32Table(int index);

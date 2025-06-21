@@ -270,6 +270,9 @@ void BoardModel::randomFill(int fillTubes, int emptyTubes)
         for (int i = 0; i < fillTubes + emptyTubes; ++i)
             addNewTube();
 
+//        if (fillTubes < 13)
+//            CtGlobal::game().usedColors()->setUsed(13, 4);
+
         for (int i = 0; i < fillTubes; ++i) {
             for (int c = m_tubes->at(i)->count(); c < 4; ++c) {
                 quint8 clr = CtGlobal::game().usedColors()->getRandomColor();
