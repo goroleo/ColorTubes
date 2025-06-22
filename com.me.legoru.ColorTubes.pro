@@ -12,7 +12,7 @@
 TARGET = com.me.legoru.ColorTubes
 
 CONFIG += \
-    auroraapp
+    sailfishapp
 
 PKGCONFIG += \
 
@@ -52,14 +52,16 @@ DISTFILES += \
     translations/*.ts \
     com.me.legoru.ColorTubes.desktop
 
-AURORAAPP_ICONS = 86x86 108x108 128x128 172x172
+SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
 CONFIG += \
-    auroraapp_i18n
+    sailfishapp_i18n
 
 TRANSLATIONS += \
     translations/com.me.legoru.ColorTubes.ts \
-    translations/com.me.legoru.ColorTubes-ru.ts \ 
+    translations/com.me.legoru.ColorTubes-ru.ts \
+    translations/com.me.legoru.ColorTubes-de.ts \
+    translations/com.me.legoru.ColorTubes-sv.ts \
     translations/com.me.legoru.ColorTubes-tr.ts 
 
 HEADERS += \

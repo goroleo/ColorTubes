@@ -17,11 +17,15 @@
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Any issues, requests or suggests: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Any issues, requests or suggests: legoru@mail.ru</translation>
     </message>
     <message>
         <source>#aboutText3</source>
         <translation>© Lionet Entertainment, 2025</translation>
+    </message>
+    <message>
+        <source>#version</source>
+        <translation>Version</translation>
     </message>
     <message>
         <source>#aboutText4</source>
@@ -86,6 +90,73 @@
     <message>
         <source>#ColorTubes</source>
         <translation>Color Tubes</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>#wantToResetGamePlay</source>
+        <translation>Do you want to reset all progress and start again from the first level?&lt;br&gt;This operation cannot be undone.</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Yes</translation>
+    </message>
+    <message>
+        <source>Game settings</source>
+        <translation>Game settings</translation>
+    </message>
+    <message>
+        <source>Screen orientation</source>
+        <translation>Screen orientation</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation>Like in the system</translation>
+    </message>
+    <message>
+        <source>Portrait</source>
+        <translation>Portrait</translation>
+    </message>
+    <message>
+        <source>Landscape</source>
+        <translation>Landscape</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation>Appearance</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Dark</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Light</translation>
+    </message>
+    <message>
+        <source>Others</source>
+        <translation>Others</translation>
+    </message>
+    <message>
+        <source>Reset gameplay...</source>
+        <translation>Reset gameplay...</translation>
+    </message>
+    <message>
+        <source>About...</source>
+        <translation>About...</translation>
+    </message>
+    <message>
+        <source>Undo button</source>
+        <translation>Undo button undoes...</translation>
+    </message>
+    <message>
+        <source>#oneMove</source>
+        <translation>one move</translation>
+    </message>
+    <message>
+        <source>#untilSolve</source>
+        <translation>some moves until a solution is possible</translation>
     </message>
 </context>
 </TS>

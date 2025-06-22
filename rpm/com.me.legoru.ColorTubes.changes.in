@@ -12,7 +12,13 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sun Apr 13 2014 Jack Tar <jack.tar@example.com> 0.0.1-1
-- Scrubbed the deck
-- Hoisted the sails
+* 09.04.2025 Andreas Wüst <andreas.wuest.freelancer@gmail.com> 0.9.0-5
+
+- Portrait/Landscape/System mode (upstream)
+- Dark/Light/System theme (upstream)
+- Undo button: the ability to undo several moves until a solution is possible (upstream)
+- Button to reset gameplay and start again from the first level (upstream)
+- added My Backup support
+- added Swedish translation
+
 

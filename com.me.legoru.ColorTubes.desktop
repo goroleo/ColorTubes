@@ -8,20 +8,11 @@ Name[en]=Color Tubes
 Name[ru]=Цветные пробирки
 Name[tr]=Renkli tüpler
 
-########################################################
-#           for AuroraOS 4
-# [X-Sailjail]
-# Permissions=
-# OrganizationName=com.me.legoru
-# ApplicationName=ColorTubes
-
-########################################################
-#           for AuroraOS 5
-[X-Application]
+[X-Sailjail]
 Permissions=
 OrganizationName=com.me.legoru
 ApplicationName=ColorTubes
 
-[X-Aurora-Application]
-Orientation=All
-IconMode=Crop
+[X-HarbourBackup]
+BackupPathList=.local/share/com.me.legoru/ColorTubes/
+BackupConfigList=/apps/ColorTubes/

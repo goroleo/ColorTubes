@@ -17,11 +17,19 @@
     </message>
     <message>
         <source>#aboutText2</source>
-        <translation>Any issues, requests or suggests: &lt;a href=&quot;mailto:legoru@mail.ru&quot;&gt;legoru@mail.ru&lt;/a&gt;</translation>
+        <translation>Any issues, requests or suggests: legoru@mail.ru</translation>
     </message>
     <message>
         <source>#aboutText3</source>
         <translation>© Lionet Entertainment, 2025</translation>
+    </message>
+    <message>
+        <source>#version</source>
+        <translation>Version</translation>
+    </message>
+    <message>
+        <source>#aboutText4</source>
+        <translation>Sailfish OS Adaption: Andreas Wüst</translation>
     </message>
 </context>
 <context>
